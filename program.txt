@@ -1,0 +1,6 @@
+var a : Integer is 42
+routine main() is
+   var b : Boolean is true
+   var c : Real is 1.234
+   a := 7
+end
