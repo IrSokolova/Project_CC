@@ -1,6 +1,6 @@
-var a : Integer is 42
 routine main() is
-   var b : Boolean is true
-   var c : Real is 1.234
-   a := 7
+   var x : Real is 2.5
+   for i in (2 + 3) loop
+       x := x + i
+   end
 end

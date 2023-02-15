@@ -35,6 +35,7 @@ public class LexicalAnal
                         @"^\s*(false|true)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
+                // TODO Add + -
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Operators, new Regex(
                         @"^\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\/])=?|(?:[\*\+\[-]=%]))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));

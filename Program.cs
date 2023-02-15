@@ -33,7 +33,7 @@ internal class Program
         List<Tuple<TokenTypes, string>> lexicalAnalysisResult = new List<Tuple<TokenTypes, string>>(); 
         foreach (string str in splitedText)
         {
-            text = str.Replace("\t", string.Empty);
+            text = str.Replace("\t", String.Empty);
             text = text.Replace("\n", String.Empty);
             text = text.Replace("\b", String.Empty);
             lexicalAnalysisResult.AddRange(lexicalAnal.SplitToTokens(text));
