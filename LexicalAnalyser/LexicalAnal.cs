@@ -28,7 +28,7 @@ public class LexicalAnal
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Keywords, new Regex(
-                        @"^\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine|array|return)(?![a-zA-Z0-9_])([\s\S]*)",
+                        @"^\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|return)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.BooleanLiterals, new Regex(
@@ -37,7 +37,7 @@ public class LexicalAnal
 
                 // TODO Add + -
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Operators, new Regex(
-                        @"^\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\/])=?|(?:[\*\+\[-]=%]))([\s\S]*)",
+                        @"^\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\/+*%-])=?|(?:[\*\+\[-]=%]))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Punctuators, new Regex(
@@ -65,19 +65,19 @@ public class LexicalAnal
                 foreach (string str in splitedText)
                 {
                         List<string> splitedStr = new List<string>();
-                        if (str.Contains("()"))
+                        if (str.Contains("()") || str.Contains("[]"))
                         {
                                 splitedStr.Add(str.Substring(0,str.Length - 2));
                                 splitedStr.Add(str[str.Length - 2].ToString());
                                 splitedStr.Add(str.Last().ToString());
                         }
-                        else if (str.Contains('('))
+                        else if (str.Contains('(') || str.Contains('['))
                         {
                                 splitedStr.Add(str[0].ToString());
                                 splitedStr.Add(str.Substring(1));
                                 
                         }
-                        else if (str.Contains(')'))
+                        else if (str.Contains(')') || str.Contains(']'))
                         {
                                 splitedStr.Add(str.Substring(0,str.Length - 1));
                                 splitedStr.Add(str.Last().ToString());
@@ -107,7 +107,6 @@ public class LexicalAnal
                         if (m.Success)
                         {
                                 Tuple<TokenTypes, string> resToken = new Tuple<TokenTypes, string>(token.Item1, str);
-                                // Console.WriteLine(resToken);
                                 return resToken;
                         }
                 }
