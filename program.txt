@@ -1,8 +1,7 @@
-routine main() is
+routine main () is
    var x : Real is 2.5
-   var n : Integer is 5
-   var y : array [1 n] of Char
-   for i in (2 3 +) loop
-       x := x - i
+   var y : Real is 8.1
+   while (x < y) loop
+       x := x + 1
    end
 end

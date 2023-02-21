@@ -22,22 +22,20 @@ public class LexicalAnal
         public List<Tuple<TokenTypes, string>> SplitToTokens(string text)
         {
                 List<Tuple<TokenTypes, string>> result = new List<Tuple<TokenTypes, string>>();
-                // string remainingText = Text;
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.DeclarationSeparators, new Regex(@"^\s*(;)([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Keywords, new Regex(
-                        @"^\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|return)(?![a-zA-Z0-9_])([\s\S]*)",
+                        @"^\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|return|to)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.BooleanLiterals, new Regex(
                         @"^\s*(false|true)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
-
-                // TODO Add + -
+                
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Operators, new Regex(
-                        @"^\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\/+*%-])=?|(?:[\*\+\[-]=%]))([\s\S]*)",
+                        @"^\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[=:><\/+*%-])=?)([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Punctuators, new Regex(
@@ -65,10 +63,10 @@ public class LexicalAnal
                 foreach (string str in splitedText)
                 {
                         List<string> splitedStr = new List<string>();
-                        if (str.Contains("()") || str.Contains("[]"))
+                        if (str.Contains('(') && str.Contains(')') || str.Contains('[') && str.Contains(']'))
                         {
-                                splitedStr.Add(str.Substring(0,str.Length - 2));
-                                splitedStr.Add(str[str.Length - 2].ToString());
+                                splitedStr.Add(str[0].ToString());
+                                splitedStr.Add(str.Substring(1, str.Length - 2));
                                 splitedStr.Add(str.Last().ToString());
                         }
                         else if (str.Contains('(') || str.Contains('['))

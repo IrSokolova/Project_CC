@@ -1,8 +1,6 @@
 ﻿using System.Text;
 using ConsoleApp1.LexicalAnalyser;
-using Tuple = System.Tuple;
 namespace DefaultNamespace;
-using System.Text.RegularExpressions;
 
 internal class Program 
 {
