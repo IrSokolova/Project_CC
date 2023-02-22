@@ -5,11 +5,11 @@ namespace ConsoleApp1.LexicalAnalyser;
 public enum TokenTypes
 {
         Undefined = 0,
-        DeclarationSeparators,
         Keywords,
         BooleanLiterals,
         Operators,
-        Punctuators,
+        OpenPunctuators,
+        ClosePunctuators,
         Identifiers,
         FloatingLiterals,
         IntegerLiterals
@@ -19,15 +19,10 @@ public class LexicalAnal
 {
         public List<Tuple<TokenTypes, Regex>> _Tokens = new List<Tuple<TokenTypes, Regex>>();
 
-        public List<Tuple<TokenTypes, string>> SplitToTokens(string text)
+        public void AddTokens()
         {
-                List<Tuple<TokenTypes, string>> result = new List<Tuple<TokenTypes, string>>();
-
-                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.DeclarationSeparators, new Regex(@"^\s*(;)([\s\S]*)",
-                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
-
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Keywords, new Regex(
-                        @"^\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|return|to)(?![a-zA-Z0-9_])([\s\S]*)",
+                        @"^\s*(var|is|end|in|reverse|while|for|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|return|to)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.BooleanLiterals, new Regex(
@@ -37,9 +32,13 @@ public class LexicalAnal
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Operators, new Regex(
                         @"^\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[=:><\/+*%-])=?)([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
+                
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.OpenPunctuators, new Regex(
+                        @"^\s*(\\.{1,2}|[\(\[])([\s\S]*)",
+                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
-                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Punctuators, new Regex(
-                        @"^\s*(\\.{1,2}|[\()\[\]:,])([\s\S]*)",
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.ClosePunctuators, new Regex(
+                        @"^\s*(\\.{1,2}|[\)\]])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Identifiers, new Regex(
@@ -57,6 +56,11 @@ public class LexicalAnal
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Undefined, new Regex(
                         @"^\s*(\S*)([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
+        }
+
+        public List<Tuple<TokenTypes, string>> SplitToTokens(string text)
+        {
+                List<Tuple<TokenTypes, string>> result = new List<Tuple<TokenTypes, string>>();
 
                 string[] splitedText = text.Split();
 

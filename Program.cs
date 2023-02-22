@@ -22,11 +22,11 @@ internal class Program
             }
  
             text = Encoding.UTF8.GetString(bytes);
-            Console.WriteLine(text);
         }
         string[] splitedText = text.Split('\n');
         
         LexicalAnal lexicalAnal = new LexicalAnal();
+        lexicalAnal.AddTokens();
         List<Tuple<TokenTypes, string>> lexicalAnalysisResult = new List<Tuple<TokenTypes, string>>();
         foreach (string str in splitedText)
         {
