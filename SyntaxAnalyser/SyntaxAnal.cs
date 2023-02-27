@@ -4,6 +4,10 @@ using DefaultNamespace;
 
 public class SyntaxAnal
 {
-    List<Tuple<TokenTypes, string>> lexicalAnalysis = 
-    
+    public List<Tuple<TokenTypes, string>> lexicalAnalysis;
+
+    public SyntaxAnal(List<Tuple<TokenTypes, string>> lexicalAnalysis)
+    {
+        this.lexicalAnalysis = lexicalAnalysis;
+    }
 }

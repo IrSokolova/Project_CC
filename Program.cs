@@ -43,6 +43,8 @@ internal class Program
                 Console.WriteLine(token);
             }
         }
+
+        SyntaxAnal syntaxAnal = new SyntaxAnal(lexicalAnalysis);
     }
 }
 
