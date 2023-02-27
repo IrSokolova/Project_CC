@@ -6,7 +6,7 @@ internal class Program
 {
     public static void Main(string[] args)
     {
-        string path = @"C:\Users\User\RiderProjects\Compiler Construction\СС_Project\program.txt";
+        string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt";
         string text = "";
  
         using (FileStream stream = File.OpenRead(path))
