@@ -1,6 +1,7 @@
+not
 function incr (num : Integer) : Integer is
     var result : Integer
-    result := num + 1
+    result := num / 1
     return result
 
 routine main () is
