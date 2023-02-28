@@ -15,6 +15,6 @@ public class TreeNode
         this.LexicalAnalysis = new Tuple<TokenTypes, string>(token, valueTokenized);
     }
     
-    pub
+    
 }
 

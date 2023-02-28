@@ -68,7 +68,7 @@ public class TypeDeclaration
         _type = type;
     }
 }
-
+    
 public class RoutineDeclaration
 {
     private Identifier _identifier;
@@ -143,6 +143,18 @@ public class Expression
     }
 }
 
+public class Expressions
+{
+    private Expression _expression;
+    private Expressions _expressions;
+
+    public Expressions(Expression expression, Expressions expressions)
+    {
+        _expression = expression;
+        _expressions = expressions;
+    }
+}
+
 public class Relation 
 {
     private Operation _operation;
@@ -151,19 +163,8 @@ public class Relation
 
 public class Operation // Simple
 {
-    
-}
-
-public class Comparison
-{
-    private Operator _operator; // (something before) less then...
-    private Operation _operation; // then the operation
-
-    public Comparison(Operator @operator, Operation operation)
-    {
-        _operator = @operator;
-        _operation = operation;
-    }
+    private Operator _operator;
+    private Operand _operand;
 }
 
 public class Operand // Summand
@@ -175,6 +176,18 @@ public class Operand // Summand
     {
         _single = single;
         _expression = expression;
+    }
+}
+
+public class Comparison
+{
+    private Operator _operator; // (something before) less then...
+    private Operation _operation; // then the operation
+
+    public Comparison(Operator @operator, Operation operation)
+    {
+        _operator = @operator;
+        _operation = operation;
     }
 }
 
@@ -211,11 +224,13 @@ public class Operator
 {
     private ComparisonOperator _comparisonOperator;
     private MathematicalOperator _mathematicalOperator;
+    private LogicalOperator _logicalOperator;  // maybe not needed
 
-    public Operator(ComparisonOperator comparisonOperator, MathematicalOperator mathematicalOperator)
+    public Operator(ComparisonOperator comparisonOperator, MathematicalOperator mathematicalOperator, LogicalOperator logicalOperator)
     {
         _comparisonOperator = comparisonOperator;
         _mathematicalOperator = mathematicalOperator;
+        _logicalOperator = logicalOperator;
     }
 }
 
@@ -239,37 +254,27 @@ public class MathematicalOperator
     }
 }
 
-struct Simple {
-    struct Factor* factor;
-    struct Factors* factors;
-    Simple(Factor* factor, Factors* factors):
-        factor(factor), factors(factors) {};
-};
+public class LogicalOperator
+{
+    private string _sign;
 
-struct Factor {
-    struct Summand* summand;
-    struct Summands* summands;
-    Factor(Summand* summand, Summands* summands):
-        summand(summand),
-    summands(summands) {};
-};
-
-struct Sign {
-    string op;
-    Sign(string op):
-        op(op) {};
-};
-
+    public LogicalOperator(string sign)
+    {
+        _sign = sign;
+    }
+}
 
 public class MultipleRelation
 {
+    private LogicalOperator _logicalOperator;
     private Relation _relation;
     private MultipleRelation _multipleRelation;
 
-    public MultipleRelation(Relation relation, MultipleRelation multipleRelation)
+    public MultipleRelation(Relation relation, MultipleRelation multipleRelation, LogicalOperator logicalOperator)
     {
         _relation = relation;
         _multipleRelation = multipleRelation;
+        _logicalOperator = logicalOperator;
     }
 }
 
@@ -397,169 +402,157 @@ public class Body
     }
 }
 
+public class Statement
+{
+    private Assignment _assignment;
+    private WhileLoop _whileLoop;
+    private ForLoop _forLoop;
+    private IfStatement _ifStatement;
+    private RoutineCall _routineCall;
 
+    public Statement(Assignment assignment, WhileLoop whileLoop, ForLoop forLoop, IfStatement ifStatement, RoutineCall routineCall)
+    {
+        _assignment = assignment;
+        _whileLoop = whileLoop;
+        _forLoop = forLoop;
+        _ifStatement = ifStatement;
+        _routineCall = routineCall;
+    }
+}
 
-struct Statement {
-    struct Assignment *assignment;
-    struct RoutineCall *routinecall;
-    struct WhileLoop *whileloop;
-    struct ForLoop *forloop;
-    struct IfStatement *ifstatement;
-    Statement(Assignment *assignment, RoutineCall *routinecall, WhileLoop *whileloop, ForLoop *forloop,
-              IfStatement *ifstatement):
-            assignment(assignment),
-            routinecall(routinecall),
-            whileloop(whileloop),
-            forloop(forloop),
-            ifstatement(ifstatement) {};
-};
+public class Assignment
+{
+    private Modifiable _modifiable;
+    private Expression _expression;
 
-struct Assignment {
-    struct ModifiablePrimary *modifiableprimary;
-    struct Expression *expression;
-    Assignment(ModifiablePrimary *modifiableprimary, Expression *expression):
-            modifiableprimary(modifiableprimary),
-            expression(expression) {};
-};
+    public Assignment(Modifiable modifiable, Expression expression)
+    {
+        _modifiable = modifiable;
+        _expression = expression;
+    }
+}
 
-struct RoutineCall {
-    string name;
-    struct ExpressionInRoutineCall *expressioninroutinecall;
-    RoutineCall(string name, ExpressionInRoutineCall *expressioninroutinecall):
-            name(name),
-            expressioninroutinecall(expressioninroutinecall) {};
-};
+public class RoutineCall 
+{
+    private Identifier _identifier;
+    private Expressions _expressions; // ExpressionInRoutineCall IS DELETED 
 
-struct ExpressionInRoutineCall {
-    struct Expression *expression;
-    struct ExpressionsInRoutineCall *expressionsinroutinecall;
-    ExpressionInRoutineCall(Expression *expression, ExpressionsInRoutineCall *expressionsinroutinecall):
-            expression(expression),
-            expressionsinroutinecall(expressionsinroutinecall) {};
-};
+    public RoutineCall(Identifier identifier, Expressions expressions)
+    {
+        _identifier = identifier;
+        _expressions = expressions;
+    }
+}
 
-struct ExpressionsInRoutineCall {
-    struct Expression *expression;
-    struct ExpressionsInRoutineCall *expressionsinroutinecall;
-    ExpressionsInRoutineCall(Expression *expression, ExpressionsInRoutineCall *expressionsinroutinecall):
-            expression(expression),
-            expressionsinroutinecall(expressionsinroutinecall) {};
-};
+public class WhileLoop
+{
+    private Expression _expression;
+    private Body _body;
 
-struct WhileLoop {
-    struct Expression *expression;
-    struct Body *body;
-    WhileLoop(Expression *expression, Body *body):
-            expression(expression),
-            body(body) {};
-};
+    public WhileLoop(Expression expression, Body body)
+    {
+        _expression = expression;
+        _body = body;
+    }
+}
 
-struct ForLoop {
-    string name;
-    struct Reverse *reverse;
-    struct Range *range;
-    struct Body *body;
-    ForLoop(string name, Reverse *reverse, Range *range, Body *body):
-            name(name),
-            reverse(reverse),
-            range(range),
-            body(body) {};
-};
+public class ForLoop
+{
+    // private string _name;
+    private bool _reverse;
+    private Range _range;
+    private Body _body;
 
-struct Range {
-    struct Expression *expression1;
-    struct Expression *expression2;
-    Range(Expression *expression1, Expression *expression2):
-            expression1(expression1),
-            expression2(expression2) {};
-};
+    public ForLoop(bool reverse, Range range, Body body)
+    {
+        _reverse = reverse;
+        _range = range;
+        _body = body;
+    }
+}
 
-struct Reverse {
-    bool isreverse;
-    Reverse(bool isreverse):
-            isreverse(isreverse) {};
-};
+public class Range
+{
+    private Expression _from;
+    private Expression _to;
 
-struct IfStatement {
-    struct Expression *expression;
-    struct Body *body;
-    struct ElseInIfStatement *elseinifstatement;
-    IfStatement(Expression *expression, Body *body, ElseInIfStatement *elseinifstatement):
-            expression(expression),
-            body(body),
-            elseinifstatement(elseinifstatement) {};
-};
+    public Range(Expression from, Expression to)
+    {
+        _from = from;
+        _to = to;
+    }
+}
 
-struct ElseInIfStatement {
-    struct Body *body;
-    ElseInIfStatement(Body *body):
-            body(body) {};
-};
+public class IfStatement
+{
+    private Expression _condition;
+    private Body _ifBody;
+    private Body _elseBody;
+    // private ElseStatement _elseStatement;
 
+    public IfStatement(Expression condition, Body ifBody, Body elseBody)
+    {
+        _condition = condition;
+        _ifBody = ifBody;
+        _elseBody = elseBody;
+    }
+}
 
+// public class ElseStatement {private Body _Body;public ElseStatement(Body body){_Body = body;}}
 
-struct MultipleRelationsInExpression {
-    struct LogicalOperator *logicaloperator;
-    struct Relation *relation;
-    struct MultipleRelationsInExpression *multiplerelationsinexpression;
-    MultipleRelationsInExpression(LogicalOperator *logicaloperator, Relation *relation,
-                                  MultipleRelationsInExpression *multiplerelationsinexpression):
-            logicaloperator(logicaloperator),
-            relation(relation),
-            multiplerelationsinexpression(multiplerelationsinexpression) {};
-};
+// struct Identifiers {
+//     string name;
+//     struct Expression* expression;
+//     struct Identifiers* identifiers;
+//     Identifiers(string name, struct Expression* expression, struct Identifiers* identifiers):
+//             name(name),
+//             expression(expression),
+//             identifiers(identifiers) {};
+// };
 
-struct LogicalOperator {
-    string op;
-    LogicalOperator(string op):
-            op(op) {};
-};
-
-
-
-
-
-struct Factors {
-    struct SimpleOperator* simpleOperator;
-    struct Factor* factor;
-    struct Factors* factors;
-    Factors(SimpleOperator* simpleOperator, Factor* factor, Factors* factors):
-            simpleOperator(simpleOperator),
-            factor(factor),
-            factors(factors) {};
-};
-
-struct SimpleOperator {
-    string op;
-    SimpleOperator(string op):
-            op(op) {};
-};
-
-
-
-struct Summands {
-    struct Sign* sign;
-    struct Summand* summand;
-    struct Summands* summands;
-    Summands(Sign* sign, Summand* summand, Summands* summands):
-            sign(sign),
-            summand(summand),
-            summands(summands) {};
-};
-
-
-
-
-
-
-struct Identifiers {
-    string name;
-    struct Expression* expression;
-    struct Identifiers* identifiers;
-    Identifiers(string name, struct Expression* expression, struct Identifiers* identifiers):
-            name(name),
-            expression(expression),
-            identifiers(identifiers) {};
-};
-
-#endif
+// struct Simple {
+//     struct Factor* factor;
+//     struct Factors* factors;
+//     Simple(Factor* factor, Factors* factors):
+//         factor(factor), factors(factors) {};
+// };
+//
+// struct Factor {
+//     struct Summand* summand;
+//     struct Summands* summands;
+//     Factor(Summand* summand, Summands* summands):
+//         summand(summand),
+//     summands(summands) {};
+// };
+//
+// struct Factors {
+//     struct SimpleOperator* simpleOperator;
+//     struct Factor* factor;
+//     struct Factors* factors;
+//     Factors(SimpleOperator* simpleOperator, Factor* factor, Factors* factors):
+//         simpleOperator(simpleOperator),
+//     factor(factor),
+//     factors(factors) {};
+// };
+//
+// struct Sign {
+//     string op;
+//     Sign(string op):
+//         op(op) {};
+// };
+//
+// struct SimpleOperator {
+//     string op;
+//     SimpleOperator(string op):
+//         op(op) {};
+// };
+//
+// struct Summands {
+//     struct Sign* sign;
+//     struct Summand* summand;
+//     struct Summands* summands;
+//     Summands(Sign* sign, Summand* summand, Summands* summands):
+//         sign(sign),
+//     summand(summand),
+//     summands(summands) {};
+// };
