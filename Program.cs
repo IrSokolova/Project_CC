@@ -40,11 +40,16 @@ internal class Program
             if (!(token.Item1 == TokenTypes.Undefined && token.Item2 == ""))
             {
                 lexicalAnalysis.Add(token);
-                Console.WriteLine(token);
+                // Console.WriteLine(token);
             }
         }
 
         SyntaxAnal syntaxAnal = new SyntaxAnal(lexicalAnalysis);
+        foreach (var line in syntaxAnal.lexicalAnalysis)
+        {
+            
+            Console.WriteLine(line);
+        }
     }
 }
 
