@@ -7,4 +7,10 @@ routine main () is
     var x : Integer is 5
     var k : Integer
     k := incr (x)
+    if (k > x) then
+        x := 3.4
+    else
+        x := 4.5
+    end
+
 end
