@@ -143,7 +143,7 @@ public class Expression
     }
 }
 
-public class Expressions
+public class Expressions // WHY
 {
     private Expression _expression;
     private Expressions _expressions;
@@ -281,6 +281,7 @@ public class MultipleRelation
 public class Type
 {
     private Identifier _identifier;
+    
     private PrimitiveType _primitivetype;
     private ArrayType _arraytype;
     private RecordType _recordtype;
@@ -312,6 +313,7 @@ public class ArrayType  // TODO IDONTUNDERSTAND
 {
     private Expression _expression; 
     private Type _type;
+    // size
 
     public ArrayType(Expression expression, Type type)
     {
@@ -435,7 +437,7 @@ public class Assignment
 public class RoutineCall 
 {
     private Identifier _identifier;
-    private Expressions _expressions; // ExpressionInRoutineCall IS DELETED 
+    private Expressions _expressions; // ExpressionInRoutineCall IS DELETED // MAYBE ACTION // TODO EXPLAIN
 
     public RoutineCall(Identifier identifier, Expressions expressions)
     {
