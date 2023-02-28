@@ -1,6 +1,10 @@
+function incr (num : Integer) : Integer is
+    var result : Integer
+    result := num + 1
+    return result
+
 routine main () is
-  var x : Real is 2.5
-  for i := 4 to 3 reverse loop
-      x := x - i
-  end
+    var x : Integer is 5
+    var k : Integer
+    k := incr (x)
 end

@@ -22,7 +22,7 @@ public class LexicalAnal
         public void AddTokens()
         {
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Keywords, new Regex(
-                        @"^\s*(var|is|end|in|reverse|while|for|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|return|to)(?![a-zA-Z0-9_])([\s\S]*)",
+                        @"^\s*(var|is|end|in|reverse|while|for|loop|if|then|else|real|boolean|integer|char|type|record|routine|array|function|return|to)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.BooleanLiterals, new Regex(
