@@ -76,10 +76,12 @@ public class RoutineDeclaration
     private RoutineReturnType _routineReturnType;
     private RoutineInsights _routineInsights;
 
-    public RoutineDeclaration(Identifier identifier, Parameters parameters)
+    public RoutineDeclaration(Identifier identifier, Parameters parameters, RoutineReturnType routineReturnType, RoutineInsights routineInsights)
     {
         _identifier = identifier;
         _parameters = parameters;
+        _routineReturnType = routineReturnType;
+        _routineInsights = routineInsights;
     }
 }
 
@@ -161,13 +163,13 @@ public class Relation
     private Comparison _comparison;
 }
 
-public class Operation // Simple
+public class Operation 
 {
     private Operator _operator;
     private Operand _operand;
 }
 
-public class Operand // Summand
+public class Operand 
 {
     private Single _single;
     private Expression _expression;
@@ -203,9 +205,6 @@ public class Single
         _type = type;
         _value = value;
         _modifiable = modifiable;
-        
-        // if (sign) value *= sign->op == "-" ? -1 : 1;
-        // this->value = std::to_string(value);
     }
 }
 
@@ -371,7 +370,7 @@ public class RoutineReturnType
 public class RoutineInsights
 {
     private Body _body;
-    private Return _return; // ReturnInRoutine
+    private Return _return;
 
     public RoutineInsights(Body body, Return @return)
     {
@@ -392,7 +391,7 @@ public class Return
 
 public class Body
 {
-    private Declaration _declaration; // instead of SimpleDeclaration
+    private Declaration _declaration;
     private Statement _statement;
     private Body _body;
 
@@ -437,7 +436,7 @@ public class Assignment
 public class RoutineCall 
 {
     private Identifier _identifier;
-    private Expressions _expressions; // ExpressionInRoutineCall IS DELETED // MAYBE ACTION // TODO EXPLAIN
+    private Expressions _expressions; // MAYBE ACTION // TODO EXPLAIN
 
     public RoutineCall(Identifier identifier, Expressions expressions)
     {
@@ -501,60 +500,3 @@ public class IfStatement
 }
 
 // public class ElseStatement {private Body _Body;public ElseStatement(Body body){_Body = body;}}
-
-// struct Identifiers {
-//     string name;
-//     struct Expression* expression;
-//     struct Identifiers* identifiers;
-//     Identifiers(string name, struct Expression* expression, struct Identifiers* identifiers):
-//             name(name),
-//             expression(expression),
-//             identifiers(identifiers) {};
-// };
-
-// struct Simple {
-//     struct Factor* factor;
-//     struct Factors* factors;
-//     Simple(Factor* factor, Factors* factors):
-//         factor(factor), factors(factors) {};
-// };
-//
-// struct Factor {
-//     struct Summand* summand;
-//     struct Summands* summands;
-//     Factor(Summand* summand, Summands* summands):
-//         summand(summand),
-//     summands(summands) {};
-// };
-//
-// struct Factors {
-//     struct SimpleOperator* simpleOperator;
-//     struct Factor* factor;
-//     struct Factors* factors;
-//     Factors(SimpleOperator* simpleOperator, Factor* factor, Factors* factors):
-//         simpleOperator(simpleOperator),
-//     factor(factor),
-//     factors(factors) {};
-// };
-//
-// struct Sign {
-//     string op;
-//     Sign(string op):
-//         op(op) {};
-// };
-//
-// struct SimpleOperator {
-//     string op;
-//     SimpleOperator(string op):
-//         op(op) {};
-// };
-//
-// struct Summands {
-//     struct Sign* sign;
-//     struct Summand* summand;
-//     struct Summands* summands;
-//     Summands(Sign* sign, Summand* summand, Summands* summands):
-//         sign(sign),
-//     summand(summand),
-//     summands(summands) {};
-// };
