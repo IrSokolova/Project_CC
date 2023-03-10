@@ -197,23 +197,23 @@ public class Single
 {
     private Type _type;
     private Value _value;
-    private Modifiable _modifiable;
+    private Variable _variable;
     // private bool _isNot;
     
-    public Single(Type type, Value value, Modifiable modifiable)
+    public Single(Type type, Value value, Variable variable)
     {
         _type = type;
         _value = value;
-        _modifiable = modifiable;
+        _variable = variable;
     }
 }
 
-public class Modifiable
+public class Variable
 {
     private Identifier _identifier;
     // private Identifiers _identifiers;
     
-    public Modifiable(Identifier identifier)
+    public Variable(Identifier identifier)
     {
         _identifier = identifier;
     }
@@ -423,12 +423,12 @@ public class Statement
 
 public class Assignment
 {
-    private Modifiable _modifiable;
+    private Variable _variable;
     private Expression _expression;
 
-    public Assignment(Modifiable modifiable, Expression expression)
+    public Assignment(Variable variable, Expression expression)
     {
-        _modifiable = modifiable;
+        _variable = variable;
         _expression = expression;
     }
 }
@@ -460,6 +460,7 @@ public class WhileLoop
 public class ForLoop
 {
     // private string _name;
+    private Identifier _identifier;
     private bool _reverse;
     private Range _range;
     private Body _body;

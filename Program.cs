@@ -6,7 +6,7 @@ internal class Program
 {
     public static void Main(string[] args)
     {
-        string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt";
+        string path = @"C:\Users\alena\RiderProjects\Project_CC\program.txt";
         string text = "";
  
         using (FileStream stream = File.OpenRead(path))
@@ -40,15 +40,8 @@ internal class Program
             if (!(token.Item1 == TokenTypes.Undefined && token.Item2 == ""))
             {
                 lexicalAnalysis.Add(token);
-                // Console.WriteLine(token);
+                Console.WriteLine(token);
             }
-        }
-
-        SyntaxAnal syntaxAnal = new SyntaxAnal(lexicalAnalysis);
-        foreach (var line in syntaxAnal.lexicalAnalysis)
-        {
-            
-            Console.WriteLine(line);
         }
     }
 }
