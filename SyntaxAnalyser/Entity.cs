@@ -1,15 +1,14 @@
-﻿namespace DefaultNamespace.SyntaxAnalyser;
+﻿namespace ConsoleApp1.SyntaxAnalyser;
 
 public class Identifier
 {
-    private bool _global;
+    // private bool _global;
     private bool _readOnly;
     private string _type; // "Function" or type of variable
     private string _name;
 
-    public Identifier(bool global, bool readOnly, string type, string name)
+    public Identifier(bool readOnly, string type, string name)
     {
-        _global = global;
         _readOnly = readOnly;
         _type = type;
         _name = name;
@@ -18,11 +17,11 @@ public class Identifier
 
 public class Declaration
 {
-    private VariableDeclaration _variableDeclaration;
-    private TypeDeclaration _typeDeclaration;
-    private RoutineDeclaration _routineDeclaration;
+    private VariableDeclaration? _variableDeclaration;
+    private TypeDeclaration? _typeDeclaration;
+    private RoutineDeclaration? _routineDeclaration;
 
-    public Declaration(VariableDeclaration variableDeclaration, TypeDeclaration typeDeclaration, RoutineDeclaration routineDeclaration)
+    public Declaration(VariableDeclaration? variableDeclaration, TypeDeclaration? typeDeclaration, RoutineDeclaration routineDeclaration)
     {
         _variableDeclaration = variableDeclaration;
         _typeDeclaration = typeDeclaration;
@@ -72,11 +71,11 @@ public class TypeDeclaration
 public class RoutineDeclaration
 {
     private Identifier _identifier;
-    private Parameters _parameters;
+    private Parameters? _parameters;
     private RoutineReturnType _routineReturnType;
     private RoutineInsights _routineInsights;
 
-    public RoutineDeclaration(Identifier identifier, Parameters parameters, RoutineReturnType routineReturnType, RoutineInsights routineInsights)
+    public RoutineDeclaration(Identifier identifier, Parameters? parameters, RoutineReturnType routineReturnType, RoutineInsights routineInsights)
     {
         _identifier = identifier;
         _parameters = parameters;
@@ -88,9 +87,9 @@ public class RoutineDeclaration
 public class Parameters
 {
     private ParameterDeclaration _parameterDeclaration;
-    private ParameterDeclarations _parameterDeclarations;
+    private ParameterDeclarations? _parameterDeclarations;
 
-    public Parameters(ParameterDeclaration parameterDeclaration, ParameterDeclarations parameterDeclarations)
+    public Parameters(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
     {
         _parameterDeclaration = parameterDeclaration;
         _parameterDeclarations = parameterDeclarations;
@@ -113,9 +112,9 @@ public class ParameterDeclaration // TYPE DEC IS THE SAME
 public class ParameterDeclarations
 {
     private ParameterDeclaration _parameterDeclaration;
-    private ParameterDeclarations _parameterDeclarations;
+    private ParameterDeclarations? _parameterDeclarations;
 
-    public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations parameterDeclarations)
+    public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
     {
         _parameterDeclaration = parameterDeclaration;
         _parameterDeclarations = parameterDeclarations;
@@ -279,18 +278,17 @@ public class MultipleRelation
 
 public class Type
 {
-    private Identifier _identifier;
+    // private Identifier _identifier;
     
-    private PrimitiveType _primitivetype;
-    private ArrayType _arraytype;
-    private RecordType _recordtype;
+    private PrimitiveType? _primitiveType;
+    private ArrayType? _arrayType;
+    private RecordType? _recordType;
 
-    public Type(Identifier identifier, PrimitiveType primitivetype, ArrayType arraytype, RecordType recordtype)
+    public Type(PrimitiveType? primitiveType, ArrayType? arrayType, RecordType? recordType)
     {
-        _identifier = identifier;
-        _primitivetype = primitivetype;
-        _arraytype = arraytype;
-        _recordtype = recordtype;
+        _primitiveType = primitiveType;
+        _arrayType = arrayType;
+        _recordType = recordType;
     }
 }
 
