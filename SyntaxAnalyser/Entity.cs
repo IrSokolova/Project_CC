@@ -13,6 +13,11 @@ public class Identifier
         _type = type;
         _name = name;
     }
+
+    public override string ToString()
+    {
+        return "(" + _name + ") \n      └──" + _type;
+    }
 }
 
 public class Declaration
@@ -21,11 +26,17 @@ public class Declaration
     private TypeDeclaration? _typeDeclaration;
     private RoutineDeclaration? _routineDeclaration;
 
-    public Declaration(VariableDeclaration? variableDeclaration, TypeDeclaration? typeDeclaration, RoutineDeclaration routineDeclaration)
+    public Declaration(VariableDeclaration? variableDeclaration, TypeDeclaration? typeDeclaration, RoutineDeclaration? routineDeclaration)
     {
         _variableDeclaration = variableDeclaration;
         _typeDeclaration = typeDeclaration;
         _routineDeclaration = routineDeclaration;
+    }
+
+    public override string ToString()
+    {
+        string variableDeclarationToString = _variableDeclaration.ToString();
+        return "Declaration \n    └──" + variableDeclarationToString;
     }
 }
 
@@ -33,14 +44,20 @@ public class VariableDeclaration
 {
     private Identifier _identifier;
     private Type _type;
-    private Value _value;  // why we need Value if we can replace it with expression
-    // private Expression _expression;
+    // private Value _value;  // replaced it with expression, now value is a float
+    private Expression? _expression;
     
-    public VariableDeclaration(Identifier identifier, Type type, Value value)
+    public VariableDeclaration(Identifier identifier, Type type, Expression? expression)
     {
         _identifier = identifier;
         _type = type;
-        _value = value;
+        _expression = expression;
+    }
+
+    public override string ToString()
+    {
+        string identifierToString = _identifier.ToString();
+        return "VariableDeclaration " + identifierToString;
     }
 }
 
@@ -149,6 +166,7 @@ public class ParameterDeclarations
 }
 
 
+/*
 public class Value
 {
     private Expression _expression;
@@ -158,6 +176,7 @@ public class Value
         _expression = expression;
     }
 }
+*/
 
 public class Expression
 {
@@ -222,11 +241,11 @@ public class Comparison
 public class Single
 {
     private Type _type;
-    private Value _value;
+    private float _value;
     private Variable _variable;
     // private bool _isNot;
     
-    public Single(Type type, Value value, Variable variable)
+    public Single(Type type, float value, Variable variable)
     {
         _type = type;
         _value = value;
@@ -361,12 +380,18 @@ public class RecordType
 public class Action
 {
     private Declaration _declaration;
-    private Actions _actions;
+    private Actions? _actions;
 
-    public Action(Declaration declaration, Actions actions)
+    public Action(Declaration declaration, Actions? actions)
     {
         _declaration = declaration;
         _actions = actions;
+    }
+
+    public override string ToString()
+    {
+        string declarationToString = _declaration.ToString();
+        return "└──Action \n  └──" + declarationToString;
     }
 }
 

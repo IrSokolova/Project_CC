@@ -1,7 +1,1 @@
-routine main (Integer p1, Boolean p2) is
-    var x : Integer is 5
-end
-
-routine main (Integer p1, Boolean p2) is
-    var x : Integer is 5
-end
+var x : Integer is 5

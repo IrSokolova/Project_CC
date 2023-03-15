@@ -97,6 +97,9 @@ public class Ast
     /// <returns></returns>
     public Body BuildRoutineBody()
     {
+        Declaration? declaration;
+        Statement? statement;
+        Body? body;
         return null!;
     }
 
@@ -205,6 +208,28 @@ public class Ast
     }
 
     /// <summary>
+    /// BuildVariableDeclaration собирает identifier (почему-то с типом, хотя тип дальше тоже присутствует),
+    /// type и возможный expression
+    /// </summary>
+    /// <param name="variableDeclarationTokens"></param>
+    /// <returns></returns>
+    public Declaration BuildVariableDeclaration(List<Tuple<TokenTypes, string>> variableDeclarationTokens)
+    {
+        Identifier identifier = new Identifier(false, variableDeclarationTokens[0].Item1.ToString(), variableDeclarationTokens[1].Item2);
+        Type? type = BuildType(variableDeclarationTokens[0].Item1);
+        Expression? expression = null; // TODO Expression
+
+        if (type is null)
+        {
+            Console.WriteLine("Error in BuildParameterDeclaration");
+            Environment.Exit(0);
+        }
+        
+        VariableDeclaration variableDeclaration = new VariableDeclaration(identifier, type, expression);
+        return new Declaration(variableDeclaration, null, null);
+    }
+
+    /// <summary>
     /// эта функция выводит null если что-то пошло не так. Иначе она находит нужный тип переменной и собирает переменную
     /// вида Type()
     /// </summary>
@@ -240,4 +265,5 @@ public class Ast
         }
         return null;
     }
+    
 }

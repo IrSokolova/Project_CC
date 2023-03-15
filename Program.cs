@@ -1,14 +1,16 @@
 ﻿using System.Text;
 using ConsoleApp1.LexicalAnalyser;
+using ConsoleApp1.SyntaxAnalyser;
+
 namespace DefaultNamespace;
 
 internal class Program 
 {
     public static void Main(string[] args)
     {
-        string path = @"C:\Users\alena\RiderProjects\Project_CC\program.txt";
+        string path = @"C:\Users\alena\RiderProjects\Project_CC-master\program.txt";
         string text = "";
- 
+
         using (FileStream stream = File.OpenRead(path))
         {
             int totalBytes = (int)stream.Length;
@@ -43,6 +45,11 @@ internal class Program
                 Console.WriteLine(token);
             }
         }
+
+        Parser parser = new Parser(lexicalAnalysis);
+        var action = parser.BuildAction();
+        Console.WriteLine(action.ToString());
+
     }
 }
 
