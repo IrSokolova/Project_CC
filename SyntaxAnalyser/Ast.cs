@@ -14,7 +14,7 @@ public class Ast
         _lexicalAnalysis = lexicalAnalysis;
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// функция немного обрабатывает _lexicalAnalysis и вызывает BuildMainRoutineDeclaration, которая потом
     /// вызывает другие функции. Такая вот рекурсия
     /// </summary>
@@ -43,7 +43,7 @@ public class Ast
         return null!;
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// routineInsights до вызова этой функции берутся из функции ExtractRoutineInsights, а эта функция
     /// вызывает BuildRoutineBody (которая собирает body для MainRoutineDeclaration), потом собирает 
     /// объявление main рутины и возвращает его.
@@ -60,7 +60,7 @@ public class Ast
         return new Declaration(null, null, routineDeclaration);
     }
     
-    /// <summary> TAT
+    /// <summary>
     /// как BuildMainRoutineDeclaration только с параметрами и ретерном
     /// </summary>
     /// <param name="name"></param>
@@ -90,7 +90,7 @@ public class Ast
         return new Declaration(null, null, routineDeclaration);
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// эта функция вызывается для BuildMainRoutineDeclaration (и возможно в будущем для BuildFunctionDeclaration). Она
     /// должна вернуть body согласно его структуре (Declaration - Statement - Body)
     /// </summary>
@@ -100,7 +100,7 @@ public class Ast
         return null!;
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// в этой функции можно собрать body функцией BuildRoutineBody, а потом придумать что делать с ретерном и
     /// собрать RoutineInsights согласно его структуре (Body - Return)
     /// </summary>
@@ -113,7 +113,7 @@ public class Ast
         return null!;
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// эта функция делит lexicalAnalysis лист (аргумент) на 2 листа: 1) внутренности функции (после is и до end)
     /// 2) после end. Все должно работать, endы которые встречаются в if/loop/etc учтены
     /// </summary>
@@ -154,7 +154,7 @@ public class Ast
         return (null, null);
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// в эту функцию идет аргумент List(Tuple(TypeOfVar, NameOfVar)) (!не путать с оригинальным выводом
     /// в _lexicalAnalysis! его надо перебрать и вытащить из него переменные). Функция выводит null если параметров
     /// нет, в остальных случаях выводит объект с типом Parameters
@@ -184,7 +184,7 @@ public class Ast
         return new Parameters(declaration, declarations);
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// эта функция строит ParameterDeclaration из TypeOfVar, NameOfVar и readOnly. Это просто функция для упрощения
     /// кода
     /// </summary>
@@ -204,7 +204,7 @@ public class Ast
         return new ParameterDeclaration(identifier, type);
     }
 
-    /// <summary> TAT
+    /// <summary>
     /// эта функция выводит null если что-то пошло не так. Иначе она находит нужный тип переменной и собирает переменную
     /// вида Type()
     /// </summary>
