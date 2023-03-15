@@ -14,6 +14,11 @@ public class Ast
         _lexicalAnalysis = lexicalAnalysis;
     }
 
+    /// <summary> TAT
+    /// функция немного обрабатывает _lexicalAnalysis и вызывает BuildMainRoutineDeclaration, которая потом
+    /// вызывает другие функции. Такая вот рекурсия
+    /// </summary>
+    /// <returns> AST. </returns>
     public Action ComposeTree()
     {
         // _action = new Action(null!, null!);
@@ -35,19 +40,34 @@ public class Ast
             }
         }
 
-        return null;
+        return null!;
     }
 
+    /// <summary> TAT
+    /// routineInsights до вызова этой функции берутся из функции ExtractRoutineInsights, а эта функция
+    /// вызывает BuildRoutineBody (которая собирает body для MainRoutineDeclaration), потом собирает 
+    /// объявление main рутины и возвращает его.
+    /// </summary>
+    /// <param name="routineInsights"></param>
+    /// <returns></returns>
     public Declaration BuildMainRoutineDeclaration(List<Tuple<TokenTypes, string>> routineInsights)
     {
         Identifier identifier = new Identifier(true, "Function", "main");
-        RoutineInsights insights = BuildRoutineInsights(routineInsights);
+        Body body = BuildRoutineBody();
 
-        MainRoutine? mainRoutine = new MainRoutine(identifier, insights);
+        MainRoutine? mainRoutine = new MainRoutine(identifier, body);
         RoutineDeclaration routineDeclaration = new RoutineDeclaration(mainRoutine, null);
         return new Declaration(null, null, routineDeclaration);
     }
     
+    /// <summary> TAT
+    /// как BuildMainRoutineDeclaration только с параметрами и ретерном
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="parametersList"></param>
+    /// <param name="returnType"></param>
+    /// <param name="routineInsights"></param>
+    /// <returns></returns>
     public Declaration BuildFunctionDeclaration(
         string name, 
         List<Tuple<TokenTypes, string>> parametersList, 
@@ -70,13 +90,77 @@ public class Ast
         return new Declaration(null, null, routineDeclaration);
     }
 
+    /// <summary> TAT
+    /// эта функция вызывается для BuildMainRoutineDeclaration (и возможно в будущем для BuildFunctionDeclaration). Она
+    /// должна вернуть body согласно его структуре (Declaration - Statement - Body)
+    /// </summary>
+    /// <returns></returns>
+    public Body BuildRoutineBody()
+    {
+        return null!;
+    }
+
+    /// <summary> TAT
+    /// в этой функции можно собрать body функцией BuildRoutineBody, а потом придумать что делать с ретерном и
+    /// собрать RoutineInsights согласно его структуре (Body - Return)
+    /// </summary>
+    /// <param name="routineInsights"></param>
+    /// <returns></returns>
     public RoutineInsights BuildRoutineInsights(List<Tuple<TokenTypes, string>> routineInsights)
     {
         // private Body _body;
         // private Return _return; -> private Expression _expression;
-        return null;
+        return null!;
     }
 
+    /// <summary> TAT
+    /// эта функция делит lexicalAnalysis лист (аргумент) на 2 листа: 1) внутренности функции (после is и до end)
+    /// 2) после end. Все должно работать, endы которые встречаются в if/loop/etc учтены
+    /// </summary>
+    /// <param name="lexicalAnalysis"></param>
+    /// <returns> RoutineInsights (code between "is" and "end") and code after the end of the function. </returns>
+    public (List<Tuple<TokenTypes, string>>?, List<Tuple<TokenTypes, string>>?) ExtractRoutineInsights(List<Tuple<TokenTypes, string>> lexicalAnalysis)
+    {
+        int numberOfEnds = 0;
+        List<Tuple<TokenTypes, string>> routineInsights = new List<Tuple<TokenTypes, string>>();
+
+        foreach (var pair in lexicalAnalysis)
+        {
+            if (pair.Item1 == TokenTypes.End && numberOfEnds == 0)
+            {
+                int zeroIndexOfRest = routineInsights.Count() + 1;
+                List<Tuple<TokenTypes, string>> restOfCode = lexicalAnalysis.GetRange(
+                    zeroIndexOfRest, lexicalAnalysis.Count() - zeroIndexOfRest);
+                
+                return (routineInsights, restOfCode);
+            }
+            
+            routineInsights.Add(pair);
+            switch (pair.Item1)
+            {
+                case TokenTypes.End:
+                    numberOfEnds -= 1;
+                    break;
+                case TokenTypes.For:
+                case TokenTypes.If:
+                case TokenTypes.While:
+                    numberOfEnds += 1;
+                    break;
+            }
+        }
+        
+        Console.WriteLine("Error in ExtractRoutineInsights");
+        Environment.Exit(0);
+        return (null, null);
+    }
+
+    /// <summary> TAT
+    /// в эту функцию идет аргумент List(Tuple(TypeOfVar, NameOfVar)) (!не путать с оригинальным выводом
+    /// в _lexicalAnalysis! его надо перебрать и вытащить из него переменные). Функция выводит null если параметров
+    /// нет, в остальных случаях выводит объект с типом Parameters
+    /// </summary>
+    /// <param name="parametersList"></param>
+    /// <returns></returns>
     public Parameters? BuildParameters(List<Tuple<TokenTypes, string>> parametersList)
     {
         if (parametersList.Count == 0)
@@ -100,6 +184,14 @@ public class Ast
         return new Parameters(declaration, declarations);
     }
 
+    /// <summary> TAT
+    /// эта функция строит ParameterDeclaration из TypeOfVar, NameOfVar и readOnly. Это просто функция для упрощения
+    /// кода
+    /// </summary>
+    /// <param name="tokenType"></param>
+    /// <param name="token"></param>
+    /// <param name="readOnly"></param>
+    /// <returns></returns>
     public ParameterDeclaration BuildParameterDeclaration(TokenTypes tokenType, string token, bool readOnly)
     {
         Identifier identifier = new Identifier(readOnly, tokenType.ToString(), token);
@@ -112,6 +204,12 @@ public class Ast
         return new ParameterDeclaration(identifier, type);
     }
 
+    /// <summary> TAT
+    /// эта функция выводит null если что-то пошло не так. Иначе она находит нужный тип переменной и собирает переменную
+    /// вида Type()
+    /// </summary>
+    /// <param name="tokenType"></param>
+    /// <returns></returns>
     public Type? BuildType(TokenTypes tokenType)
     {
         switch (tokenType)

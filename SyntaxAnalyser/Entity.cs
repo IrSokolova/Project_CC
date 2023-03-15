@@ -83,14 +83,15 @@ public class RoutineDeclaration
 public class MainRoutine
 {
     private Identifier _identifier;
-    private RoutineInsights _routineInsights;
+    private Body _body;
+    // private RoutineInsights _routineInsights;
     // private Parameters? _parameters;
     // private RoutineReturnType _routineReturnType;
 
-    public MainRoutine(Identifier identifier, RoutineInsights routineInsights)
+    public MainRoutine(Identifier identifier, Body body)
     {
         _identifier = identifier;
-        _routineInsights = routineInsights;
+        _body = body;
     }
 }
     
