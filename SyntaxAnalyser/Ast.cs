@@ -9,7 +9,6 @@ public class Ast
     private List<Tuple<TokenTypes, string>> _lexicalAnalysis;
     private Action _action;
     
-    
     public Ast(List<Tuple<TokenTypes, string>> lexicalAnalysis)
     {
         _lexicalAnalysis = lexicalAnalysis;
@@ -39,7 +38,17 @@ public class Ast
         return null;
     }
 
-    public Declaration BuildRoutineDeclaration(
+    public Declaration BuildMainRoutineDeclaration(List<Tuple<TokenTypes, string>> routineInsights)
+    {
+        Identifier identifier = new Identifier(true, "Function", "main");
+        RoutineInsights insights = BuildRoutineInsights(routineInsights);
+
+        MainRoutine? mainRoutine = new MainRoutine(identifier, insights);
+        RoutineDeclaration routineDeclaration = new RoutineDeclaration(mainRoutine, null);
+        return new Declaration(null, null, routineDeclaration);
+    }
+    
+    public Declaration BuildFunctionDeclaration(
         string name, 
         List<Tuple<TokenTypes, string>> parametersList, 
         TokenTypes returnType,
@@ -50,19 +59,22 @@ public class Ast
         Type? type = BuildType(returnType);
         if (type == null)
         {
-            Console.WriteLine("Error in BuildParameters");
+            Console.WriteLine("Error in BuildFunctionDeclaration");
             Environment.Exit(0);
         }
         RoutineReturnType routineReturnType = new RoutineReturnType(type);
         RoutineInsights insights = BuildRoutineInsights(routineInsights);
 
-        RoutineDeclaration routineDeclaration = new RoutineDeclaration(identifier, parameters, routineReturnType, insights);
+        Function function = new Function(identifier, parameters, routineReturnType, insights);
+        RoutineDeclaration routineDeclaration = new RoutineDeclaration(null, function);
         return new Declaration(null, null, routineDeclaration);
     }
 
     public RoutineInsights BuildRoutineInsights(List<Tuple<TokenTypes, string>> routineInsights)
     {
-        
+        // private Body _body;
+        // private Return _return; -> private Expression _expression;
+        return null;
     }
 
     public Parameters? BuildParameters(List<Tuple<TokenTypes, string>> parametersList)
@@ -94,7 +106,7 @@ public class Ast
         Type? type = BuildType(tokenType);
         if (type == null)
         {
-            Console.WriteLine("Error in BuildParameters");
+            Console.WriteLine("Error in BuildParameterDeclaration");
             Environment.Exit(0);
         }
         return new ParameterDeclaration(identifier, type);

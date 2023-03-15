@@ -67,15 +67,41 @@ public class TypeDeclaration
         _type = type;
     }
 }
-    
+
 public class RoutineDeclaration
+{
+    private MainRoutine? _mainRoutine;
+    private Function? _function;
+
+    public RoutineDeclaration(MainRoutine? mainRoutine, Function? function)
+    {
+        _mainRoutine = mainRoutine;
+        _function = function;
+    }
+}
+
+public class MainRoutine
+{
+    private Identifier _identifier;
+    private RoutineInsights _routineInsights;
+    // private Parameters? _parameters;
+    // private RoutineReturnType _routineReturnType;
+
+    public MainRoutine(Identifier identifier, RoutineInsights routineInsights)
+    {
+        _identifier = identifier;
+        _routineInsights = routineInsights;
+    }
+}
+    
+public class Function
 {
     private Identifier _identifier;
     private Parameters? _parameters;
     private RoutineReturnType _routineReturnType;
     private RoutineInsights _routineInsights;
 
-    public RoutineDeclaration(Identifier identifier, Parameters? parameters, RoutineReturnType routineReturnType, RoutineInsights routineInsights)
+    public Function(Identifier identifier, Parameters? parameters, RoutineReturnType routineReturnType, RoutineInsights routineInsights)
     {
         _identifier = identifier;
         _parameters = parameters;
