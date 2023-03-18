@@ -184,35 +184,35 @@ public class LexicalAnal
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Assign, new Regex(
-                        @"^\s*((?:[:=]))([\s\S]*)",
+                        @"^\s*((?::=))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Colon, new Regex(
                         @"^\s*((?:[:]))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.GreaterEq, new Regex(
+                        @"^\s*((?:>=))([\s\S]*)",
+                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
+                
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Greater, new Regex(
                         @"^\s*((?:[>]))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
-                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.GreaterEq, new Regex(
-                        @"^\s*((?:[>=]))([\s\S]*)",
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.LessEq, new Regex(
+                        @"^\s*((?:<=))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
-                
+
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Less, new Regex(
                         @"^\s*((?:[<]))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
-                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.LessEq, new Regex(
-                        @"^\s*((?:[<=]))([\s\S]*)",
-                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
-                
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Eq, new Regex(
-                        @"^\s*((?:[==]))([\s\S]*)",
+                        @"^\s*((?:==))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.NotEq, new Regex(
-                        @"^\s*((?:[!=]))([\s\S]*)",
+                        @"^\s*((?:!=))([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.ParenthesesL, new Regex(

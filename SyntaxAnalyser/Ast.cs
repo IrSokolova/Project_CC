@@ -218,6 +218,7 @@ public class Ast
         Identifier identifier = new Identifier(false, variableDeclarationTokens[0].Item1.ToString(), variableDeclarationTokens[1].Item2);
         Type? type = BuildType(variableDeclarationTokens[0].Item1);
         Expression? expression = null; // TODO Expression
+        Value? value = null;
 
         if (type is null)
         {
@@ -225,7 +226,7 @@ public class Ast
             Environment.Exit(0);
         }
         
-        VariableDeclaration variableDeclaration = new VariableDeclaration(identifier, type, expression);
+        VariableDeclaration variableDeclaration = new VariableDeclaration(identifier, type, value);
         return new Declaration(variableDeclaration, null, null);
     }
 

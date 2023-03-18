@@ -14,9 +14,9 @@ public class Identifier
         _name = name;
     }
 
-    public override string ToString()
+    public string ToString(string shift)
     {
-        return "(" + _name + ") \n      └──" + _type;
+        return "(" + _name + ") \n";
     }
 }
 
@@ -33,10 +33,32 @@ public class Declaration
         _routineDeclaration = routineDeclaration;
     }
 
-    public override string ToString()
+    public string ToString(string shift)
     {
-        string variableDeclarationToString = _variableDeclaration.ToString();
-        return "Declaration \n    └──" + variableDeclarationToString;
+        string declarationToString = "──Declaration \n";
+        shift += "   ";
+        string variableDeclarationToString;
+        string typeDeclarationToString;
+        string routineDeclarationToString;
+        
+        if (_variableDeclaration != null)
+        {
+            variableDeclarationToString = _variableDeclaration.ToString(shift);
+            return declarationToString + shift + "└" + variableDeclarationToString;
+        }
+        
+        if (_typeDeclaration != null)
+        {
+            typeDeclarationToString = _typeDeclaration.ToString(shift);
+            return declarationToString + shift + "└" + typeDeclarationToString;
+        }
+        
+        if (_routineDeclaration != null)
+        {
+            routineDeclarationToString = _routineDeclaration.ToString(shift);
+            return declarationToString + shift + "└" + routineDeclarationToString;
+        }
+        return "";
     }
 }
 
@@ -44,20 +66,37 @@ public class VariableDeclaration
 {
     private Identifier _identifier;
     private Type _type;
-    // private Value _value;  // replaced it with expression, now value is a float
-    private Expression? _expression;
+    private Value? _value;
+    // private Expression? _expression;
     
-    public VariableDeclaration(Identifier identifier, Type type, Expression? expression)
+    public VariableDeclaration(Identifier identifier, Type type, Value? value)
     {
         _identifier = identifier;
         _type = type;
-        _expression = expression;
+        _value = value;
+        // _expression = expression;
     }
 
-    public override string ToString()
+    public string ToString(string shift)
     {
-        string identifierToString = _identifier.ToString();
-        return "VariableDeclaration " + identifierToString;
+        string variableDeclarationToString = "──VariableDeclaration ";
+        shift += "   ";
+        
+        string identifierToString;
+        string typeToString;
+        string valueToString;
+        
+        if (_value == null)
+        {
+            identifierToString = _identifier.ToString(shift);
+            typeToString = _type.ToString(shift);
+            return variableDeclarationToString + identifierToString + shift + "└" + typeToString;
+        }
+        
+        identifierToString = _identifier.ToString(shift);
+        typeToString = _type.ToString(shift);
+        valueToString = _value.ToString(shift);
+        return variableDeclarationToString + identifierToString + shift + "│" + typeToString + shift + "└" + valueToString;
     }
 }
 
@@ -83,6 +122,11 @@ public class TypeDeclaration
         _identifier = identifier;
         _type = type;
     }
+
+    public string ToString(string shift)
+    {
+        return "";
+    }
 }
 
 public class RoutineDeclaration
@@ -94,6 +138,11 @@ public class RoutineDeclaration
     {
         _mainRoutine = mainRoutine;
         _function = function;
+    }
+
+    public string ToString(string shift)
+    {
+        return "";
     }
 }
 
@@ -166,7 +215,6 @@ public class ParameterDeclarations
 }
 
 
-/*
 public class Value
 {
     private Expression _expression;
@@ -175,18 +223,46 @@ public class Value
     {
         _expression = expression;
     }
+
+    public string ToString(string shift)
+    {
+        shift += "   ";
+        string expressionToString = _expression.ToString(shift);
+        return "──Value \n" + shift + "└" + expressionToString;
+    }
 }
-*/
+
 
 public class Expression
 {
     private Relation _relation;
-    private MultipleRelation _multipleRelation;
+    private MultipleRelation? _multipleRelation;
 
-    public Expression(Relation relation, MultipleRelation multipleRelation)
+    public Expression(Relation relation, MultipleRelation? multipleRelation)
     {
         _relation = relation;
         _multipleRelation = multipleRelation;
+    }
+
+    public string ToString(string shift)
+    {
+        string expressionToString = "──Expression \n";
+        string relationToString;
+        string actionsToString;
+
+        if (_multipleRelation != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            shift += "   ";
+            relationToString = _relation.ToString(shift1);
+            actionsToString = _multipleRelation.ToString(shift);
+            return expressionToString + shift1 + relationToString + shift2 + actionsToString;
+        }
+
+        shift += "   ";
+        relationToString = _relation.ToString(shift);
+        return expressionToString + shift + "└" + relationToString;
     }
 }
 
@@ -204,31 +280,107 @@ public class Expressions // WHY
 
 public class Relation 
 {
-    private Operation _operation;
-    private Comparison _comparison;
+    private Operation? _operation;
+    private Comparison? _comparison;
+
+    public Relation(Operation? operation, Comparison? comparison)
+    {
+        _operation = operation;
+        _comparison = comparison;
+    }
+
+    public string ToString(string shift)
+    {
+        string relationToString = "──Relation \n";
+        string operationToString;
+        string comparisonToString;
+
+        if (_comparison != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            shift += "   ";
+            operationToString = _operation.ToString(shift1);
+            comparisonToString = _comparison.ToString(shift);
+            return relationToString + shift1 + operationToString + shift2 + comparisonToString;
+        }
+
+        shift += "   ";
+        operationToString = _operation.ToString(shift);
+        return relationToString + shift + "└" + operationToString;
+    }
 }
 
-public class Operation 
+public class Operation
 {
-    private Operator _operator;
     private Operand _operand;
+    private Operator? _operator;
+
+    public Operation(Operand operand, Operator? @operator)
+    {
+        _operand = operand;
+        _operator = @operator;
+    }
+
+    public string ToString(string shift)
+    {
+        string operationToString = "──Operation \n";
+        string operandToString;
+        string operatorToString;
+
+        if (_operator != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            shift += "   ";
+            operandToString = _operand.ToString(shift1);
+            operatorToString = _operator.ToString(shift);
+            return operationToString + shift1 + operandToString + shift2 + operatorToString;
+        }
+
+        shift += "   ";
+        operandToString = _operand.ToString(shift);
+        return operationToString + shift + "└" + operandToString;
+    }
 }
 
 public class Operand 
 {
-    private Single _single;
-    private Expression _expression;
+    private Single? _single;
+    private Expression? _expression;
 
-    public Operand(Single single, Expression expression)
+    public Operand(Single? single, Expression? expression)
     {
         _single = single;
         _expression = expression;
+    }
+    
+    public string ToString(string shift)
+    {
+        string operandToString = "──Operand \n";
+        string singleToString;
+        string expressionToString;
+
+        shift += "   ";
+        if (_single != null)
+        {
+            singleToString = _single.ToString(shift);
+            return operandToString + shift + "└" + singleToString;
+        }
+
+        if (_expression != null)
+        {
+            expressionToString = _expression.ToString(shift);
+            return operandToString + shift + "└" + expressionToString;
+        }
+
+        return "";
     }
 }
 
 public class Comparison
 {
-    private Operator _operator; // (something before) less then...
+    private Operator _operator; // (something before) less than...
     private Operation _operation; // then the operation
 
     public Comparison(Operator @operator, Operation operation)
@@ -236,20 +388,47 @@ public class Comparison
         _operator = @operator;
         _operation = operation;
     }
+
+    public string ToString(string shift)
+    {
+        return "";
+    }
 }
 
 public class Single
 {
-    private Type _type;
-    private float _value;
-    private Variable _variable;
+    private Type? _type;
+    private float? _value;
+    private Variable? _variable;
     // private bool _isNot;
     
-    public Single(Type type, float value, Variable variable)
+    public Single(Type? type, float? value, Variable? variable)
     {
         _type = type;
         _value = value;
         _variable = variable;
+    }
+
+    public string ToString(string shift)
+    {
+        string singleToString = "──Single (";
+        string typeToString;
+        string valueToString;
+        string variableToString;
+
+        if (_type != null)
+        {
+            typeToString = _type.ToString();
+            return singleToString + typeToString + ", " + _value + ") \n";
+        }
+
+        if (_variable != null)
+        {
+            variableToString = _variable.ToString(shift);
+            return singleToString + variableToString + ") \n";
+        }
+
+        return "";
     }
 }
 
@@ -262,19 +441,55 @@ public class Variable
     {
         _identifier = identifier;
     }
+
+    public string ToString(string shift)
+    {
+        string identifierToString = _identifier.ToString(shift);
+        return "Variable " + identifierToString;
+    }
 }
 
 public class Operator
 {
-    private ComparisonOperator _comparisonOperator;
-    private MathematicalOperator _mathematicalOperator;
-    private LogicalOperator _logicalOperator;  // maybe not needed
+    private ComparisonOperator? _comparisonOperator;
+    private MathematicalOperator? _mathematicalOperator;
+    private LogicalOperator? _logicalOperator;  // maybe not needed
 
-    public Operator(ComparisonOperator comparisonOperator, MathematicalOperator mathematicalOperator, LogicalOperator logicalOperator)
+    public Operator(ComparisonOperator? comparisonOperator, MathematicalOperator? mathematicalOperator,
+        LogicalOperator? logicalOperator)
     {
         _comparisonOperator = comparisonOperator;
         _mathematicalOperator = mathematicalOperator;
         _logicalOperator = logicalOperator;
+    }
+
+    public string ToString(string shift)
+    {
+        string operatorToString = "──Operator \n";
+        string comparisonOperatorToString;
+        string mathematicalOperatorToString;
+        string logicalOperatorToString;
+
+        shift += "   ";
+        if (_comparisonOperator != null)
+        {
+            comparisonOperatorToString = _comparisonOperator.ToString(shift);
+            return operatorToString + shift + "└" + comparisonOperatorToString;
+        }
+
+        if (_mathematicalOperator != null)
+        {
+            mathematicalOperatorToString = _mathematicalOperator.ToString(shift);
+            return operatorToString + shift + "└" + mathematicalOperatorToString;
+        }
+        
+        if (_logicalOperator != null)
+        {
+            logicalOperatorToString = _logicalOperator.ToString(shift);
+            return operatorToString + shift + "└" + logicalOperatorToString;
+        }
+
+        return "";
     }
 }
 
@@ -286,6 +501,12 @@ public class ComparisonOperator
     {
         _sign = sign;
     }
+
+    public string ToString(string shift)
+    {
+        return "──ComparisonOperator (" + _sign + ") \n";
+    }
+
 }
 
 public class MathematicalOperator
@@ -295,6 +516,11 @@ public class MathematicalOperator
     public MathematicalOperator(string sign)
     {
         _sign = sign;
+    }
+    
+    public string ToString(string shift)
+    {
+        return "──MathematicalOperator (" + _sign + ") \n";
     }
 }
 
@@ -306,19 +532,45 @@ public class LogicalOperator
     {
         _sign = sign;
     }
+    
+    public string ToString(string shift)
+    {
+        return "──LogicalOperator (" + _sign + ") \n";
+    }
+    
 }
 
 public class MultipleRelation
 {
     private LogicalOperator _logicalOperator;
     private Relation _relation;
-    private MultipleRelation _multipleRelation;
+    private MultipleRelation? _multipleRelation;
 
-    public MultipleRelation(Relation relation, MultipleRelation multipleRelation, LogicalOperator logicalOperator)
+    public MultipleRelation(Relation relation, MultipleRelation? multipleRelation, LogicalOperator logicalOperator)
     {
         _relation = relation;
         _multipleRelation = multipleRelation;
         _logicalOperator = logicalOperator;
+    }
+
+    public string ToString(string shift)
+    {
+        string multipleRelationToString = "──MultipleRelation \n";
+        string relationToString;
+
+        if (_multipleRelation != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            shift += "   ";
+            relationToString = _relation.ToString(shift1);
+            var relationsToString = _multipleRelation.ToString(shift);
+            return multipleRelationToString + shift1 + relationToString + shift2 + relationsToString;
+        }
+
+        shift += "   ";
+        relationToString = _relation.ToString(shift);
+        return multipleRelationToString + shift + "└" + relationToString;
     }
 }
 
@@ -336,6 +588,56 @@ public class Type
         _arrayType = arrayType;
         _recordType = recordType;
     }
+
+    public string ToString(string shift)
+    {
+
+        string primitiveTypeToString;
+        string arrayTypeToString;
+        string recordTypeToString;
+
+        if (_primitiveType != null)
+        {
+            primitiveTypeToString = _primitiveType.ToString();
+            return "──Type (" + primitiveTypeToString + ") \n";
+        }
+        if (_arrayType != null)
+        {
+            return "──Type (Array) \n";
+        }
+        if (_recordType != null)
+        {
+            return "──Type (Record) \n";
+        }
+
+        return "";
+
+    }
+    
+    public override string ToString()
+    {
+
+        string primitiveTypeToString;
+        string arrayTypeToString;
+        string recordTypeToString;
+
+        if (_primitiveType != null)
+        {
+            primitiveTypeToString = _primitiveType.ToString();
+            return primitiveTypeToString;
+        }
+        if (_arrayType != null)
+        {
+            return "Array";
+        }
+        if (_recordType != null)
+        {
+            return "Record";
+        }
+
+        return "";
+
+    }
 }
 
 public class PrimitiveType
@@ -349,6 +651,17 @@ public class PrimitiveType
         _isInt = isInt;
         _isReal = isReal;
         _isBoolean = isBoolean;
+    }
+
+    public override string ToString()
+    {
+        if (_isInt)
+            return "Integer";
+        if (_isReal)
+            return "Real";
+        if (_isBoolean)
+            return "Boolean";
+        return "";
     }
 }
 
@@ -368,9 +681,9 @@ public class ArrayType  // TODO IDONTUNDERSTAND
 public class RecordType
 {
     private VariableDeclaration _variableDeclaration;
-    private VariableDeclarations _variableDeclarations;
+    private VariableDeclarations? _variableDeclarations;
 
-    public RecordType(VariableDeclaration variableDeclaration, VariableDeclarations variableDeclarations)
+    public RecordType(VariableDeclaration variableDeclaration, VariableDeclarations? variableDeclarations)
     {
         _variableDeclaration = variableDeclaration;
         _variableDeclarations = variableDeclarations;
@@ -379,31 +692,51 @@ public class RecordType
 
 public class Action
 {
-    private Declaration _declaration;
+    private Declaration? _declaration;
     private Actions? _actions;
 
-    public Action(Declaration declaration, Actions? actions)
+    public Action(Declaration? declaration, Actions? actions)
     {
         _declaration = declaration;
         _actions = actions;
     }
 
-    public override string ToString()
+    public string ToString(string shift)
     {
-        string declarationToString = _declaration.ToString();
-        return "└──Action \n  └──" + declarationToString;
+        string actionToString = shift + "└──Action \n";
+        string declarationToString;
+        string actionsToString;
+
+        if (_actions != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            shift += "   ";
+            declarationToString = _declaration.ToString(shift1);
+            actionsToString = _actions.ToString(shift);
+            return actionToString + shift1 + declarationToString + shift2 + actionsToString;
+        }
+
+        shift += "   ";
+        declarationToString = _declaration.ToString(shift);
+        return actionToString + shift + "└" + declarationToString;
     }
 }
 
 public class Actions
 {
     private Action _action;
-    private Actions _actions;
+    private Actions? _actions;
 
-    public Actions(Action action, Actions actions)
+    public Actions(Action action, Actions? actions)
     {
         _action = action;
         _actions = actions;
+    }
+
+    public string ToString(string shift)
+    {
+        return "";
     }
 }
 

@@ -1,1 +1,1 @@
-var x : Integer is 5
+var x : Integer is 1 / (2 + 5) * 3

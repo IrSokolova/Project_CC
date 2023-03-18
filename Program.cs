@@ -48,7 +48,10 @@ internal class Program
 
         Parser parser = new Parser(lexicalAnalysis);
         var action = parser.BuildAction();
-        Console.WriteLine(action.ToString());
+        Console.WriteLine("=========================");
+        Console.WriteLine("        *  AST  *        ");
+        Console.WriteLine("=========================");
+        Console.WriteLine(action.ToString(""));
 
     }
 }

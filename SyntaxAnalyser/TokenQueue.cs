@@ -15,15 +15,13 @@ public class TokenQueue
     }
 
     /// <summary>
-    /// Функция пытается достать следующий токен из очереди и возвращает его или null
+    /// Функция пытается удалить текущий токен из очереди и возвращает его или null
     /// </summary>
     /// <returns>nextToken or null</returns>
     public Tuple<TokenTypes, string>? GetNextToken()
     {
         var isNextToken = _tokenQueue.TryDequeue(out var nextToken);
-        if (isNextToken) 
-            return nextToken;
-        return null;
+        return isNextToken ? nextToken : null;
     }
 
     /// <summary>
