@@ -8,6 +8,7 @@ internal class Program
 {
     public static void Main(string[] args)
     {
+        // ADD YOUR PATH HERE
         string path = @"C:\Users\alena\RiderProjects\Project_CC-master\program.txt";
         string text = "";
 
