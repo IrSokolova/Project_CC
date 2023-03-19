@@ -18,7 +18,7 @@ public class TokenQueue
     /// Функция пытается удалить текущий токен из очереди и возвращает его или null
     /// </summary>
     /// <returns>nextToken or null</returns>
-    public Tuple<TokenTypes, string>? GetNextToken()
+    public Tuple<TokenTypes, string?>? GetNextToken()
     {
         var isNextToken = _tokenQueue.TryDequeue(out var nextToken);
         return isNextToken ? nextToken : null;
@@ -28,7 +28,7 @@ public class TokenQueue
     /// Функция возвращает текущий токен или null
     /// </summary>
     /// <returns></returns>
-    public Tuple<TokenTypes, string>? Current()
+    public Tuple<TokenTypes, string?>? Current()
     {
         var isCurrentToken = _tokenQueue.TryPeek(out var currentToken);
         return currentToken;

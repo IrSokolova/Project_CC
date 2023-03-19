@@ -4,10 +4,10 @@ public class Identifier
 {
     // private bool _global;
     private bool _readOnly;
-    private string _type; // "Function" or type of variable
-    private string _name;
+    private string? _type; // "Function" or type of variable
+    private string? _name;
 
-    public Identifier(bool readOnly, string type, string name)
+    public Identifier(bool readOnly, string? type, string? name)
     {
         _readOnly = readOnly;
         _type = type;
@@ -149,12 +149,12 @@ public class RoutineDeclaration
 public class MainRoutine
 {
     private Identifier _identifier;
-    private Body _body;
+    private Body? _body;
     // private RoutineInsights _routineInsights;
     // private Parameters? _parameters;
     // private RoutineReturnType _routineReturnType;
 
-    public MainRoutine(Identifier identifier, Body body)
+    public MainRoutine(Identifier identifier, Body? body)
     {
         _identifier = identifier;
         _body = body;
@@ -753,20 +753,18 @@ public class RoutineReturnType
 public class RoutineInsights
 {
     private Body _body;
-    private Return _return;
 
-    public RoutineInsights(Body body, Return @return)
+    public RoutineInsights(Body body)
     {
         _body = body;
-        _return = @return;
     }
 }
 
 public class Return
 {
-    private Expression _expression;
+    private Expression? _expression;
 
-    public Return(Expression expression)
+    public Return(Expression? expression)
     {
         _expression = expression;
     }
@@ -774,27 +772,29 @@ public class Return
 
 public class Body
 {
-    private Declaration _declaration;
-    private Statement _statement;
-    private Body _body;
+    private Declaration? _declaration;
+    private Statement? _statement;
+    private Return? _return;
+    private Body? _body;
 
-    public Body(Declaration declaration, Statement statement, Body body)
+    public Body(Declaration? declaration, Statement? statement, Body? body, Return? @return)
     {
         _declaration = declaration;
         _statement = statement;
         _body = body;
+        _return = @return;
     }
 }
 
 public class Statement
 {
-    private Assignment _assignment;
-    private WhileLoop _whileLoop;
-    private ForLoop _forLoop;
-    private IfStatement _ifStatement;
-    private RoutineCall _routineCall;
+    private Assignment? _assignment;
+    private WhileLoop? _whileLoop;
+    private ForLoop? _forLoop;
+    private IfStatement? _ifStatement;
+    private RoutineCall? _routineCall;
 
-    public Statement(Assignment assignment, WhileLoop whileLoop, ForLoop forLoop, IfStatement ifStatement, RoutineCall routineCall)
+    public Statement(Assignment? assignment, WhileLoop? whileLoop, ForLoop? forLoop, IfStatement? ifStatement, RoutineCall? routineCall)
     {
         _assignment = assignment;
         _whileLoop = whileLoop;
@@ -819,9 +819,9 @@ public class Assignment
 public class RoutineCall 
 {
     private Identifier _identifier;
-    private Expressions _expressions; // MAYBE ACTION // TODO EXPLAIN
+    private Expressions? _expressions; // MAYBE ACTION // TODO EXPLAIN
 
-    public RoutineCall(Identifier identifier, Expressions expressions)
+    public RoutineCall(Identifier identifier, Expressions? expressions)
     {
         _identifier = identifier;
         _expressions = expressions;
@@ -831,9 +831,9 @@ public class RoutineCall
 public class WhileLoop
 {
     private Expression _expression;
-    private Body _body;
+    private Body? _body;
 
-    public WhileLoop(Expression expression, Body body)
+    public WhileLoop(Expression expression, Body? body)
     {
         _expression = expression;
         _body = body;
@@ -846,10 +846,11 @@ public class ForLoop
     private Identifier _identifier;
     private bool _reverse;
     private Range _range;
-    private Body _body;
+    private Body? _body;
 
-    public ForLoop(bool reverse, Range range, Body body)
+    public ForLoop(Identifier identifier, bool reverse, Range range, Body? body)
     {
+        _identifier = identifier;
         _reverse = reverse;
         _range = range;
         _body = body;

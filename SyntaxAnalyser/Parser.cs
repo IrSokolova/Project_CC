@@ -70,22 +70,153 @@ public class Parser
                 case TokenTypes.Type:
                     typeDeclaration = BuildTypeDeclaration();
                     break;
-                case TokenTypes.Routine:
+                case TokenTypes.Routine :
                     routineDeclaration = BuildRoutineDeclaration();
                     break;
-                default:
-                    Console.WriteLine(
-                        "Error in BuildDeclaration. Expected Var, Type or Routine tokens: Found " +
-                        nextToken.Item1 +
-                        " Token");
-                    Environment.Exit(0);
+                case TokenTypes.Function:
+                    routineDeclaration = BuildFunctionDeclaration();
                     break;
+                default:
+                    return null;
             }
-
             return new Declaration(variableDeclaration, typeDeclaration, routineDeclaration);
         }
-
         return null;
+    }
+    
+    public Statement? BuildStatement()
+    {
+        WhileLoop? whileLoop = null;
+        ForLoop? forLoop = null;
+        IfStatement? ifStatement = null;
+        
+        Assignment? assignment = null;
+        RoutineCall? routineCall = null;
+
+        if (_tokens.Current() != null)
+        {
+            var nextToken = _tokens.GetNextToken();
+            switch (nextToken!.Item1)
+            {
+                case TokenTypes.While:
+                    whileLoop = BuildWhileLoop();
+                    break;
+                case TokenTypes.For:
+                    forLoop = BuildForLoop();
+                    break;
+                case TokenTypes.If :
+                    ifStatement = BuildIfStatement();
+                    break;
+                case TokenTypes.Identifiers:
+                    string? name = nextToken.Item2;
+                    Identifier identifier = new Identifier(false, null, name);
+                    
+                    nextToken = _tokens.GetNextToken();
+                    CheckNull(nextToken, TokenTypes.Assign, "BuildStatement");
+
+                    switch (nextToken!.Item1)
+                    {
+                        case TokenTypes.Assign:
+                            Expression? expression = BuildExpression();
+                            Variable variable = new Variable(identifier);
+                            assignment = new Assignment(variable, expression);
+                            break;
+                        case TokenTypes.ParenthesesL:
+                            Expressions? expressions = BuildExpressions();
+                            nextToken = _tokens.GetNextToken();
+                            CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildStatement");
+                            CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
+                            routineCall = new RoutineCall(identifier, expressions);
+                            break;
+                    }
+                    break;
+            }
+            
+            return new Statement(assignment, whileLoop, forLoop, ifStatement, routineCall);
+        }
+        return null;
+    }
+
+    public WhileLoop BuildWhileLoop()
+    {
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesL, "BuildWhileLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesL, "BuildWhileLoop");
+        
+        Expression? expression = BuildExpression();
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildWhileLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildWhileLoop");
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Loop, "BuildWhileLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildWhileLoop");
+
+        Body? body = BuildBody();
+        return new WhileLoop(expression, body);
+    }
+    
+    public ForLoop BuildForLoop()
+    {
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Identifiers, "BuildForLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Identifiers, "BuildForLoop");
+        Identifier identifier = new Identifier(true, "Integer", nextToken.Item2);
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Assign, "BuildForLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Assign, "BuildForLoop");
+        
+        Expression from = BuildExpression();
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.To, "BuildForLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.To, "BuildForLoop");
+        
+        Expression to = BuildExpression();
+        Range range = new Range(from, to);
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Reverse, "BuildForLoop");
+        Boolean reverse = false;
+        Body? body;
+        if (nextToken!.Item1 == TokenTypes.Reverse)
+        {
+            reverse = true;
+            nextToken = _tokens.GetNextToken();
+            CheckNull(nextToken!, TokenTypes.Loop, "BuildForLoop");
+        }
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildForLoop");
+        body = BuildBody();
+        return new ForLoop(identifier, reverse, range, body);
+    }
+    
+    public IfStatement BuildIfStatement()
+    {
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesL, "BuildIfStatement");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesL, "BuildIfStatement");
+        
+        Expression? expression = BuildExpression();
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildIfStatement");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildIfStatement");
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Then, "BuildIfStatement");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Then, "BuildIfStatement");
+
+        Body? ifBody = BuildIfBody(); // BuildIfBody because the body ends with "Else" token BUT maybe BuildBody is ok idk
+        Body? elseBody = null;
+        CheckNull(_tokens.Current(), TokenTypes.Else, "BuildIfStatement");
+        if (_tokens.Current()!.Item1 == TokenTypes.Else)
+        {
+            elseBody = BuildBody(); // BuildBody because the body ends with usual "End" token
+        }
+
+        return new IfStatement(expression, ifBody, elseBody);
     }
 
     /// <summary>
@@ -95,9 +226,8 @@ public class Parser
     /// </summary>
     public VariableDeclaration? BuildVariableDeclaration()
     {
-
-        string name = null;
-        string type = null;
+        string? name = null;
+        string? type = null;
         bool readOnly = false;
 
         Type varType = null;
@@ -106,42 +236,18 @@ public class Parser
 
         // Get Identifiers Token
         var nextToken = _tokens.GetNextToken();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildVariableDeclaration. Expected Identifier: Found end of Tokens");
-            Environment.Exit(0);
-        }
-
-        if (nextToken.Item1 is TokenTypes.Identifiers)
-            name = nextToken.Item2;
-        else
-        {
-            Console.WriteLine("Error in BuildVariableDeclaration. Expected Identifier: Found " + nextToken.Item1 +
-                              " Token");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Identifiers, "BuildVariableDeclaration");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Identifiers, "BuildVariableDeclaration");
+        name = nextToken.Item2;
 
         // Get Colon Token
         nextToken = _tokens.GetNextToken();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildVariableDeclaration. Expected \":\" token: Found end of Tokens");
-            Environment.Exit(0);
-        }
-
-        if (nextToken.Item1 is not TokenTypes.Colon)
-        {
-            Console.WriteLine("Error in BuildVariableDeclaration. Expected \":\" token: Found " + nextToken.Item1 + " Token");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Colon, "BuildVariableDeclaration");
+        CheckTokenMatch(nextToken.Item1, TokenTypes.Colon, "BuildVariableDeclaration");
 
         // Get Type
         nextToken = _tokens.Current();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildVariableDeclaration. Expected some Type: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Type, "BuildVariableDeclaration"); // Expected some Type
 
         varType = BuildType();
         type = nextToken.Item2;
@@ -154,12 +260,7 @@ public class Parser
         if (nextToken?.Item1 is TokenTypes.Is)
         {
             nextToken = _tokens.Current();
-            if (nextToken == null)
-            {
-                Console.WriteLine(
-                    "Error in BuildVariableDeclaration. Expected some Expression: Found end of Tokens");
-                Environment.Exit(0);
-            }
+            CheckNull(nextToken, "Expression", "BuildVariableDeclaration");
 
             expression = BuildExpression();
             value = new Value(expression);
@@ -189,56 +290,29 @@ public class Parser
     /// </summary>
     public TypeDeclaration? BuildTypeDeclaration()
     {
-        string name = null;
-        string type = null;
+        string? name = null;
+        string? type = null;
         bool readOnly = false;
 
         Type varType = null;
 
         // Get Identifiers Token
         var nextToken = _tokens.GetNextToken();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildTypeDeclaration. Expected Identifier: Found end of Tokens");
-            Environment.Exit(0);
-        }
-
-        if (nextToken.Item1 is TokenTypes.Identifiers)
-            name = nextToken.Item2;
-        else
-        {
-            Console.WriteLine("Error in BuildTypeDeclaration. Expected Identifier: Found " + nextToken.Item1 +
-                              " Token");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Identifiers, "BuildTypeDeclaration");
+        CheckTokenMatch(nextToken.Item1, TokenTypes.Identifiers, "BuildTypeDeclaration");
+        name = nextToken.Item2;
         
         // Get "is" token
         nextToken = _tokens.GetNextToken();
-
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildTypeDeclaration. Expected \"is\" token: Found end of Tokens");
-            Environment.Exit(0);
-        }
-        
-        if (nextToken?.Item1 is not TokenTypes.Is)
-        {
-            Console.WriteLine(
-                    "Error in BuildTypeDeclaration. Expected \"is\" token: Found " + nextToken.Item1 +
-                    " Token");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Is, "BuildTypeDeclaration");
+        CheckTokenMatch(nextToken.Item1, TokenTypes.Is, "BuildTypeDeclaration");
 
         // Get Type
         nextToken = _tokens.Current();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildTypeDeclaration. Expected some Type: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Type, "BuildTypeDeclaration");
 
         varType = BuildType();
-        type = nextToken.Item2;
+        type = nextToken!.Item2;
         
         Identifier identifier = new Identifier(readOnly, type, name);
 
@@ -248,28 +322,33 @@ public class Parser
     /// <summary>
     /// RoutineDeclaration contains MainRoutine or Function
     /// </summary>
-    public RoutineDeclaration? BuildRoutineDeclaration()
+    public RoutineDeclaration BuildRoutineDeclaration()
     {
-        if (_tokens.Current() == null)
+        CheckNull(_tokens.Current(), "Routine", "BuildRoutineDeclaration");
+        
+        MainRoutine? mainRoutine = BuildMainRoutine();
+        if (mainRoutine == null)
         {
-            Console.WriteLine("Error in BuildRoutineDeclaration. Expected mainRoutine or function: Found end of Tokens");
+            Console.WriteLine("Error in BuildRoutineDeclaration. Expected Routine: Found null for both of them");
             Environment.Exit(0);
         }
-        else
-        {
-            MainRoutine? mainRoutine = BuildMainRoutine();
-            Function? function = BuildFunction();
-            if (mainRoutine == null && function == null)
-            {
-                Console.WriteLine(
-                    "Error in BuildRoutineDeclaration. Expected mainRoutine or function: Found null for both of them");
-                Environment.Exit(0);
-            }
 
-            return new RoutineDeclaration(mainRoutine, function);
+        return new RoutineDeclaration(mainRoutine, null);
+    }
+    
+    public RoutineDeclaration BuildFunctionDeclaration()
+    {
+        CheckNull(_tokens.Current(), "Function", "BuildFunctionDeclaration");
+        
+        Function? function = BuildFunction();
+        if (function == null)
+        {
+            Console.WriteLine(
+                "Error in BuildRoutineDeclaration. Expected mainRoutine or function: Found null for both of them");
+            Environment.Exit(0);
         }
 
-        return null;
+        return new RoutineDeclaration(null, function);
     }
 
     /// <summary>
@@ -322,49 +401,22 @@ public class Parser
         var nextToken = _tokens.GetNextToken();
         
         // Get BracketsL Token
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildArrayType. Expected \"[\" token: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.BracketsL, "BuildArrayType");
+        CheckTokenMatch(nextToken.Item1, TokenTypes.BracketsL, "BuildArrayType");
 
-        if (nextToken.Item1 is not TokenTypes.BracketsL)
-        {
-            Console.WriteLine("Error in BuildArrayType. Expected \"[\" token: Found " + nextToken.Item1 + " Token");
-            Environment.Exit(0);
-        }
-        
         // Get Expression
         nextToken = _tokens.Current();
-        if (nextToken == null)
-        {
-            Console.WriteLine(
-                "Error in BuildArrayType. Expected some Expression: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, "Expression", "BuildArrayType");
         expression = BuildExpression();
         
         // Get BracketsR Token
         nextToken = _tokens.GetNextToken();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildArrayType. Expected \"]\" token: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.BracketsR, "BuildArrayType");
+        CheckTokenMatch(nextToken.Item1, TokenTypes.BracketsR, "BuildArrayType");
 
-        if (nextToken.Item1 is not TokenTypes.BracketsR)
-        {
-            Console.WriteLine("Error in BuildArrayType. Expected \"]\" token: Found " + nextToken.Item1 + " Token");
-            Environment.Exit(0);
-        }
-        
         // Get Type
         nextToken = _tokens.Current();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildArrayType. Expected some Type: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.Type, "BuildArrayType");
         type = BuildType();
         
         return new ArrayType(expression, type);
@@ -380,35 +432,17 @@ public class Parser
         var nextToken = _tokens.GetNextToken();
         
         // Get VariableDeclarations
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildRecordType. Expected Var token: Found end of Tokens");
-            Environment.Exit(0);
-        }
-
-        if (nextToken.Item1 is not TokenTypes.Var)
-        {
-            Console.WriteLine("Error in BuildRecordType. Expected Var token: Found " + nextToken.Item1 + " Token");
-            Environment.Exit(0);
-        }
-
+        CheckNull(nextToken, TokenTypes.Var, "BuildRecordType");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Var, "BuildRecordType");
+        
         variableDeclaration = BuildVariableDeclaration();
         variableDeclarations = BuildVariableDeclarations();
 
         // Get End token
         nextToken = _tokens.Current();
-        if (nextToken == null)
-        {
-            Console.WriteLine("Error in BuildRecordType. Expected End token: Found end of Tokens");
-            Environment.Exit(0);
-        }
+        CheckNull(nextToken, TokenTypes.End, "BuildRecordType");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildRecordType");
 
-        if (nextToken.Item1 is not TokenTypes.End)
-        {
-            Console.WriteLine("Error in BuildRecordType. Expected End token: Found " + nextToken.Item1 + " Token");
-            Environment.Exit(0);
-        }
-        
         return new RecordType(variableDeclaration, variableDeclarations);
     }
     
@@ -423,11 +457,25 @@ public class Parser
             return null;
         
         // Try to build more Relations
-        MultipleRelation? multipleRelation= BuildMultipleRelation();
+        MultipleRelation? multipleRelation = BuildMultipleRelation();
         
         return new Expression(relation, multipleRelation);
     }
 
+    public Expressions? BuildExpressions()
+    {
+        Expression? expression = BuildExpression();
+        Expressions? expressions;
+        if (expression != null)
+        {
+            expressions = BuildExpressions();
+            return new Expressions(expression, expressions);
+        }
+
+        return null;
+    }
+    
+    
     /// <summary>
     /// Relation contains Operation and maybe Comparison following it
     /// </summary>
@@ -514,18 +562,9 @@ public class Parser
                 
                 // Check if parentheses are closed
                 nextToken = _tokens.Current();
-                if (nextToken == null)
-                {
-                    Console.WriteLine("Error in BuildOperand. Expected \")\" token: Found end of Tokens");
-                    Environment.Exit(0);
-                }
-
-                if (nextToken.Item1 is not TokenTypes.ParenthesesR)
-                {
-                    Console.WriteLine("Error in BuildOperand. Expected \")\" token: Found " + nextToken.Item1 +
-                                      " Token");
-                    Environment.Exit(0);
-                }
+                CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildOperand");
+                CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildOperand");
+                
                 _tokens.GetNextToken();
             }
         }
@@ -688,12 +727,96 @@ public class Parser
 
     public MainRoutine? BuildMainRoutine()
     {
-        return null;
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Identifiers, "BuildMainRoutine");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Identifiers, "BuildMainRoutine");
+
+        string? name = nextToken.Item2;
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesL, "BuildMainRoutine");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesL, "BuildMainRoutine");
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildMainRoutine");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildMainRoutine");
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Is, "BuildMainRoutine");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Is, "BuildMainRoutine");
+        
+        Identifier identifier = new Identifier(true, "Function", name);
+        Body? body = BuildBody();
+        return new MainRoutine(identifier, body);
+    }
+
+    public void CheckNull(Tuple<TokenTypes, string?>? token, TokenTypes expected, string where)
+    {
+        if (token == null)
+        {
+            Console.WriteLine("Error in " + where + ". Expected " + expected + ": Found end of Tokens");
+            Environment.Exit(0);
+        }
     }
     
+    public void CheckNull(Tuple<TokenTypes, string?>? token, string expected, string where)
+    {
+        if (token == null)
+        {
+            Console.WriteLine("Error in " + where + ". Expected " + expected + ": Found end of Tokens");
+            Environment.Exit(0);
+        }
+    }
+
+    public void CheckTokenMatch(TokenTypes token, TokenTypes expected, string where)
+    {
+        if (token != expected)
+        {
+            Console.WriteLine("Error in " + where + ". Expected " + expected + ": Found " + token + " Token");
+            Environment.Exit(0);
+        }
+    }
+
     public Function? BuildFunction()
     {
         return null;
     }
+    
+    /// <summary>
+    /// эта функция вызывается для BuildMainRoutineDeclaration (и возможно в будущем для BuildFunctionDeclaration). Она
+    /// должна вернуть body согласно его структуре (Declaration - Statement - Body)
+    /// </summary>
+    /// <returns></returns>
+    public Body? BuildBody()
+    {
+        Return? @return = null;
+        Statement? statement = null;
+        // TODO check that Declaration is here
+        Declaration? declaration = BuildDeclaration();
+        if (declaration == null)
+        {
+            // TODO check that statement is here
+            statement = BuildStatement();
+            if (statement == null)
+            {
+                // TODO check that BuildReturn is here
+                @return = BuildReturn();
+                if (@return == null)
+                {
+                    return null;
+                }
+            }
+        }
+        Body? body = BuildBody();
+        return new Body(declaration, statement, body, @return);
+    }
 
+    public Return? BuildReturn()
+    {
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Return, "BuildReturn");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Return, "BuildReturn");
+        Expression? expression = BuildExpression();
+        return new Return(expression);
+    }
 }

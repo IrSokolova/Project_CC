@@ -42,23 +42,13 @@ public class Ast
 
         return null!;
     }
-
-    /// <summary>
-    /// routineInsights до вызова этой функции берутся из функции ExtractRoutineInsights, а эта функция
-    /// вызывает BuildRoutineBody (которая собирает body для MainRoutineDeclaration), потом собирает 
-    /// объявление main рутины и возвращает его.
-    /// </summary>
-    /// <param name="routineInsights"></param>
-    /// <returns></returns>
-    public Declaration BuildMainRoutineDeclaration(List<Tuple<TokenTypes, string>> routineInsights)
-    {
-        Identifier identifier = new Identifier(true, "Function", "main");
-        Body body = BuildRoutineBody();
-
-        MainRoutine? mainRoutine = new MainRoutine(identifier, body);
-        RoutineDeclaration routineDeclaration = new RoutineDeclaration(mainRoutine, null);
-        return new Declaration(null, null, routineDeclaration);
-    }
+    
+    // public MainRoutine BuildMainRoutineDeclaration(List<Tuple<TokenTypes, string>> routineInsights)
+    // {
+    //     Identifier identifier = new Identifier(true, "Function", "main");
+    //     Body body = BuildRoutineBody();
+    //     return new MainRoutine(identifier, body);
+    // }
     
     /// <summary>
     /// как BuildMainRoutineDeclaration только с параметрами и ретерном
@@ -68,9 +58,9 @@ public class Ast
     /// <param name="returnType"></param>
     /// <param name="routineInsights"></param>
     /// <returns></returns>
-    public Declaration BuildFunctionDeclaration(
-        string name, 
-        List<Tuple<TokenTypes, string>> parametersList, 
+    public Function BuildFunction(
+        string? name, 
+        List<Tuple<TokenTypes, string?>> parametersList, 
         TokenTypes returnType,
         List<Tuple<TokenTypes, string>> routineInsights)
     {
@@ -85,23 +75,10 @@ public class Ast
         RoutineReturnType routineReturnType = new RoutineReturnType(type);
         RoutineInsights insights = BuildRoutineInsights(routineInsights);
 
-        Function function = new Function(identifier, parameters, routineReturnType, insights);
-        RoutineDeclaration routineDeclaration = new RoutineDeclaration(null, function);
-        return new Declaration(null, null, routineDeclaration);
+        return new Function(identifier, parameters, routineReturnType, insights);
     }
 
-    /// <summary>
-    /// эта функция вызывается для BuildMainRoutineDeclaration (и возможно в будущем для BuildFunctionDeclaration). Она
-    /// должна вернуть body согласно его структуре (Declaration - Statement - Body)
-    /// </summary>
-    /// <returns></returns>
-    public Body BuildRoutineBody()
-    {
-        Declaration? declaration;
-        Statement? statement;
-        Body? body;
-        return null!;
-    }
+    
 
     /// <summary>
     /// в этой функции можно собрать body функцией BuildRoutineBody, а потом придумать что делать с ретерном и
@@ -164,7 +141,7 @@ public class Ast
     /// </summary>
     /// <param name="parametersList"></param>
     /// <returns></returns>
-    public Parameters? BuildParameters(List<Tuple<TokenTypes, string>> parametersList)
+    public Parameters? BuildParameters(List<Tuple<TokenTypes, string?>> parametersList)
     {
         if (parametersList.Count == 0)
         {
@@ -195,7 +172,7 @@ public class Ast
     /// <param name="token"></param>
     /// <param name="readOnly"></param>
     /// <returns></returns>
-    public ParameterDeclaration BuildParameterDeclaration(TokenTypes tokenType, string token, bool readOnly)
+    public ParameterDeclaration BuildParameterDeclaration(TokenTypes tokenType, string? token, bool readOnly)
     {
         Identifier identifier = new Identifier(readOnly, tokenType.ToString(), token);
         Type? type = BuildType(tokenType);
@@ -213,9 +190,12 @@ public class Ast
     /// </summary>
     /// <param name="variableDeclarationTokens"></param>
     /// <returns></returns>
-    public Declaration BuildVariableDeclaration(List<Tuple<TokenTypes, string>> variableDeclarationTokens)
+    public Declaration BuildVariableDeclaration(List<Tuple<TokenTypes, string?>> variableDeclarationTokens)
     {
-        Identifier identifier = new Identifier(false, variableDeclarationTokens[0].Item1.ToString(), variableDeclarationTokens[1].Item2);
+        Identifier identifier = new Identifier(
+            false, 
+            variableDeclarationTokens[0].Item1.ToString(), 
+            variableDeclarationTokens[1].Item2);
         Type? type = BuildType(variableDeclarationTokens[0].Item1);
         Expression? expression = null; // TODO Expression
         Value? value = null;

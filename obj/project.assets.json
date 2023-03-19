@@ -8,19 +8,19 @@
     "net7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\alena\\.nuget\\packages\\": {}
+    "C:\\Users\\79953\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alena\\RiderProjects\\Project_CC-master\\ConsoleApp1.csproj",
+      "projectUniqueName": "C:\\Users\\79953\\RiderProjects\\Project_CC\\ConsoleApp1.csproj",
       "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\alena\\RiderProjects\\Project_CC-master\\ConsoleApp1.csproj",
-      "packagesPath": "C:\\Users\\alena\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alena\\RiderProjects\\Project_CC-master\\obj\\",
+      "projectPath": "C:\\Users\\79953\\RiderProjects\\Project_CC\\ConsoleApp1.csproj",
+      "packagesPath": "C:\\Users\\79953\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\79953\\RiderProjects\\Project_CC\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\alena\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\79953\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -59,7 +59,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\alena\\.dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\79953\\.dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }
