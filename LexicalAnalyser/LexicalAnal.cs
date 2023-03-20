@@ -16,6 +16,7 @@ public enum TokenTypes
         Reverse,
         Var,
         Is,
+        To,
         Return,
         If,
         Then,
@@ -101,6 +102,10 @@ public class LexicalAnal
                 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Is, new Regex(
                         @"^\s*(is)(?![a-zA-Z0-9_])([\s\S]*)",
+                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
+                
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.To, new Regex(
+                        @"^\s*(to)(?![a-zA-Z0-9_])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
                 
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Return, new Regex(

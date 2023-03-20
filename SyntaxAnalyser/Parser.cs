@@ -185,8 +185,8 @@ public class Parser
         Expression from = BuildExpression();
         
         nextToken = _tokens.GetNextToken();
-        // CheckNull(nextToken, TokenTypes.To, "BuildForLoop");
-        // CheckTokenMatch(nextToken!.Item1, TokenTypes.To, "BuildForLoop");
+        CheckNull(nextToken, TokenTypes.To, "BuildForLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.To, "BuildForLoop");
         
         Expression to = BuildExpression();
         Range range = new Range(from, to);
