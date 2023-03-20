@@ -52,6 +52,8 @@ public class Parser
     /// Чекаем, является ли токен "var", "type" или "routine",
     /// И вызываем соответствующую функцию.
     /// Или, если ни один токен не подошёл, возвращаем null
+    ///
+    /// Если токен не подходит то очередь не меняется и декларэйшн не строится.
     /// </summary>
     public Declaration? BuildDeclaration()
     {
@@ -61,25 +63,28 @@ public class Parser
 
         if (_tokens.Current() != null)
         {
-            var nextToken = _tokens.GetNextToken();
-            switch (nextToken!.Item1)
+            var token = _tokens.Current();
+            switch (token!.Item1)
             {
                 case TokenTypes.Var:
+                    _tokens.GetNextToken();
                     variableDeclaration = BuildVariableDeclaration();
-                    break;
+                    return new Declaration(variableDeclaration, typeDeclaration, routineDeclaration);
                 case TokenTypes.Type:
+                    _tokens.GetNextToken();
                     typeDeclaration = BuildTypeDeclaration();
-                    break;
+                    return new Declaration(variableDeclaration, typeDeclaration, routineDeclaration);
                 case TokenTypes.Routine :
+                    _tokens.GetNextToken();
                     routineDeclaration = BuildRoutineDeclaration();
-                    break;
+                    return new Declaration(variableDeclaration, typeDeclaration, routineDeclaration);
                 case TokenTypes.Function:
+                    _tokens.GetNextToken();
                     routineDeclaration = BuildFunctionDeclaration();
-                    break;
+                    return new Declaration(variableDeclaration, typeDeclaration, routineDeclaration);
                 default:
                     return null;
             }
-            return new Declaration(variableDeclaration, typeDeclaration, routineDeclaration);
         }
         return null;
     }
@@ -791,17 +796,18 @@ public class Parser
     {
         Return? @return = null;
         Statement? statement = null;
-        // TODO check that Declaration is here
+
+        var token = _tokens.Current();
+        CheckNull(token, TokenTypes.Return, "BuildReturn");
+
         Declaration? declaration = BuildDeclaration();
         if (declaration == null)
         {
-            // TODO check that statement is here
-            statement = BuildStatement();
-            if (statement == null)
+            @return = BuildReturn();
+            if (@return == null)
             {
-                // TODO check that BuildReturn is here
-                @return = BuildReturn();
-                if (@return == null)
+                statement = BuildStatement(); // !there is no check for statement inside BuildStatement!
+                if (statement == null)
                 {
                     return null;
                 }
@@ -811,12 +817,20 @@ public class Parser
         return new Body(declaration, statement, body, @return);
     }
 
+    /// <summary>
+    /// проверка на ретерн потом построение ретерна
+    /// </summary>
+    /// <returns></returns>
     public Return? BuildReturn()
     {
-        var nextToken = _tokens.GetNextToken();
-        CheckNull(nextToken, TokenTypes.Return, "BuildReturn");
-        CheckTokenMatch(nextToken!.Item1, TokenTypes.Return, "BuildReturn");
-        Expression? expression = BuildExpression();
-        return new Return(expression);
+        CheckNull(_tokens.Current(), TokenTypes.Return, "BuildReturn");
+        if (_tokens.Current()!.Item1 == TokenTypes.Return)
+        {
+            _tokens.GetNextToken();
+            Expression? expression = BuildExpression();
+            return new Return(expression);
+        }
+
+        return null;
     }
 }
