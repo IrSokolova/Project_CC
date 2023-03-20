@@ -693,10 +693,12 @@ public class RecordType
 public class Action
 {
     private Declaration? _declaration;
+    private Statement? _statement;
     private Actions? _actions;
 
-    public Action(Declaration? declaration, Actions? actions)
+    public Action(Declaration? declaration, Statement? statement, Actions? actions)
     {
+        _statement = statement;
         _declaration = declaration;
         _actions = actions;
     }

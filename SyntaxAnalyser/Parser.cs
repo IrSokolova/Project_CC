@@ -26,9 +26,18 @@ public class Parser
     {
         if (_tokens.Current() != null)
         {
+            Statement? statement = null;
             Declaration? declaration = BuildDeclaration();
+            if (declaration == null)
+            {
+                statement = BuildStatement(); // !there is no check for statement inside BuildStatement!
+                if (statement == null)
+                {
+                    return null;
+                }
+            }
             Actions? actions = BuildActions();
-            return new Action(declaration, actions);
+            return new Action(declaration, statement, actions);
         }
 
         return null;
@@ -176,8 +185,8 @@ public class Parser
         Expression from = BuildExpression();
         
         nextToken = _tokens.GetNextToken();
-        CheckNull(nextToken, TokenTypes.To, "BuildForLoop");
-        CheckTokenMatch(nextToken!.Item1, TokenTypes.To, "BuildForLoop");
+        // CheckNull(nextToken, TokenTypes.To, "BuildForLoop");
+        // CheckTokenMatch(nextToken!.Item1, TokenTypes.To, "BuildForLoop");
         
         Expression to = BuildExpression();
         Range range = new Range(from, to);
@@ -213,7 +222,7 @@ public class Parser
         CheckNull(nextToken, TokenTypes.Then, "BuildIfStatement");
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Then, "BuildIfStatement");
 
-        Body? ifBody = BuildIfBody(); // BuildIfBody because the body ends with "Else" token BUT maybe BuildBody is ok idk
+        Body? ifBody = BuildBody(); // BuildIfBody because the body ends with "Else" token BUT maybe BuildBody is ok idk
         Body? elseBody = null;
         CheckNull(_tokens.Current(), TokenTypes.Else, "BuildIfStatement");
         if (_tokens.Current()!.Item1 == TokenTypes.Else)

@@ -1,7 +1,5 @@
-var x : Integer is 1 / (2 + 5) * 3
-
 if (x < y) then
        x := 3.4
    else
 	 x := 4.5
-
+end
