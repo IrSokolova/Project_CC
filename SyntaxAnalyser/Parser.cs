@@ -20,7 +20,7 @@ public class Parser
     }
     
     /// <summary>
-    /// Создаём Action, который состоит из Declaration и Actions
+    /// Создаём Action, который состоит из Declaration, Statement и Actions
     /// </summary>
     public Action? BuildAction()
     {

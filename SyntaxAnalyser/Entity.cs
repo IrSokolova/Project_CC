@@ -707,21 +707,41 @@ public class Action
     {
         string actionToString = shift + "└──Action \n";
         string declarationToString;
+        string statementToString;
         string actionsToString;
-
+        
         if (_actions != null)
         {
             string shift1 = shift + "  │";
             string shift2 = shift + "  └";
             shift += "   ";
-            declarationToString = _declaration.ToString(shift1);
-            actionsToString = _actions.ToString(shift);
-            return actionToString + shift1 + declarationToString + shift2 + actionsToString;
+            if(_declaration != null)
+            {
+                declarationToString = _declaration.ToString(shift1);
+                actionsToString = _actions.ToString(shift);
+                return actionToString + shift1 + declarationToString + shift2 + actionsToString;
+            }
+            if (_statement != null)
+            {
+                statementToString = _statement.ToString(shift1);
+                actionsToString = _actions.ToString(shift);
+                return actionToString + shift1 + statementToString + shift2 + actionsToString;
+            }
+        }
+        if(_declaration != null)
+        {
+            shift += "   ";
+            declarationToString = _declaration.ToString(shift);
+            return actionToString + shift + "└" + declarationToString;
+        }
+        if(_statement != null)
+        {
+            shift += "   ";
+            declarationToString = _statement.ToString(shift);
+            return actionToString + shift + "└" + declarationToString;
         }
 
-        shift += "   ";
-        declarationToString = _declaration.ToString(shift);
-        return actionToString + shift + "└" + declarationToString;
+        return actionToString;
     }
 }
 
