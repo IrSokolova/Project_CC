@@ -179,13 +179,13 @@ public class Function
 
 public class Parameters
 {
-    private ParameterDeclaration _parameterDeclaration;
-    private ParameterDeclarations? _parameterDeclarations;
+    private ParameterDeclaration? _parameterDeclaration;
+    private Parameters? _parameters;
 
-    public Parameters(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
+    public Parameters(ParameterDeclaration? parameterDeclaration, Parameters? parameters)
     {
         _parameterDeclaration = parameterDeclaration;
-        _parameterDeclarations = parameterDeclarations;
+        _parameters = parameters;
     }
 }
 
@@ -202,17 +202,17 @@ public class ParameterDeclaration // TYPE DEC IS THE SAME
     
 }
 
-public class ParameterDeclarations
-{
-    private ParameterDeclaration _parameterDeclaration;
-    private ParameterDeclarations? _parameterDeclarations;
-
-    public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
-    {
-        _parameterDeclaration = parameterDeclaration;
-        _parameterDeclarations = parameterDeclarations;
-    }
-}
+// public class ParameterDeclarations
+// {
+//     private ParameterDeclaration _parameterDeclaration;
+//     private ParameterDeclarations? _parameterDeclarations;
+//
+//     public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
+//     {
+//         _parameterDeclaration = parameterDeclaration;
+//         _parameterDeclarations = parameterDeclarations;
+//     }
+// }
 
 
 public class Value
@@ -744,9 +744,9 @@ public class Actions
 
 public class RoutineReturnType
 {
-    private Type _type;
+    private Type? _type;
 
-    public RoutineReturnType(Type type)
+    public RoutineReturnType(Type? type)
     {
         _type = type;
     }
@@ -754,9 +754,9 @@ public class RoutineReturnType
 
 public class RoutineInsights
 {
-    private Body _body;
+    private Body? _body;
 
-    public RoutineInsights(Body body)
+    public RoutineInsights(Body? body)
     {
         _body = body;
     }

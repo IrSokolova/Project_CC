@@ -793,9 +793,58 @@ public class Parser
 
     public Function? BuildFunction()
     {
-        return null;
+        Type? type = BuildType();
+        
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Identifiers, "BuildFunction");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Identifiers, "BuildFunction");
+
+        string? name = nextToken.Item2;
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesL, "BuildFunction");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesL, "BuildFunction");
+        
+        Parameters? parameters = BuildParameters();
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildFunction");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildFunction");
+
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Is, "BuildFunction");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Is, "BuildFunction");
+        
+        Identifier identifier = new Identifier(true, "Function", name);
+        Body? body = BuildBody();
+        RoutineReturnType? routineReturnType = new RoutineReturnType(type);
+        RoutineInsights? routineInsights = new RoutineInsights(body);
+        return new Function(identifier, parameters, routineReturnType, routineInsights);
     }
-    
+
+    public Parameters? BuildParameters()
+    {
+        ParameterDeclaration? parameterDeclaration = BuildParameterDeclaration();
+
+        if (parameterDeclaration == null)
+            return null;
+        Parameters? parameters = BuildParameters();
+        return new Parameters(parameterDeclaration, parameters);
+    }
+
+    public ParameterDeclaration? BuildParameterDeclaration()
+    {
+        Type? type = BuildType();
+        if (type == null)
+            return null;
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.Identifiers, "BuildParameterDeclaration");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.Identifiers, "BuildParameterDeclaration");
+        Identifier? identifier = new Identifier(true, null, nextToken.Item2);
+
+        return new ParameterDeclaration(identifier, type);
+    }
+
     /// <summary>
     /// эта функция вызывается для BuildMainRoutineDeclaration (и возможно в будущем для BuildFunctionDeclaration). Она
     /// должна вернуть body согласно его структуре (Declaration - Statement - Body)
@@ -807,7 +856,7 @@ public class Parser
         Statement? statement = null;
 
         var token = _tokens.Current();
-        CheckNull(token, TokenTypes.Return, "BuildReturn");
+        // CheckNull(token, TokenTypes.Return, "BuildReturn");
 
         Declaration? declaration = BuildDeclaration();
         if (declaration == null)
