@@ -283,10 +283,11 @@ public class Parser
         Identifier identifier = new Identifier(readOnly, type, name);
 
         // Get "is" and Expression
-        nextToken = _tokens.GetNextToken();
+        nextToken = _tokens.Current();
 
         if (nextToken?.Item1 is TokenTypes.Is)
         {
+            _tokens.GetNextToken();
             nextToken = _tokens.Current();
             CheckNull(nextToken, "Expression", "BuildVariableDeclaration");
 
