@@ -435,11 +435,13 @@ public class Single
 public class Variable
 {
     private Identifier _identifier;
+    private Type? _arrayType;
     // private Identifiers _identifiers;
     
-    public Variable(Identifier identifier)
+    public Variable(Identifier identifier, Type? arrayType)
     {
         _identifier = identifier;
+        _arrayType = arrayType;
     }
 
     public string ToString(string shift)

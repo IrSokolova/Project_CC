@@ -131,6 +131,15 @@ public class Parser
                     string? name = token.Item2;
                     Identifier identifier = new Identifier(false, null, name);
                     
+                    token = _tokens.Current();
+                    CheckNull(token, TokenTypes.Assign, "BuildStatement");
+                    Type? arrayType = null;
+                    if (token!.Item1 == TokenTypes.BracketsL)
+                    {
+                        var array = BuildArrayType(false);
+                        arrayType = new Type(null, array, null);
+                    }
+                    
                     token = _tokens.GetNextToken();
                     CheckNull(token, TokenTypes.Assign, "BuildStatement");
 
@@ -138,7 +147,7 @@ public class Parser
                     {
                         case TokenTypes.Assign:
                             Expression? expression = BuildExpression();
-                            Variable variable = new Variable(identifier);
+                            Variable variable = new Variable(identifier, arrayType);
                             assignment = new Assignment(variable, expression);
                             break;
                         case TokenTypes.ParenthesesL:
@@ -411,7 +420,7 @@ public class Parser
                 break;
             case TokenTypes.Array:
                 _tokens.GetNextToken();
-                arrayType = BuildArrayType();
+                arrayType = BuildArrayType(true);
                 break;
             case TokenTypes.Record:
                 _tokens.GetNextToken();
@@ -432,10 +441,10 @@ public class Parser
     /// <summary>
     /// Structure of Array: array '[' [Expression] ']' Type
     /// </summary>
-    public ArrayType? BuildArrayType()
+    public ArrayType? BuildArrayType(Boolean isDeclaration)
     {
         Expression? expression;
-        Type? type;
+        Type? type = null;
         
         var nextToken = _tokens.GetNextToken();
         
@@ -454,9 +463,12 @@ public class Parser
         CheckTokenMatch(nextToken.Item1, TokenTypes.BracketsR, "BuildArrayType");
 
         // Get Type
-        nextToken = _tokens.Current();
-        CheckNull(nextToken, TokenTypes.Type, "BuildArrayType");
-        type = BuildType();
+        if (isDeclaration)
+        {
+            nextToken = _tokens.Current();
+            CheckNull(nextToken, TokenTypes.Type, "BuildArrayType");
+            type = BuildType();
+        }
         
         return new ArrayType(expression, type);
     }
@@ -611,8 +623,9 @@ public class Parser
                 _tokens.GetNextToken();
             }
         }
-        else if (nextToken != null)
-            _tokens.GetNextToken();
+        // else if (nextToken != null && 
+        //          nextToken.Item1 != TokenTypes.BracketsR)
+        //     _tokens.GetNextToken();
 
         if (single == null && expression == null)
             return null;
@@ -637,14 +650,24 @@ public class Parser
         // If Single is a variable
         if (nextToken.Item1 is TokenTypes.Identifiers)
         {
+            _tokens.GetNextToken();
             identifier = new Identifier(true, null, nextToken.Item2);
-            variable = new Variable(identifier);
+            var token = _tokens.Current();
+            CheckNull(token, TokenTypes.Assign, "BuildStatement");
+            Type? arrayType = null;
+            if (token!.Item1 == TokenTypes.BracketsL)
+            {
+                var array = BuildArrayType(false);
+                arrayType = new Type(null, array, null);
+            }
+            variable = new Variable(identifier, arrayType);
             return new Single(type, value, variable);
         }
 
         // If Single is Float
         if (nextToken.Item1 is TokenTypes.FloatingLiterals)
         {
+            _tokens.GetNextToken();
             primitiveType = new PrimitiveType(false, true, false);
             type = new Type(primitiveType, null, null);
             string floatValue = nextToken.Item2;
@@ -654,6 +677,7 @@ public class Parser
         // If Single is Integer
         if (nextToken.Item1 is TokenTypes.IntegerLiterals)
         {
+            _tokens.GetNextToken();
             primitiveType = new PrimitiveType(true, false, false);
             type = new Type(primitiveType, null, null);
             string intValue = nextToken.Item2;
@@ -662,6 +686,7 @@ public class Parser
 
         if (nextToken.Item1 is TokenTypes.True || nextToken.Item1 is TokenTypes.False)
         {
+            _tokens.GetNextToken();
             primitiveType = new PrimitiveType(false, false, true);
             type = new Type(primitiveType, null, null);
             string boolValue = nextToken.Item2;

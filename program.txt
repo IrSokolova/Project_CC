@@ -1,9 +1,1 @@
-routine main () is
-   var x : Real is 2.5
-   var y : Real is 8.1
-   if (x < y) then
-       x := 3.4
-   else
-	 x := 4.5
-   end
-end
+var x : Integer is 1 / (2 + 5) * 3
