@@ -247,10 +247,11 @@ public class Parser
         Body? ifBody = BuildBody(); // BuildIfBody because the body ends with "Else" token BUT maybe BuildBody is ok idk
         Body? elseBody = null;
         CheckNull(_tokens.Current(), TokenTypes.Else, "BuildIfStatement");
-        if (_tokens.Current()!.Item1 == TokenTypes.Else)
+        var end = _tokens.GetNextToken();
+        if (end!.Item1 == TokenTypes.Else)
         {
+            elseBody = BuildBody();
             _tokens.GetNextToken();
-            elseBody = BuildBody(); // BuildBody because the body ends with usual "End" token
         }
 
         return new IfStatement(expression, ifBody, elseBody);
