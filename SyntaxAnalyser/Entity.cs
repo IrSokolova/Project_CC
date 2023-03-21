@@ -179,13 +179,13 @@ public class Function
 
 public class Parameters
 {
-    private ParameterDeclaration _parameterDeclaration;
-    private ParameterDeclarations? _parameterDeclarations;
+    private ParameterDeclaration? _parameterDeclaration;
+    private Parameters? _parameters;
 
-    public Parameters(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
+    public Parameters(ParameterDeclaration? parameterDeclaration, Parameters? parameters)
     {
         _parameterDeclaration = parameterDeclaration;
-        _parameterDeclarations = parameterDeclarations;
+        _parameters = parameters;
     }
 }
 
@@ -202,17 +202,17 @@ public class ParameterDeclaration // TYPE DEC IS THE SAME
     
 }
 
-public class ParameterDeclarations
-{
-    private ParameterDeclaration _parameterDeclaration;
-    private ParameterDeclarations? _parameterDeclarations;
-
-    public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
-    {
-        _parameterDeclaration = parameterDeclaration;
-        _parameterDeclarations = parameterDeclarations;
-    }
-}
+// public class ParameterDeclarations
+// {
+//     private ParameterDeclaration _parameterDeclaration;
+//     private ParameterDeclarations? _parameterDeclarations;
+//
+//     public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
+//     {
+//         _parameterDeclaration = parameterDeclaration;
+//         _parameterDeclarations = parameterDeclarations;
+//     }
+// }
 
 
 public class Value
@@ -707,21 +707,41 @@ public class Action
     {
         string actionToString = shift + "└──Action \n";
         string declarationToString;
+        string statementToString;
         string actionsToString;
-
+        
         if (_actions != null)
         {
             string shift1 = shift + "  │";
             string shift2 = shift + "  └";
             shift += "   ";
-            declarationToString = _declaration.ToString(shift1);
-            actionsToString = _actions.ToString(shift);
-            return actionToString + shift1 + declarationToString + shift2 + actionsToString;
+            if(_declaration != null)
+            {
+                declarationToString = _declaration.ToString(shift1);
+                actionsToString = _actions.ToString(shift);
+                return actionToString + shift1 + declarationToString + shift2 + actionsToString;
+            }
+            if (_statement != null)
+            {
+                statementToString = _statement.ToString(shift1);
+                actionsToString = _actions.ToString(shift);
+                return actionToString + shift1 + statementToString + shift2 + actionsToString;
+            }
+        }
+        if(_declaration != null)
+        {
+            shift += "   ";
+            declarationToString = _declaration.ToString(shift);
+            return actionToString + shift + "└" + declarationToString;
+        }
+        if(_statement != null)
+        {
+            shift += "   ";
+            declarationToString = _statement.ToString(shift);
+            return actionToString + shift + "└" + declarationToString;
         }
 
-        shift += "   ";
-        declarationToString = _declaration.ToString(shift);
-        return actionToString + shift + "└" + declarationToString;
+        return actionToString;
     }
 }
 
@@ -744,9 +764,9 @@ public class Actions
 
 public class RoutineReturnType
 {
-    private Type _type;
+    private Type? _type;
 
-    public RoutineReturnType(Type type)
+    public RoutineReturnType(Type? type)
     {
         _type = type;
     }
@@ -754,9 +774,9 @@ public class RoutineReturnType
 
 public class RoutineInsights
 {
-    private Body _body;
+    private Body? _body;
 
-    public RoutineInsights(Body body)
+    public RoutineInsights(Body? body)
     {
         _body = body;
     }

@@ -154,14 +154,15 @@ public class Ast
         }
 
         ParameterDeclaration declaration;
-        ParameterDeclarations? declarations = null;
+        // ParameterDeclarations? declarations = null;
         for (int i = 1; i < parametersList.Count - 1; i++)
         {
             declaration = BuildParameterDeclaration(parametersList[i].Item1, parametersList[i].Item2, true);
-            declarations = new ParameterDeclarations(declaration, declarations);
+            // declarations = new ParameterDeclarations(declaration, declarations);
         }
         declaration = BuildParameterDeclaration(parametersList[^1].Item1, parametersList[^1].Item2, true);
-        return new Parameters(declaration, declarations);
+        // return new Parameters(declaration, declarations);
+        return null;
     }
 
     /// <summary>
