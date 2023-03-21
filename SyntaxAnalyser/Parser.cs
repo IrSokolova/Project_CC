@@ -391,7 +391,7 @@ public class Parser
         ArrayType? arrayType = null;
         RecordType? recordType = null;
         
-        var nextToken = _tokens.GetNextToken();
+        var nextToken = _tokens.Current();
         switch (nextToken.Item1)
         {
             case TokenTypes.Integer:
@@ -413,7 +413,12 @@ public class Parser
         
         if (isInt || isReal || isBoolean)
             primitiveType = new PrimitiveType(isInt, isReal, isBoolean);
-        
+
+        if (primitiveType == null && arrayType == null && recordType == null)
+        {
+            return null;
+        }
+        _tokens.GetNextToken();
         return new Type(primitiveType, arrayType, recordType);
     }
     
