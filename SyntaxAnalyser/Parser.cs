@@ -1,5 +1,6 @@
 using ConsoleApp1.LexicalAnalyser;
 using System.Globalization;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace ConsoleApp1.SyntaxAnalyser;
 
@@ -623,7 +624,7 @@ public class Parser
     public Single? BuildSingle()
     {
         Type? type = null;
-        float? value = null;
+        string? value = null;
         Variable? variable = null;
         Identifier? identifier = null;
         PrimitiveType? primitiveType = null;
@@ -645,7 +646,7 @@ public class Parser
         {
             primitiveType = new PrimitiveType(false, true, false);
             type = new Type(primitiveType, null, null);
-            float floatValue = float.Parse(nextToken.Item2, CultureInfo.InvariantCulture.NumberFormat);
+            string floatValue = nextToken.Item2;
             return new Single(type, floatValue, null);
         }
 
@@ -654,8 +655,16 @@ public class Parser
         {
             primitiveType = new PrimitiveType(true, false, false);
             type = new Type(primitiveType, null, null);
-            int intValue = Int16.Parse(nextToken.Item2);
+            string intValue = nextToken.Item2;
             return new Single(type, intValue, null);
+        }
+
+        if (nextToken.Item1 is TokenTypes.True || nextToken.Item1 is TokenTypes.False)
+        {
+            primitiveType = new PrimitiveType(false, false, true);
+            type = new Type(primitiveType, null, null);
+            string boolValue = nextToken.Item2;
+            return new Single(type, boolValue, null);
         }
 
         return null;

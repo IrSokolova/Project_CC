@@ -1,6 +1,6 @@
 routine main () is
-var x : Record {
-    var y : boolean is true
-    var z : Real is 8.1
-    }
+ type a is record {
+  var a : Integer is 42
+  var b : boolean is true
+ }
 end

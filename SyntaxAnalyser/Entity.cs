@@ -398,11 +398,11 @@ public class Comparison
 public class Single
 {
     private Type? _type;
-    private float? _value;
+    private string? _value;
     private Variable? _variable;
     // private bool _isNot;
     
-    public Single(Type? type, float? value, Variable? variable)
+    public Single(Type? type, string? value, Variable? variable)
     {
         _type = type;
         _value = value;
@@ -665,7 +665,7 @@ public class PrimitiveType
     }
 }
 
-public class ArrayType  // TODO IDONTUNDERSTAND
+public class ArrayType 
 {
     private Expression _expression; 
     private Type _type;
