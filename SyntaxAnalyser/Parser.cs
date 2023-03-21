@@ -552,15 +552,13 @@ public class Parser
     /// </summary>
     public MultipleRelation? BuildMultipleRelation()
     {
-        LogicalOperator? logicalOperator = null;
         Relation? relation = BuildRelation();
 
         if (relation == null)
             return null;
         
-        MultipleRelation? multipleRelation = null;
-        multipleRelation = BuildMultipleRelation();
-        return new MultipleRelation(relation, multipleRelation, logicalOperator);
+        MultipleRelation? multipleRelation = BuildMultipleRelation();
+        return new MultipleRelation(relation, multipleRelation);
     }
 
     /// <summary>
@@ -703,7 +701,7 @@ public class Parser
     {
         ComparisonOperator? comparisonOperator = BuildComparisonOperator();
         MathematicalOperator? mathematicalOperator = BuildMathematicalOperator();
-        LogicalOperator? logicalOperator = null;
+        LogicalOperator? logicalOperator = BuildLogicalOperator();
         if (comparisonOperator == null && mathematicalOperator == null && logicalOperator == null)
             return null;
         return new Operator(comparisonOperator, mathematicalOperator, logicalOperator);
@@ -712,7 +710,7 @@ public class Parser
     /// <summary>
     /// Checks for > < >= <= != == tokens
     /// </summary>
-    public ComparisonOperator? BuildComparisonOperator()
+    public ComparisonOperator? BuildComparisonOperator() 
     {
         string sign = "";
         var nextToken = _tokens.Current();
@@ -790,15 +788,33 @@ public class Parser
 
         return new MathematicalOperator(sign);
     }
-
-    
-    //============================================================================
-    // TODO доделать остальные методы
     
     // not and or xor
     public LogicalOperator? BuildLogicalOperator()
     {
-        return null;
+        string op = "";
+        var nextToken = _tokens.Current();
+        if (nextToken == null)
+            return null;
+        switch (nextToken.Item1)
+        {
+            case TokenTypes.And:
+                _tokens.GetNextToken();
+                op = "and";
+                break;
+            case TokenTypes.Or:
+                _tokens.GetNextToken();
+                op = "or";
+                break;
+            case TokenTypes.Xor:
+                _tokens.GetNextToken();
+                op = "xor";
+                break;
+            default:
+                return null;
+        }
+
+        return new LogicalOperator(op);
     }
 
     public MainRoutine? BuildMainRoutine()
@@ -936,7 +952,7 @@ public class Parser
                 }
                 else
                 {
-                    _tokens.GetNextToken();
+                    // _tokens.GetNextToken();
                     return null;
                 }
             }

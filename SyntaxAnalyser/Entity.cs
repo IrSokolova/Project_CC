@@ -621,15 +621,13 @@ public class LogicalOperator
 
 public class MultipleRelation
 {
-    private LogicalOperator _logicalOperator;
     private Relation _relation;
     private MultipleRelation? _multipleRelation;
 
-    public MultipleRelation(Relation relation, MultipleRelation? multipleRelation, LogicalOperator logicalOperator)
+    public MultipleRelation(Relation relation, MultipleRelation? multipleRelation)
     {
         _relation = relation;
         _multipleRelation = multipleRelation;
-        _logicalOperator = logicalOperator;
     }
 
     public string ToString(string shift)
