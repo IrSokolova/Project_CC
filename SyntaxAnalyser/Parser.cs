@@ -190,6 +190,7 @@ public class Parser
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildWhileLoop");
 
         Body? body = BuildBody();
+        _tokens.GetNextToken();
         return new WhileLoop(expression, body);
     }
     
@@ -225,6 +226,7 @@ public class Parser
         }
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildForLoop");
         body = BuildBody();
+        _tokens.GetNextToken();
         return new ForLoop(identifier, reverse, range, body);
     }
     
