@@ -1,3 +1,8 @@
-if ( (num1 % i == 0) and (num2 % i == 0) ) then
-          gcd := i
-      end  
+
+
+var n : array [1 5 h 6 n] Integer
+
+function Integer main (Integer a1, Integer a2) is
+  var x : Real is 2.5
+  return a1
+end

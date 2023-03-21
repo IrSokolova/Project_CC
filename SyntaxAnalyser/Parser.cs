@@ -190,6 +190,9 @@ public class Parser
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildWhileLoop");
 
         Body? body = BuildBody();
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.End, "BuildWhileLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildWhileLoop");
         return new WhileLoop(expression, body);
     }
     
@@ -225,6 +228,9 @@ public class Parser
         }
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildForLoop");
         body = BuildBody();
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.End, "BuildForLoop");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildForLoop");
         return new ForLoop(identifier, reverse, range, body);
     }
     
@@ -247,10 +253,19 @@ public class Parser
         Body? ifBody = BuildBody(); // BuildIfBody because the body ends with "Else" token BUT maybe BuildBody is ok idk
         Body? elseBody = null;
         CheckNull(_tokens.Current(), TokenTypes.Else, "BuildIfStatement");
-        if (_tokens.Current()!.Item1 == TokenTypes.Else)
+        
+        nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.End, "BuildIfStatement");
+        if (nextToken!.Item1 == TokenTypes.Else)
         {
-            _tokens.GetNextToken();
-            elseBody = BuildBody(); // BuildBody because the body ends with usual "End" token
+            elseBody = BuildBody();
+            nextToken = _tokens.GetNextToken();
+            CheckNull(nextToken, TokenTypes.End, "BuildIfStatement");
+            CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildIfStatement");
+        }
+        else
+        {
+            CheckTokenMatch(nextToken.Item1, TokenTypes.End, "BuildIfStatement");
         }
 
         return new IfStatement(expression, ifBody, elseBody);
@@ -372,6 +387,9 @@ public class Parser
             Environment.Exit(0);
         }
 
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.End, "BuildRoutineDeclaration");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildRoutineDeclaration");
         return new RoutineDeclaration(mainRoutine, null);
     }
     
@@ -383,10 +401,13 @@ public class Parser
         if (function == null)
         {
             Console.WriteLine(
-                "Error in BuildRoutineDeclaration. Expected mainRoutine or function: Found null for both of them");
+                "Error in BuildFunctionDeclaration. Expected  function: Found null for both of them");
             Environment.Exit(0);
         }
-
+        
+        var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.End, "BuildFunctionDeclaration");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildFunctionDeclaration");
         return new RoutineDeclaration(null, function);
     }
 
