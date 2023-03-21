@@ -52,6 +52,8 @@ public enum TokenTypes
         ParenthesesR,
         BracketsL,
         BracketsR,
+        FigureBracketsL,
+        FigureBracketsR
 };
 
 public class LexicalAnal
@@ -236,6 +238,14 @@ public class LexicalAnal
                         @"^\s*(\\.{1,2}|[]])([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
 
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.FigureBracketsL, new Regex(
+                        @"^\s*(\\.{1,2}|[{])([\s\S]*)",
+                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
+                
+                _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.FigureBracketsR, new Regex(
+                        @"^\s*(\\.{1,2}|[}])([\s\S]*)",
+                        RegexOptions.Compiled | RegexOptions.IgnoreCase)));
+                
                 _Tokens.Add(new Tuple<TokenTypes, Regex>(TokenTypes.Identifiers, new Regex(
                         @"^\s*([a-zA-Z_][a-zA-Z0-9_]*)([\s\S]*)",
                         RegexOptions.Compiled | RegexOptions.IgnoreCase)));
