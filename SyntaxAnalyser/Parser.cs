@@ -109,26 +109,31 @@ public class Parser
 
         if (_tokens.Current() != null)
         {
-            var nextToken = _tokens.GetNextToken();
-            switch (nextToken!.Item1)
+            var token = _tokens.Current();
+            // var token = _tokens.GetNextToken();
+            switch (token!.Item1)
             {
                 case TokenTypes.While:
+                    _tokens.GetNextToken();
                     whileLoop = BuildWhileLoop();
                     break;
                 case TokenTypes.For:
+                    _tokens.GetNextToken();
                     forLoop = BuildForLoop();
                     break;
                 case TokenTypes.If :
+                    _tokens.GetNextToken();
                     ifStatement = BuildIfStatement();
                     break;
                 case TokenTypes.Identifiers:
-                    string? name = nextToken.Item2;
+                    _tokens.GetNextToken();
+                    string? name = token.Item2;
                     Identifier identifier = new Identifier(false, null, name);
                     
-                    nextToken = _tokens.GetNextToken();
-                    CheckNull(nextToken, TokenTypes.Assign, "BuildStatement");
+                    token = _tokens.GetNextToken();
+                    CheckNull(token, TokenTypes.Assign, "BuildStatement");
 
-                    switch (nextToken!.Item1)
+                    switch (token!.Item1)
                     {
                         case TokenTypes.Assign:
                             Expression? expression = BuildExpression();
@@ -137,16 +142,23 @@ public class Parser
                             break;
                         case TokenTypes.ParenthesesL:
                             Expressions? expressions = BuildExpressions();
-                            nextToken = _tokens.GetNextToken();
-                            CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildStatement");
-                            CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
+                            token = _tokens.GetNextToken();
+                            CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
+                            CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
                             routineCall = new RoutineCall(identifier, expressions);
                             break;
                     }
                     break;
             }
-            
-            return new Statement(assignment, whileLoop, forLoop, ifStatement, routineCall);
+
+            if (assignment != null || 
+                whileLoop != null || 
+                forLoop != null || 
+                ifStatement != null ||
+                routineCall != null)
+            {
+                return new Statement(assignment, whileLoop, forLoop, ifStatement, routineCall);
+            }
         }
         return null;
     }
@@ -227,6 +239,7 @@ public class Parser
         CheckNull(_tokens.Current(), TokenTypes.Else, "BuildIfStatement");
         if (_tokens.Current()!.Item1 == TokenTypes.Else)
         {
+            _tokens.GetNextToken();
             elseBody = BuildBody(); // BuildBody because the body ends with usual "End" token
         }
 

@@ -1,5 +1,5 @@
 if (x < y) then
-       x := 3.4
-   else
-	 x := 4.5
+  x := 3.4
+else
+  x := 4.5
 end

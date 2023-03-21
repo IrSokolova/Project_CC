@@ -723,7 +723,7 @@ public class Action
             }
             if (_statement != null)
             {
-                statementToString = _statement.ToString(shift1);
+                statementToString = _statement.ToString(shift1); // TODO UNCOMMENT
                 actionsToString = _actions.ToString(shift);
                 return actionToString + shift1 + statementToString + shift2 + actionsToString;
             }
@@ -737,7 +737,7 @@ public class Action
         if(_statement != null)
         {
             shift += "   ";
-            declarationToString = _statement.ToString(shift);
+            declarationToString = _statement.ToString(shift);  // TODO UNCOMMENT
             return actionToString + shift + "└" + declarationToString;
         }
 
