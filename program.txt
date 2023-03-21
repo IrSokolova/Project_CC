@@ -1,2 +1,9 @@
-var num2 : Integer
-var num2 : Integer
+routine main () is
+   var x : Real is 2.5
+   var y : Real is 8.1
+   if (x < y) then
+       x := 3.4
+   else
+	 x := 4.5
+   end
+end

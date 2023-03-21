@@ -901,9 +901,17 @@ public class Parser
             @return = BuildReturn();
             if (@return == null)
             {
-                statement = BuildStatement(); // !there is no check for statement inside BuildStatement!
-                if (statement == null)
+                if (_tokens.Current().Item1 != TokenTypes.End) 
                 {
+                    statement = BuildStatement(); // !there is no check for statement inside BuildStatement!
+                    if (statement == null)
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    _tokens.GetNextToken();
                     return null;
                 }
             }
