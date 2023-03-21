@@ -16,7 +16,7 @@ public class Identifier
 
     public override string ToString()
     {
-        return "(" + _name + ") \n";
+        return _name;
     }
     
     public string ToString(string shift)
@@ -94,24 +94,44 @@ public class VariableDeclaration
         if (_value == null)
         {
             typeToString = _type.ToString(shift);
-            return variableDeclarationToString + identifierToString + shift + "└" + typeToString;
+            return variableDeclarationToString + "(" + identifierToString + ") \n" + shift + "└" + typeToString;
         }
         
         typeToString = _type.ToString(shift1);
         valueToString = _value.ToString(shift);
-        return variableDeclarationToString + identifierToString + shift + "│" + typeToString + shift + "└" + valueToString;
+        return variableDeclarationToString + "(" + identifierToString + ") \n" + shift + "│" + typeToString + shift + "└" + valueToString;
     }
 }
 
 public class VariableDeclarations
 {
     private VariableDeclaration _variableDeclaration;
-    private VariableDeclarations _variableDeclarations;
+    private VariableDeclarations? _variableDeclarations;
 
-    public VariableDeclarations(VariableDeclaration variableDeclaration, VariableDeclarations variableDeclarations)
+    public VariableDeclarations(VariableDeclaration variableDeclaration, VariableDeclarations? variableDeclarations)
     {
         _variableDeclaration = variableDeclaration;
         _variableDeclarations = variableDeclarations;
+    }
+    
+    public string ToString(string shift)
+    {
+        string variableDeclarationsToString = "──VariableDeclarations \n";
+        string variableDeclarationToString;
+        string nextVariableDeclarationsToString;
+        
+        shift += "   ";
+        if (_variableDeclarations != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            variableDeclarationToString = _variableDeclaration.ToString(shift1);
+            nextVariableDeclarationsToString = _variableDeclarations.ToString(shift);
+            return variableDeclarationsToString + shift1 + variableDeclarationToString + shift2 + nextVariableDeclarationsToString;
+        }
+        
+        variableDeclarationToString = _variableDeclaration.ToString(shift);
+        return variableDeclarationsToString + shift + "└" + variableDeclarationToString;
     }
 }
 
@@ -128,7 +148,11 @@ public class TypeDeclaration
 
     public string ToString(string shift)
     {
-        return "";
+        string typeDeclarationToString = "──TypeDeclaration (";
+        string identifierToString = _identifier.ToString();
+        string typeToString = _type.ToString();
+
+        return typeDeclarationToString + identifierToString + ", " + typeToString + ") \n";
     }
 }
 
@@ -257,7 +281,22 @@ public class Parameters
     
     public string ToString(string shift)
     {
-        return "";
+        string parametersToString = "──Parameters \n";
+        string parameterDeclarationToString;
+        string nextParametersToString;
+        
+        shift += "   ";
+        if (_parameters != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            parameterDeclarationToString = _parameterDeclaration.ToString(shift1);
+            nextParametersToString = _parameters.ToString(shift);
+            return parametersToString + shift1 + parameterDeclarationToString + shift2 + nextParametersToString;
+        }
+        
+        parameterDeclarationToString = _parameterDeclaration.ToString(shift);
+        return parametersToString + shift + "└" + parameterDeclarationToString;
     }
 }
 
@@ -270,6 +309,15 @@ public class ParameterDeclaration // TYPE DEC IS THE SAME
     {
         _identifier = identifier;
         _type = type;
+    }
+
+    public string ToString(string shift)
+    {
+        string parameterDeclarationToString = "──ParameterDeclaration (";
+        string identifierToString = _identifier.ToString();
+        string typeToString = _type.ToString();
+
+        return parameterDeclarationToString + identifierToString + ", " + typeToString + ") \n";
     }
     
 }
@@ -341,9 +389,9 @@ public class Expression
 public class Expressions // WHY
 {
     private Expression _expression;
-    private Expressions _expressions;
+    private Expressions? _expressions;
 
-    public Expressions(Expression expression, Expressions expressions)
+    public Expressions(Expression expression, Expressions? expressions)
     {
         _expression = expression;
         _expressions = expressions;
@@ -351,7 +399,22 @@ public class Expressions // WHY
 
     public string ToString(string shift)
     {
-        return "";
+        string expressionsToString = "──Expressions \n";
+        string expressionToString;
+        string nextExpressionsToString;
+        
+        shift += "   ";
+        if (_expressions != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            expressionToString = _expression.ToString(shift1);
+            nextExpressionsToString = _expressions.ToString(shift);
+            return expressionsToString + shift1 + expressionToString + shift2 + nextExpressionsToString;
+        }
+        
+        expressionToString = _expression.ToString(shift);
+        return expressionsToString + shift + "└" + expressionToString;
     }
 }
 
@@ -468,7 +531,16 @@ public class Comparison
 
     public string ToString(string shift)
     {
-        return "";
+        string comparisonToString = "──Comparison \n";
+        string operatorToString;
+        string operationToString;
+        
+        shift += "   ";
+        string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+        operatorToString = _operator.ToString(shift1);
+        operationToString = _operation.ToString(shift);
+        return comparisonToString + shift1 + operatorToString + shift2 + operationToString;
     }
 }
 
@@ -501,7 +573,7 @@ public class Single
 
         if (_variable != null)
         {
-            variableToString = _variable.ToString(shift);
+            variableToString = _variable.ToString();
             return singleToString + variableToString + ") \n";
         }
 
@@ -524,7 +596,13 @@ public class Variable
     public string ToString(string shift)
     {
         string identifierToString = _identifier.ToString();
-        return "Variable " + identifierToString;
+        return "──Variable (" + identifierToString + ") \n";
+    }
+    
+    public override string ToString()
+    {
+        string identifierToString = _identifier.ToString();
+        return "Variable (" + identifierToString + ")";
     }
 }
 
@@ -753,6 +831,20 @@ public class ArrayType
         _expression = expression;
         _type = type;
     }
+    
+    public string ToString(string shift)
+    {
+        string arrayTypeToString = "──ArrayType \n";
+        string typeToString;
+        string expressionToString;
+        
+        shift += "   ";
+        string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+        typeToString = _type.ToString(shift1);
+        expressionToString = _expression.ToString(shift);
+        return arrayTypeToString + shift1 + typeToString + shift2 + expressionToString;
+    }
 }
 
 public class RecordType
@@ -764,6 +856,26 @@ public class RecordType
     {
         _variableDeclaration = variableDeclaration;
         _variableDeclarations = variableDeclarations;
+    }
+    
+    public string ToString(string shift)
+    {
+        string recordTypeToString = "──RecordType \n";
+        string variableDeclarationToString;
+        string nextVariableDeclarationsToString;
+        
+        shift += "   ";
+        if (_variableDeclarations != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            variableDeclarationToString = _variableDeclaration.ToString(shift1);
+            nextVariableDeclarationsToString = _variableDeclarations.ToString(shift);
+            return recordTypeToString + shift1 + variableDeclarationToString + shift2 + nextVariableDeclarationsToString;
+        }
+        
+        variableDeclarationToString = _variableDeclaration.ToString(shift);
+        return recordTypeToString + shift + "└" + variableDeclarationToString;
     }
 }
 
@@ -782,7 +894,7 @@ public class Action
 
     public string ToString(string shift)
     {
-        string actionToString = shift + "└──Action \n";
+        string actionToString = "──Action \n";
         string declarationToString;
         string statementToString;
         string actionsToString;
@@ -835,7 +947,22 @@ public class Actions
 
     public string ToString(string shift)
     {
-        return "";
+        string actionsToString = "──Actions \n";
+        string actionToString;
+        string nextActionsToString;
+        
+        shift += "   ";
+        if (_actions != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            actionToString = _action.ToString(shift1);
+            nextActionsToString = _actions.ToString(shift);
+            return actionsToString + shift1 + actionToString + shift2 + nextActionsToString;
+        }
+        
+        actionToString = _action.ToString(shift);
+        return actionsToString + shift + "└" + actionToString;
     }
 }
 
@@ -850,7 +977,11 @@ public class RoutineReturnType
     
     public string ToString(string shift)
     {
-        return "";
+        string routineReturnTypeToString = "──RoutineReturnType (";
+        string typeToString;
+
+        typeToString = _type.ToString();
+        return routineReturnTypeToString + typeToString + ") \n";
     }
 }
 
@@ -865,7 +996,17 @@ public class RoutineInsights
 
     public string ToString(string shift)
     {
-        return "";
+        string routineInsightsToString = "──RoutineInsights \n";
+        string bodyToString;
+        
+        shift += "   ";
+        if (_body != null)
+        {
+            string shift1 = shift + "  └";
+            bodyToString = _body.ToString(shift);
+            return routineInsightsToString + shift1 + bodyToString;
+        }
+        return routineInsightsToString;
     }
 }
 
