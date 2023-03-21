@@ -306,7 +306,8 @@ public class Parser
         var nextToken = _tokens.Current();
         if(nextToken?.Item1 is not TokenTypes.Var)
             return null;
-        
+
+        _tokens.GetNextToken();
         VariableDeclaration? variableDeclaration = BuildVariableDeclaration();
         VariableDeclarations? variableDeclarations = BuildVariableDeclarations();
         return new VariableDeclarations(variableDeclaration, variableDeclarations);
@@ -395,18 +396,23 @@ public class Parser
         switch (nextToken.Item1)
         {
             case TokenTypes.Integer:
+                _tokens.GetNextToken();
                 isInt = true;
                 break;
             case TokenTypes.Real:
+                _tokens.GetNextToken();
                 isReal = true;
                 break;
             case TokenTypes.Boolean:
+                _tokens.GetNextToken();
                 isBoolean = true;
                 break;
             case TokenTypes.Array:
+                _tokens.GetNextToken();
                 arrayType = BuildArrayType();
                 break;
             case TokenTypes.Record:
+                _tokens.GetNextToken();
                 recordType = BuildRecordType();
                 break;
         }
@@ -418,7 +424,6 @@ public class Parser
         {
             return null;
         }
-        _tokens.GetNextToken();
         return new Type(primitiveType, arrayType, recordType);
     }
     
@@ -461,9 +466,13 @@ public class Parser
     {
         VariableDeclaration? variableDeclaration;
         VariableDeclarations? variableDeclarations;
+        
         var nextToken = _tokens.GetNextToken();
+        CheckNull(nextToken, TokenTypes.FigureBracketsL, "BuildRecordType");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.FigureBracketsL, "BuildRecordType");
         
         // Get VariableDeclarations
+        nextToken = _tokens.GetNextToken();
         CheckNull(nextToken, TokenTypes.Var, "BuildRecordType");
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Var, "BuildRecordType");
         
@@ -472,8 +481,8 @@ public class Parser
 
         // Get End token
         nextToken = _tokens.Current();
-        CheckNull(nextToken, TokenTypes.End, "BuildRecordType");
-        CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildRecordType");
+        CheckNull(nextToken, TokenTypes.FigureBracketsR, "BuildRecordType");
+        CheckTokenMatch(nextToken!.Item1, TokenTypes.FigureBracketsR, "BuildRecordType");
 
         return new RecordType(variableDeclaration, variableDeclarations);
     }

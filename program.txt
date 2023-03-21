@@ -1,6 +1,6 @@
-function Integer main (Integer a1, Integer a2) is
- var x : Real is 2.5
- return a1
+routine main () is
+var x : Record {
+    var y : boolean is true
+    var z : Real is 8.1
+    }
 end
-
-
