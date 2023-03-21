@@ -276,6 +276,11 @@ public class Expressions // WHY
         _expression = expression;
         _expressions = expressions;
     }
+
+    public string ToString(string shift)
+    {
+        return "";
+    }
 }
 
 public class Relation 
@@ -739,8 +744,8 @@ public class Action
         if(_statement != null)
         {
             shift += "   ";
-            declarationToString = _statement.ToString(shift);  // TODO UNCOMMENT
-            return actionToString + shift + "└" + declarationToString;
+            statementToString = _statement.ToString(shift);  // TODO UNCOMMENT
+            return actionToString + shift + "└" + statementToString;
         }
 
         return actionToString;
@@ -808,6 +813,11 @@ public class Body
         _body = body;
         _return = @return;
     }
+
+    public string ToString(string shift)
+    {
+        return "";
+    }
 }
 
 public class Statement
@@ -826,6 +836,49 @@ public class Statement
         _ifStatement = ifStatement;
         _routineCall = routineCall;
     }
+
+    public string ToString(string shift)
+    {
+        string statementToString = "──Statement \n";
+        string assignmentToString;
+        string whileLoopToString;
+        string forLoopToString;
+        string ifStatementToString;
+        string routineCallToString;
+        
+        shift += "   ";
+        if(_assignment != null)
+        {
+            assignmentToString = _assignment.ToString(shift);
+            return statementToString + shift + "└" + assignmentToString;
+        }
+        
+        if(_whileLoop != null)
+        {
+            whileLoopToString = _whileLoop.ToString(shift);
+            return statementToString + shift + "└" + whileLoopToString;
+        }
+        
+        if(_forLoop != null)
+        {
+            forLoopToString = _forLoop.ToString(shift);
+            return statementToString + shift + "└" + forLoopToString;
+        }
+        
+        if(_ifStatement != null)
+        {
+            ifStatementToString = _ifStatement.ToString(shift);
+            return statementToString + shift + "└" + ifStatementToString;
+        }
+        
+        if(_routineCall != null)
+        {
+            routineCallToString = _routineCall.ToString(shift);
+            return statementToString + shift + "└" + routineCallToString;
+        }
+
+        return statementToString;
+    }
 }
 
 public class Assignment
@@ -837,6 +890,21 @@ public class Assignment
     {
         _variable = variable;
         _expression = expression;
+    }
+
+    public string ToString(string shift)
+    {
+        string assignmentToString = "──Assignment \n";
+        string variableToString;
+        string expressionToString;
+        
+        string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+        shift += "   ";
+        
+        variableToString = _variable.ToString(shift1);
+        expressionToString = _expression.ToString(shift);
+        return assignmentToString + shift1 + variableToString + shift2 + expressionToString;
     }
 }
 
@@ -850,6 +918,25 @@ public class RoutineCall
         _identifier = identifier;
         _expressions = expressions;
     }
+    
+    public string ToString(string shift)
+    {
+        string routineCallToString = "──RoutineCall \n";
+        string ifentifierToString;
+        string expressionToString;
+        
+        shift += "   ";
+        if (_expressions != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            ifentifierToString = _identifier.ToString(shift1);
+            expressionToString = _expressions.ToString(shift);
+            return routineCallToString + shift1 + ifentifierToString + shift2 + expressionToString;
+        }
+        ifentifierToString = _identifier.ToString(shift);
+        return routineCallToString + shift + "└" + ifentifierToString;
+    }
 }
 
 public class WhileLoop
@@ -861,6 +948,25 @@ public class WhileLoop
     {
         _expression = expression;
         _body = body;
+    }
+    
+    public string ToString(string shift)
+    {
+        string whileLoopToString = "──WhileLoop \n";
+        string expressionToString;
+        string bodyToString;
+        
+        shift += "   ";
+        if (_body != null)
+        {
+            string shift1 = shift + "  │";
+            string shift2 = shift + "  └";
+            expressionToString = _expression.ToString(shift1);
+            bodyToString = _body.ToString(shift);
+            return whileLoopToString + shift1 + expressionToString + shift2 + bodyToString;
+        }
+        expressionToString = _expression.ToString(shift);
+        return whileLoopToString + shift + "└" + expressionToString;
     }
 }
 
@@ -879,6 +985,31 @@ public class ForLoop
         _range = range;
         _body = body;
     }
+    
+    public string ToString(string shift)
+    {
+        string forLoopToString = "──ForLoop ";
+        string reverseToString = "(Reverse(" + _reverse + ")) \n";
+        string identifierToString;
+        string rangeToString;
+        string bodyToString;
+        
+        shift += "   ";
+        string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+
+        if (_body != null)
+        { 
+            identifierToString = _identifier.ToString(shift1);
+            rangeToString = _range.ToString(shift1);
+            bodyToString = _body.ToString(shift);
+            return forLoopToString + reverseToString + shift1 + identifierToString + shift1 + rangeToString + shift2 +
+                   bodyToString;
+        }
+        identifierToString = _identifier.ToString(shift1);
+        rangeToString = _range.ToString(shift);
+        return forLoopToString + reverseToString + shift1 + identifierToString + shift + "└" + rangeToString;
+    }
 }
 
 public class Range
@@ -891,21 +1022,58 @@ public class Range
         _from = from;
         _to = to;
     }
+
+    public string ToString(string shift)
+    {
+        string rangeToString = "──Range \n";
+        
+        shift += "   ";
+        string shift1 = shift + "  │";
+        string fromToString = _from.ToString(shift1);
+        string toToString = _to.ToString(shift);
+        
+        return rangeToString + shift1 + fromToString + shift + "└" + toToString;
+    }
 }
 
 public class IfStatement
 {
     private Expression _condition;
     private Body _ifBody;
-    private Body _elseBody;
+    private Body? _elseBody;
     // private ElseStatement _elseStatement;
 
-    public IfStatement(Expression condition, Body ifBody, Body elseBody)
+    public IfStatement(Expression condition, Body ifBody, Body? elseBody)
     {
         _condition = condition;
         _ifBody = ifBody;
         _elseBody = elseBody;
     }
+    
+    public string ToString(string shift)
+    {
+        string ifStatementToString = "──IfStatement \n";
+        string conditionToString;
+        string ifBodyToString;
+        string elseBodyToString;
+
+        shift += "   ";
+        string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+
+        if (_elseBody != null)
+        { 
+            conditionToString = _condition.ToString(shift1);
+            ifBodyToString = _ifBody.ToString(shift1);
+            elseBodyToString = _elseBody.ToString(shift);
+            return ifStatementToString + shift1 + conditionToString + shift1 + ifBodyToString + shift2 +
+                   elseBodyToString;
+        }
+        conditionToString = _condition.ToString(shift1);
+        ifBodyToString = _ifBody.ToString(shift);
+        return ifStatementToString + shift1 + conditionToString + shift + "└" + ifBodyToString;
+    }
+    
 }
 
 // public class ElseStatement {private Body _Body;public ElseStatement(Body body){_Body = body;}}

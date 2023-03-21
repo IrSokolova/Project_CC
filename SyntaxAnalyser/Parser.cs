@@ -653,7 +653,7 @@ public class Parser
             _tokens.GetNextToken();
             identifier = new Identifier(true, null, nextToken.Item2);
             var token = _tokens.Current();
-            CheckNull(token, TokenTypes.Assign, "BuildStatement");
+            CheckNull(token, TokenTypes.Assign, "BuildSingle");
             Type? arrayType = null;
             if (token!.Item1 == TokenTypes.BracketsL)
             {
