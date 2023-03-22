@@ -535,8 +535,8 @@ public class Parser
         
         // Try to build more Relations
         // TODO бесполезная штука вроде
-        MultipleRelation? multipleRelation = BuildMultipleRelation();
-        // MultipleRelation? multipleRelation = null;
+        // MultipleRelation? multipleRelation = BuildMultipleRelation();
+        MultipleRelation? multipleRelation = null;
 
         return new Expression(relation, multipleRelation);
     }
@@ -565,7 +565,7 @@ public class Parser
         if (operation == null)
             return null;
         
-        comparison = BuildComparison();
+        // comparison = BuildComparison();
         return new Relation(operation, comparison);
     }
 
@@ -594,9 +594,11 @@ public class Parser
         if (operand == null)
             return null;
         Operator? @operator = BuildOperator();
+        Operation? operation = null;
+        if (@operator != null)
+            operation = BuildOperation();
         
-        
-        return new Operation(operand, @operator);
+        return new Operation(operand, @operator, operation);
     }
 
     /// <summary>

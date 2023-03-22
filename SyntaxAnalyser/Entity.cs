@@ -458,11 +458,13 @@ public class Operation
 {
     private Operand _operand;
     private Operator? _operator;
+    private Operation? _operation;
 
-    public Operation(Operand operand, Operator? @operator)
+    public Operation(Operand operand, Operator? @operator, Operation? operation)
     {
         _operand = operand;
         _operator = @operator;
+        _operation = operation;
     }
 
     public string ToString(string shift)
@@ -470,6 +472,7 @@ public class Operation
         string operationToString = "──Operation \n";
         string operandToString;
         string operatorToString;
+        string nextOperationToString;
 
         if (_operator != null)
         {
@@ -477,8 +480,10 @@ public class Operation
             string shift2 = shift + "  └";
             shift += "   ";
             operandToString = _operand.ToString(shift1);
-            operatorToString = _operator.ToString(shift);
-            return operationToString + shift1 + operandToString + shift2 + operatorToString;
+            operatorToString = _operator.ToString(shift1);
+            nextOperationToString = _operation.ToString(shift);
+            return operationToString + shift1 + operandToString + shift1 + operatorToString + shift2 +
+                   nextOperationToString;
         }
 
         shift += "   ";
