@@ -148,11 +148,14 @@ public class TypeDeclaration
 
     public string ToString(string shift)
     {
-        string typeDeclarationToString = "──TypeDeclaration (";
-        string identifierToString = _identifier.ToString();
-        string typeToString = _type.ToString();
+        string typeDeclarationToString = "──TypeDeclaration \n";
+        string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+        shift += "   ";
+;       string identifierToString = _identifier.ToString(shift1);
+        string typeToString = _type.ToString(shift);
 
-        return typeDeclarationToString + identifierToString + ", " + typeToString + ") \n";
+        return typeDeclarationToString + shift1 + identifierToString + shift2 + typeToString;
     }
 }
 
@@ -758,11 +761,17 @@ public class Type
         }
         if (_arrayType != null)
         {
-            return "──Type (Array) \n";
+            string shift1 = shift + "  └";
+            shift += "   ";
+            arrayTypeToString = _arrayType.ToString(shift);
+            return "──Type \n" + shift1 + arrayTypeToString;
         }
         if (_recordType != null)
         {
-            return "──Type (Record) \n";
+            string shift1 = shift + "  └";
+            shift += "   ";
+            recordTypeToString = _recordType.ToString(shift);
+            return "──Type \n" + shift1 + recordTypeToString;
         }
 
         return "";
@@ -838,9 +847,9 @@ public class ArrayType
         string typeToString;
         string expressionToString;
         
-        shift += "   ";
         string shift1 = shift + "  │";
         string shift2 = shift + "  └";
+        shift += "   ";
         typeToString = _type.ToString(shift1);
         expressionToString = _expression.ToString(shift);
         return arrayTypeToString + shift1 + typeToString + shift2 + expressionToString;
@@ -1309,12 +1318,13 @@ public class Range
     {
         string rangeToString = "──Range \n";
         
-        shift += "   ";
         string shift1 = shift + "  │";
+        string shift2 = shift + "  └";
+        shift += "   ";
         string fromToString = _from.ToString(shift1);
         string toToString = _to.ToString(shift);
         
-        return rangeToString + shift1 + fromToString + shift + "└" + toToString;
+        return rangeToString + shift1 + fromToString + shift2 + toToString;
     }
 }
 
@@ -1346,8 +1356,9 @@ public class IfStatement
         if (_elseBody != null)
         { 
             conditionToString = _condition.ToString(shift1);
-            ifBodyToString = _ifBody.ToString(shift1);
-            elseBodyToString = _elseBody.ToString(shift);
+            // shift1 += "   ";
+            ifBodyToString = "──IfBody \n" + shift1 + "   └" + _ifBody.ToString(shift1 + "   ");
+            elseBodyToString = "──ElseBody \n" + shift + "   └"  + _elseBody.ToString(shift + "   ");
             return ifStatementToString + shift1 + conditionToString + shift1 + ifBodyToString + shift2 +
                    elseBodyToString;
         }

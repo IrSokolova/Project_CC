@@ -1,8 +1,11 @@
 
-
-var n : array [1 5 h 6 n] Integer
-
-function Integer main (Integer a1, Integer a2) is
-  var x : Real is 2.5
-  return a1
+routine main () is
+ var x : Real is 2.5
+ var y : Real is 8.1
+ while (x < y) loop
+     x := x + 1
+ end
 end
+
+
+

@@ -180,7 +180,7 @@ public class Parser
         CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesL, "BuildWhileLoop");
         
         Expression? expression = BuildExpression();
-        
+
         nextToken = _tokens.GetNextToken();
         CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildWhileLoop");
         CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildWhileLoop");
@@ -190,6 +190,7 @@ public class Parser
         CheckTokenMatch(nextToken!.Item1, TokenTypes.Loop, "BuildWhileLoop");
 
         Body? body = BuildBody();
+
         nextToken = _tokens.GetNextToken();
         CheckNull(nextToken, TokenTypes.End, "BuildWhileLoop");
         CheckTokenMatch(nextToken!.Item1, TokenTypes.End, "BuildWhileLoop");
@@ -518,7 +519,7 @@ public class Parser
         nextToken = _tokens.Current();
         CheckNull(nextToken, TokenTypes.FigureBracketsR, "BuildRecordType");
         CheckTokenMatch(nextToken!.Item1, TokenTypes.FigureBracketsR, "BuildRecordType");
-
+        _tokens.GetNextToken();
         return new RecordType(variableDeclaration, variableDeclarations);
     }
     
@@ -533,8 +534,10 @@ public class Parser
             return null;
         
         // Try to build more Relations
+        // TODO бесполезная штука вроде
         MultipleRelation? multipleRelation = BuildMultipleRelation();
-        
+        // MultipleRelation? multipleRelation = null;
+
         return new Expression(relation, multipleRelation);
     }
 
