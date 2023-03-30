@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using ConsoleApp1.LexicalAnalyser;
 using ConsoleApp1.SyntaxAnalyser;
+using DefaultNamespace.SemantycalAnalyser;
 
 namespace DefaultNamespace;
 
@@ -9,8 +10,8 @@ internal class Program
     public static void Main(string[] args)
     {
         // ADD YOUR PATH HERE
-        string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt";
         // string path = @"C:\Users\alena\RiderProjects\Project_CC\Project_CC\program.txt";
+        string path = @"C:\Users\User\RiderProjects\Compiler Construction\СС_Project\program.txt";
         string text = "";
 
         using (FileStream stream = File.OpenRead(path))
@@ -54,6 +55,8 @@ internal class Program
         Console.WriteLine("        *  AST  *        ");
         Console.WriteLine("=========================");
         Console.WriteLine("└" + action.ToString(""));
+
+        SemanticAnal semanticAnal = new SemanticAnal(action);
 
     }
 }

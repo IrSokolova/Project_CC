@@ -10,6 +10,4 @@ public class SyntaxAnal
     {
         this.lexicalAnalysis = lexicalAnalysis;
     }
-    
-    
 }

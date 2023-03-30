@@ -1,4 +1,6 @@
-﻿namespace ConsoleApp1.SyntaxAnalyser;
+﻿using DefaultNamespace.SemantycalAnalyser;
+
+namespace ConsoleApp1.SyntaxAnalyser;
 
 public class Identifier
 {
@@ -906,6 +908,11 @@ public class Action
         _actions = actions;
     }
 
+    public void accept(Visitor.ActionVisitor actionVisitor)
+    {
+        actionVisitor.visit(this);
+    }
+    
     public string ToString(string shift)
     {
         string actionToString = "──Action \n";
