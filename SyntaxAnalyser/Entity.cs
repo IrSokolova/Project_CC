@@ -5,15 +5,20 @@ namespace ConsoleApp1.SyntaxAnalyser;
 public class Identifier
 {
     // private bool _global;
-    private bool _readOnly;
-    private string? _type; // "Function" or type of variable
-    private string? _name;
+    public bool _readOnly;
+    public string? _type; // "Function" or type of variable
+    public string? _name;
 
     public Identifier(bool readOnly, string? type, string? name)
     {
         _readOnly = readOnly;
         _type = type;
         _name = name;
+    }
+    
+    public void Accept(Visitor.IdentifierVisitor identifierVisitor)
+    {
+        identifierVisitor.Visit(this);
     }
 
     public override string ToString()
@@ -29,15 +34,20 @@ public class Identifier
 
 public class Declaration
 {
-    private VariableDeclaration? _variableDeclaration;
-    private TypeDeclaration? _typeDeclaration;
-    private RoutineDeclaration? _routineDeclaration;
+    public VariableDeclaration? _variableDeclaration;
+    public TypeDeclaration? _typeDeclaration;
+    public RoutineDeclaration? _routineDeclaration;
 
     public Declaration(VariableDeclaration? variableDeclaration, TypeDeclaration? typeDeclaration, RoutineDeclaration? routineDeclaration)
     {
         _variableDeclaration = variableDeclaration;
         _typeDeclaration = typeDeclaration;
         _routineDeclaration = routineDeclaration;
+    }
+    
+    public void Accept(Visitor.DeclarationVisitor declarationVisitor)
+    {
+        declarationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -71,9 +81,9 @@ public class Declaration
 
 public class VariableDeclaration
 {
-    private Identifier _identifier;
-    private Type _type;
-    private Value? _value;
+    public Identifier _identifier;
+    public Type _type;
+    public Value? _value;
     // private Expression? _expression;
     
     public VariableDeclaration(Identifier identifier, Type type, Value? value)
@@ -82,6 +92,11 @@ public class VariableDeclaration
         _type = type;
         _value = value;
         // _expression = expression;
+    }
+    
+    public void Accept(Visitor.VariableDeclarationVisitor declarationVisitor)
+    {
+        declarationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -107,13 +122,18 @@ public class VariableDeclaration
 
 public class VariableDeclarations
 {
-    private VariableDeclaration _variableDeclaration;
-    private VariableDeclarations? _variableDeclarations;
+    public VariableDeclaration _variableDeclaration;
+    public VariableDeclarations? _variableDeclarations;
 
     public VariableDeclarations(VariableDeclaration variableDeclaration, VariableDeclarations? variableDeclarations)
     {
         _variableDeclaration = variableDeclaration;
         _variableDeclarations = variableDeclarations;
+    }
+    
+    public void Accept(Visitor.VariableDeclarationsVisitor declarationVisitor)
+    {
+        declarationVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -139,13 +159,18 @@ public class VariableDeclarations
 
 public class TypeDeclaration
 {
-    private Identifier _identifier;
-    private Type _type;
+    public Identifier _identifier;
+    public Type _type;
     
     public TypeDeclaration(Identifier identifier, Type type)
     {
         _identifier = identifier;
         _type = type;
+    }
+    
+    public void Accept(Visitor.TypeDeclarationVisitor declarationVisitor)
+    {
+        declarationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -163,13 +188,18 @@ public class TypeDeclaration
 
 public class RoutineDeclaration
 {
-    private MainRoutine? _mainRoutine;
-    private Function? _function;
+    public MainRoutine? _mainRoutine;
+    public Function? _function;
 
     public RoutineDeclaration(MainRoutine? mainRoutine, Function? function)
     {
         _mainRoutine = mainRoutine;
         _function = function;
+    }
+    
+    public void Accept(Visitor.RoutineDeclarationVisitor declarationVisitor)
+    {
+        declarationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -197,16 +227,18 @@ public class RoutineDeclaration
 
 public class MainRoutine
 {
-    private Identifier _identifier;
-    private Body? _body;
-    // private RoutineInsights _routineInsights;
-    // private Parameters? _parameters;
-    // private RoutineReturnType _routineReturnType;
+    public Identifier _identifier;
+    public Body? _body;
 
     public MainRoutine(Identifier identifier, Body? body)
     {
         _identifier = identifier;
         _body = body;
+    }
+    
+    public void Accept(Visitor.MainRoutineVisitor mainRoutineVisitor)
+    {
+        mainRoutineVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -231,10 +263,10 @@ public class MainRoutine
     
 public class Function
 {
-    private Identifier _identifier;
-    private Parameters? _parameters;
-    private RoutineReturnType _routineReturnType;
-    private RoutineInsights _routineInsights;
+    public Identifier _identifier;
+    public Parameters? _parameters;
+    public RoutineReturnType _routineReturnType;
+    public RoutineInsights _routineInsights;
 
     public Function(Identifier identifier, Parameters? parameters, RoutineReturnType routineReturnType, RoutineInsights routineInsights)
     {
@@ -242,6 +274,11 @@ public class Function
         _parameters = parameters;
         _routineReturnType = routineReturnType;
         _routineInsights = routineInsights;
+    }
+    
+    public void Accept(Visitor.FunctionVisitor functionVisitor)
+    {
+        functionVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -275,13 +312,18 @@ public class Function
 
 public class Parameters
 {
-    private ParameterDeclaration? _parameterDeclaration;
-    private Parameters? _parameters;
+    public ParameterDeclaration? _parameterDeclaration;
+    public Parameters? _parameters;
 
     public Parameters(ParameterDeclaration? parameterDeclaration, Parameters? parameters)
     {
         _parameterDeclaration = parameterDeclaration;
         _parameters = parameters;
+    }
+    
+    public void Accept(Visitor.ParametersVisitor parametersVisitor)
+    {
+        parametersVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -307,13 +349,18 @@ public class Parameters
 
 public class ParameterDeclaration // TYPE DEC IS THE SAME
 {
-    private Identifier _identifier;
-    private Type _type;
+    public Identifier _identifier;
+    public Type _type;
     
     public ParameterDeclaration(Identifier identifier, Type type)
     {
         _identifier = identifier;
         _type = type;
+    }
+    
+    public void Accept(Visitor.ParameterDeclarationVisitor declarationVisitor)
+    {
+        declarationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -327,26 +374,19 @@ public class ParameterDeclaration // TYPE DEC IS THE SAME
     
 }
 
-// public class ParameterDeclarations
-// {
-//     private ParameterDeclaration _parameterDeclaration;
-//     private ParameterDeclarations? _parameterDeclarations;
-//
-//     public ParameterDeclarations(ParameterDeclaration parameterDeclaration, ParameterDeclarations? parameterDeclarations)
-//     {
-//         _parameterDeclaration = parameterDeclaration;
-//         _parameterDeclarations = parameterDeclarations;
-//     }
-// }
-
 
 public class Value
 {
-    private Expression _expression;
+    public Expression _expression;
 
     public Value(Expression expression)
     {
         _expression = expression;
+    }
+    
+    public void Accept(Visitor.ValueVisitor valueVisitor)
+    {
+        valueVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -360,13 +400,18 @@ public class Value
 
 public class Expression
 {
-    private Relation _relation;
-    private MultipleRelation? _multipleRelation;
+    public Relation _relation;
+    public MultipleRelation? _multipleRelation;
 
     public Expression(Relation relation, MultipleRelation? multipleRelation)
     {
         _relation = relation;
         _multipleRelation = multipleRelation;
+    }
+    
+    public void Accept(Visitor.ExpressionVisitor expressionVisitor)
+    {
+        expressionVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -393,13 +438,18 @@ public class Expression
 
 public class Expressions // WHY
 {
-    private Expression _expression;
-    private Expressions? _expressions;
+    public Expression _expression;
+    public Expressions? _expressions;
 
     public Expressions(Expression expression, Expressions? expressions)
     {
         _expression = expression;
         _expressions = expressions;
+    }
+    
+    public void Accept(Visitor.ExpressionsVisitor expressionsVisitor)
+    {
+        expressionsVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -425,13 +475,18 @@ public class Expressions // WHY
 
 public class Relation 
 {
-    private Operation? _operation;
-    private Comparison? _comparison;
+    public Operation? _operation;
+    public Comparison? _comparison;
 
     public Relation(Operation? operation, Comparison? comparison)
     {
         _operation = operation;
         _comparison = comparison;
+    }
+    
+    public void Accept(Visitor.RelationVisitor relationVisitor)
+    {
+        relationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -458,15 +513,20 @@ public class Relation
 
 public class Operation
 {
-    private Operand _operand;
-    private Operator? _operator;
-    private Operation? _operation;
+    public Operand _operand;
+    public Operator? _operator;
+    public Operation? _operation;
 
     public Operation(Operand operand, Operator? @operator, Operation? operation)
     {
         _operand = operand;
         _operator = @operator;
         _operation = operation;
+    }
+    
+    public void Accept(Visitor.OperationVisitor operationVisitor)
+    {
+        operationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -496,13 +556,18 @@ public class Operation
 
 public class Operand 
 {
-    private Single? _single;
-    private Expression? _expression;
+    public Single? _single;
+    public Expression? _expression;
 
     public Operand(Single? single, Expression? expression)
     {
         _single = single;
         _expression = expression;
+    }
+    
+    public void Accept(Visitor.OperandVisitor operandVisitor)
+    {
+        operandVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -530,13 +595,18 @@ public class Operand
 
 public class Comparison
 {
-    private Operator _operator; // (something before) less than...
-    private Operation _operation; // then the operation
+    public Operator _operator; // (something before) less than...
+    public Operation _operation; // then the operation
 
     public Comparison(Operator @operator, Operation operation)
     {
         _operator = @operator;
         _operation = operation;
+    }
+    
+    public void Accept(Visitor.ComparisonVisitor comparisonVisitor)
+    {
+        comparisonVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -556,16 +626,20 @@ public class Comparison
 
 public class Single
 {
-    private Type? _type;
-    private string? _value;
-    private Variable? _variable;
-    // private bool _isNot;
-    
+    public Type? _type;
+    public string? _value;
+    public Variable? _variable;
+
     public Single(Type? type, string? value, Variable? variable)
     {
         _type = type;
         _value = value;
         _variable = variable;
+    }
+    
+    public void Accept(Visitor.SingleVisitor singleVisitor)
+    {
+        singleVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -593,14 +667,18 @@ public class Single
 
 public class Variable
 {
-    private Identifier _identifier;
-    private Type? _arrayType;
-    // private Identifiers _identifiers;
-    
+    public Identifier _identifier;
+    public Type? _arrayType;
+
     public Variable(Identifier identifier, Type? arrayType)
     {
         _identifier = identifier;
         _arrayType = arrayType;
+    }
+    
+    public void Accept(Visitor.VariableVisitor variableVisitor)
+    {
+        variableVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -618,9 +696,9 @@ public class Variable
 
 public class Operator
 {
-    private ComparisonOperator? _comparisonOperator;
-    private MathematicalOperator? _mathematicalOperator;
-    private LogicalOperator? _logicalOperator;  // maybe not needed
+    public ComparisonOperator? _comparisonOperator;
+    public MathematicalOperator? _mathematicalOperator;
+    public LogicalOperator? _logicalOperator;  // maybe not needed
 
     public Operator(ComparisonOperator? comparisonOperator, MathematicalOperator? mathematicalOperator,
         LogicalOperator? logicalOperator)
@@ -628,6 +706,11 @@ public class Operator
         _comparisonOperator = comparisonOperator;
         _mathematicalOperator = mathematicalOperator;
         _logicalOperator = logicalOperator;
+    }
+    
+    public void Accept(Visitor.OperatorVisitor operatorVisitor)
+    {
+        operatorVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -662,11 +745,16 @@ public class Operator
 
 public class ComparisonOperator
 {
-    private string _sign;
+    public string _sign;
 
     public ComparisonOperator(string sign)
     {
         _sign = sign;
+    }
+    
+    public void Accept(Visitor.ComparisonOperatorVisitor comparisonOperatorVisitor)
+    {
+        comparisonOperatorVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -678,11 +766,16 @@ public class ComparisonOperator
 
 public class MathematicalOperator
 {
-    private string _sign;
+    public string _sign;
 
     public MathematicalOperator(string sign)
     {
         _sign = sign;
+    }
+    
+    public void Accept(Visitor.MathematicalOperatorVisitor mathematicalOperatorVisitor)
+    {
+        mathematicalOperatorVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -693,11 +786,16 @@ public class MathematicalOperator
 
 public class LogicalOperator
 {
-    private string _sign;
+    public string _sign;
 
     public LogicalOperator(string sign)
     {
         _sign = sign;
+    }
+    
+    public void Accept(Visitor.LogicalOperatorVisitor logicalOperatorVisitor)
+    {
+        logicalOperatorVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -709,13 +807,18 @@ public class LogicalOperator
 
 public class MultipleRelation
 {
-    private Relation _relation;
-    private MultipleRelation? _multipleRelation;
+    public Relation _relation;
+    public MultipleRelation? _multipleRelation;
 
     public MultipleRelation(Relation relation, MultipleRelation? multipleRelation)
     {
         _relation = relation;
         _multipleRelation = multipleRelation;
+    }
+    
+    public void Accept(Visitor.MultipleRelationVisitor multipleRelationVisitor)
+    {
+        multipleRelationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -743,15 +846,20 @@ public class Type
 {
     // private Identifier _identifier;
     
-    private PrimitiveType? _primitiveType;
-    private ArrayType? _arrayType;
-    private RecordType? _recordType;
+    public PrimitiveType? _primitiveType;
+    public ArrayType? _arrayType;
+    public RecordType? _recordType;
 
     public Type(PrimitiveType? primitiveType, ArrayType? arrayType, RecordType? recordType)
     {
         _primitiveType = primitiveType;
         _arrayType = arrayType;
         _recordType = recordType;
+    }
+    
+    public void Accept(Visitor.TypeVisitor typeVisitor)
+    {
+        typeVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -813,15 +921,20 @@ public class Type
 
 public class PrimitiveType
 {
-    private bool _isInt;
-    private bool _isReal;
-    private bool _isBoolean;
+    public bool _isInt;
+    public bool _isReal;
+    public bool _isBoolean;
 
     public PrimitiveType(bool isInt, bool isReal, bool isBoolean)
     {
         _isInt = isInt;
         _isReal = isReal;
         _isBoolean = isBoolean;
+    }
+    
+    public void Accept(Visitor.PrimitiveTypeVisitor primitiveTypeVisitor)
+    {
+        primitiveTypeVisitor.Visit(this);
     }
 
     public override string ToString()
@@ -838,14 +951,18 @@ public class PrimitiveType
 
 public class ArrayType 
 {
-    private Expression _expression; 
-    private Type _type;
-    // size
+    public Expression _expression; 
+    public Type _type;
 
     public ArrayType(Expression expression, Type type)
     {
         _expression = expression;
         _type = type;
+    }
+    
+    public void Accept(Visitor.ArrayTypeVisitor arrayTypeVisitor)
+    {
+        arrayTypeVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -865,13 +982,18 @@ public class ArrayType
 
 public class RecordType
 {
-    private VariableDeclaration _variableDeclaration;
-    private VariableDeclarations? _variableDeclarations;
+    public VariableDeclaration _variableDeclaration;
+    public VariableDeclarations? _variableDeclarations;
 
     public RecordType(VariableDeclaration variableDeclaration, VariableDeclarations? variableDeclarations)
     {
         _variableDeclaration = variableDeclaration;
         _variableDeclarations = variableDeclarations;
+    }
+    
+    public void Accept(Visitor.RecordTypeVisitor recordTypeVisitor)
+    {
+        recordTypeVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -897,9 +1019,9 @@ public class RecordType
 
 public class Action
 {
-    private Declaration? _declaration;
-    private Statement? _statement;
-    private Actions? _actions;
+    public Declaration? _declaration;
+    public Statement? _statement;
+    public Actions? _actions;
 
     public Action(Declaration? declaration, Statement? statement, Actions? actions)
     {
@@ -908,9 +1030,9 @@ public class Action
         _actions = actions;
     }
 
-    public void accept(Visitor.ActionVisitor actionVisitor)
+    public void Accept(Visitor.ActionVisitor actionVisitor)
     {
-        actionVisitor.visit(this);
+        actionVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -957,13 +1079,18 @@ public class Action
 
 public class Actions
 {
-    private Action _action;
-    private Actions? _actions;
+    public Action _action;
+    public Actions? _actions;
 
     public Actions(Action action, Actions? actions)
     {
         _action = action;
         _actions = actions;
+    }
+    
+    public void Accept(Visitor.ActionsVisitor actionsVisitor)
+    {
+        actionsVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -989,11 +1116,16 @@ public class Actions
 
 public class RoutineReturnType
 {
-    private Type? _type;
+    public Type? _type;
 
     public RoutineReturnType(Type? type)
     {
         _type = type;
+    }
+    
+    public void Accept(Visitor.RoutineReturnTypeVisitor routineReturnTypeVisitor)
+    {
+        routineReturnTypeVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1008,11 +1140,16 @@ public class RoutineReturnType
 
 public class RoutineInsights
 {
-    private Body? _body;
+    public Body? _body;
 
     public RoutineInsights(Body? body)
     {
         _body = body;
+    }
+    
+    public void Accept(Visitor.RoutineInsightsVisitor routineInsightsVisitor)
+    {
+        routineInsightsVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1033,11 +1170,16 @@ public class RoutineInsights
 
 public class Return
 {
-    private Expression? _expression;
+    public Expression? _expression;
 
     public Return(Expression? expression)
     {
         _expression = expression;
+    }
+    
+    public void Accept(Visitor.ReturnVisitor returnVisitor)
+    {
+        returnVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1051,10 +1193,10 @@ public class Return
 
 public class Body
 {
-    private Declaration? _declaration;
-    private Statement? _statement;
-    private Return? _return;
-    private Body? _body;
+    public Declaration? _declaration;
+    public Statement? _statement;
+    public Return? _return;
+    public Body? _body;
 
     public Body(Declaration? declaration, Statement? statement, Body? body, Return? @return)
     {
@@ -1062,6 +1204,11 @@ public class Body
         _statement = statement;
         _body = body;
         _return = @return;
+    }
+    
+    public void Accept(Visitor.BodyVisitor bodyVisitor)
+    {
+        bodyVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1125,11 +1272,11 @@ public class Body
 
 public class Statement
 {
-    private Assignment? _assignment;
-    private WhileLoop? _whileLoop;
-    private ForLoop? _forLoop;
-    private IfStatement? _ifStatement;
-    private RoutineCall? _routineCall;
+    public Assignment? _assignment;
+    public WhileLoop? _whileLoop;
+    public ForLoop? _forLoop;
+    public IfStatement? _ifStatement;
+    public RoutineCall? _routineCall;
 
     public Statement(Assignment? assignment, WhileLoop? whileLoop, ForLoop? forLoop, IfStatement? ifStatement, RoutineCall? routineCall)
     {
@@ -1138,6 +1285,11 @@ public class Statement
         _forLoop = forLoop;
         _ifStatement = ifStatement;
         _routineCall = routineCall;
+    }
+    
+    public void Accept(Visitor.StatementVisitor statementVisitor)
+    {
+        statementVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1186,13 +1338,18 @@ public class Statement
 
 public class Assignment
 {
-    private Variable _variable;
-    private Expression _expression;
+    public Variable _variable;
+    public Expression _expression;
 
     public Assignment(Variable variable, Expression expression)
     {
         _variable = variable;
         _expression = expression;
+    }
+    
+    public void Accept(Visitor.AssignmentVisitor assignmentVisitor)
+    {
+        assignmentVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1213,13 +1370,18 @@ public class Assignment
 
 public class RoutineCall 
 {
-    private Identifier _identifier;
-    private Expressions? _expressions; // MAYBE ACTION // TODO EXPLAIN
+    public Identifier _identifier;
+    public Expressions? _expressions; // MAYBE ACTION // TODO EXPLAIN
 
     public RoutineCall(Identifier identifier, Expressions? expressions)
     {
         _identifier = identifier;
         _expressions = expressions;
+    }
+    
+    public void Accept(Visitor.RoutineCallVisitor routineCallVisitor)
+    {
+        routineCallVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1244,13 +1406,18 @@ public class RoutineCall
 
 public class WhileLoop
 {
-    private Expression _expression;
-    private Body? _body;
+    public Expression _expression;
+    public Body? _body;
 
     public WhileLoop(Expression expression, Body? body)
     {
         _expression = expression;
         _body = body;
+    }
+    
+    public void Accept(Visitor.WhileLoopVisitor whileLoopVisitor)
+    {
+        whileLoopVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1276,10 +1443,10 @@ public class WhileLoop
 public class ForLoop
 {
     // private string _name;
-    private Identifier _identifier;
-    private bool _reverse;
-    private Range _range;
-    private Body? _body;
+    public Identifier _identifier;
+    public bool _reverse;
+    public Range _range;
+    public Body? _body;
 
     public ForLoop(Identifier identifier, bool reverse, Range range, Body? body)
     {
@@ -1287,6 +1454,11 @@ public class ForLoop
         _reverse = reverse;
         _range = range;
         _body = body;
+    }
+    
+    public void Accept(Visitor.ForLoopVisitor forLoopVisitor)
+    {
+        forLoopVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1317,13 +1489,18 @@ public class ForLoop
 
 public class Range
 {
-    private Expression _from;
-    private Expression _to;
+    public Expression _from;
+    public Expression _to;
 
     public Range(Expression from, Expression to)
     {
         _from = from;
         _to = to;
+    }
+    
+    public void Accept(Visitor.RangeVisitor rangeVisitor)
+    {
+        rangeVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1342,9 +1519,9 @@ public class Range
 
 public class IfStatement
 {
-    private Expression _condition;
-    private Body _ifBody;
-    private Body? _elseBody;
+    public Expression _condition;
+    public Body _ifBody;
+    public Body? _elseBody;
     // private ElseStatement _elseStatement;
 
     public IfStatement(Expression condition, Body ifBody, Body? elseBody)
@@ -1352,6 +1529,11 @@ public class IfStatement
         _condition = condition;
         _ifBody = ifBody;
         _elseBody = elseBody;
+    }
+    
+    public void Accept(Visitor.IfStatementVisitor ifStatementVisitor)
+    {
+        ifStatementVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1380,5 +1562,3 @@ public class IfStatement
     }
     
 }
-
-// public class ElseStatement {private Body _Body;public ElseStatement(Body body){_Body = body;}}

@@ -16,39 +16,77 @@ public class Visitor
 
     public class ActionVisitor
     {
-        public void visit(ConsoleApp1.SyntaxAnalyser.Action? action)
+        public void Visit(ConsoleApp1.SyntaxAnalyser.Action action)
         {
             
+            if (!(action._actions is null))
+            {
+                action._actions.Accept(new ActionsVisitor());
+            }
+            if (!(action._declaration is null))
+            {
+                action._declaration.Accept(new DeclarationVisitor());
+            }
+            if (!(action._statement is null))
+            {
+                action._statement.Accept(new StatementVisitor());
+            }
         }
     }
     
     public class ActionsVisitor
     {
-        public void visit(Actions? actions)
+        public void Visit(Actions actions)
         {
+            actions._action.Accept(new ActionVisitor());
             
+            if (!(actions._actions is null))
+            {
+                actions._actions.Accept(new ActionsVisitor());
+            }
         }
     }
     
     public class DeclarationVisitor
     {
-        public void visit(Declaration? declaration)
+        public void Visit(Declaration declaration)
         {
+            if (!(declaration._variableDeclaration is null))
+            {
+                declaration._variableDeclaration.Accept(new VariableDeclarationVisitor());
+            }
             
+            if (!(declaration._typeDeclaration is null))
+            {
+                declaration._typeDeclaration.Accept(new TypeDeclarationVisitor());
+            }
+            
+            if (!(declaration._routineDeclaration is null))
+            {
+                declaration._routineDeclaration.Accept(new RoutineDeclarationVisitor());
+            }
         }
     }
     
     public class RoutineDeclarationVisitor
     {
-        public void visit(RoutineDeclaration? routineDeclaration)
+        public void Visit(RoutineDeclaration routineDeclaration)
         {
+            if (!(routineDeclaration._mainRoutine is null))
+            {
+                routineDeclaration._mainRoutine.Accept(new MainRoutineVisitor());
+            }
             
+            if (!(routineDeclaration._function is null))
+            {
+                routineDeclaration._function.Accept(new FunctionVisitor());
+            }
         }
     }
     
     public class RoutineInsightsVisitor
     {
-        public void visit(RoutineInsights? routineInsights)
+        public void Visit(RoutineInsights? routineInsights)
         {
             
         }
@@ -56,7 +94,7 @@ public class Visitor
     
     public class RoutineReturnTypeVisitor
     {
-        public void visit(RoutineReturnType? routineReturnType)
+        public void Visit(RoutineReturnType? routineReturnType)
         {
             
         }
@@ -64,7 +102,7 @@ public class Visitor
     
     public class VariableDeclarationVisitor
     {
-        public void visit(VariableDeclaration? variableDeclaration)
+        public void Visit(VariableDeclaration? variableDeclaration)
         {
             
         }
@@ -72,7 +110,7 @@ public class Visitor
     
     public class TypeDeclarationVisitor
     {
-        public void visit(TypeDeclaration? typeDeclaration)
+        public void Visit(TypeDeclaration? typeDeclaration)
         {
             
         }
@@ -80,7 +118,7 @@ public class Visitor
     
     public class StatementVisitor
     {
-        public void visit(Statement? statement)
+        public void Visit(Statement? statement)
         {
             
         }
@@ -88,7 +126,7 @@ public class Visitor
     
     public class IfStatementVisitor
     {
-        public void visit(IfStatement? ifStatement)
+        public void Visit(IfStatement? ifStatement)
         {
             
         }
@@ -96,7 +134,7 @@ public class Visitor
     
     public class AssignmentVisitor
     {
-        public void visit(Assignment? assignment)
+        public void Visit(Assignment? assignment)
         {
             
         }
@@ -104,7 +142,7 @@ public class Visitor
     
     public class WhileLoopVisitor
     {
-        public void visit(WhileLoop? whileLoop)
+        public void Visit(WhileLoop? whileLoop)
         {
             
         }
@@ -112,7 +150,7 @@ public class Visitor
     
     public class ForLoopVisitor
     {
-        public void visit(ForLoop? forLoop)
+        public void Visit(ForLoop? forLoop)
         {
             
         }
@@ -120,7 +158,7 @@ public class Visitor
     
     public class RoutineCallVisitor
     {
-        public void visit(RoutineCall? routineCall)
+        public void Visit(RoutineCall? routineCall)
         {
             
         }
@@ -128,7 +166,7 @@ public class Visitor
 
     public class IdentifierVisitor
     {
-        public void visit(Identifier? identifier)
+        public void Visit(Identifier? identifier)
         {
             
         }
@@ -136,7 +174,7 @@ public class Visitor
     
     public class TypeVisitor
     {
-        public void visit(Type? type)
+        public void Visit(Type? type)
         {
             
         }
@@ -144,7 +182,7 @@ public class Visitor
     
     public class PrimitiveTypeVisitor
     {
-        public void visit(PrimitiveType? primitiveType)
+        public void Visit(PrimitiveType? primitiveType)
         {
             
         }
@@ -152,7 +190,7 @@ public class Visitor
     
     public class ArrayTypeVisitor
     {
-        public void visit(ArrayType? arrayType)
+        public void Visit(ArrayType? arrayType)
         {
             
         }
@@ -160,7 +198,7 @@ public class Visitor
     
     public class RecordTypeVisitor
     {
-        public void visit(RecordType? recordType)
+        public void Visit(RecordType? recordType)
         {
             
         }
@@ -168,7 +206,7 @@ public class Visitor
 
     public class ExpressionVisitor
     {
-        public void visit(Expression? expression)
+        public void Visit(Expression? expression)
         {
             
         }
@@ -176,7 +214,7 @@ public class Visitor
     
     public class ExpressionsVisitor
     {
-        public void visit(Expressions? expressions)
+        public void Visit(Expressions? expressions)
         {
             
         }
@@ -184,7 +222,7 @@ public class Visitor
 
     public class RelationVisitor
     {
-        public void visit(Relation? relation)
+        public void Visit(Relation? relation)
         {
             
         }
@@ -192,7 +230,7 @@ public class Visitor
 
     public class ValueVisitor
     {
-        public void visit(Value? value)
+        public void Visit(Value? value)
         {
             
         }
@@ -200,7 +238,7 @@ public class Visitor
 
     public class MultipleRelationVisitor
     {
-        public void visit(MultipleRelation? multipleRelation)
+        public void Visit(MultipleRelation? multipleRelation)
         {
             
         }
@@ -208,7 +246,7 @@ public class Visitor
     
     public class VariableDeclarationsVisitor
     {
-        public void visit(VariableDeclarations? variableDeclarations)
+        public void Visit(VariableDeclarations? variableDeclarations)
         {
             
         }
@@ -216,7 +254,7 @@ public class Visitor
     
     public class MainRoutineVisitor
     {
-        public void visit(MainRoutine? mainRoutine)
+        public void Visit(MainRoutine? mainRoutine)
         {
             
         }
@@ -224,7 +262,7 @@ public class Visitor
     
     public class FunctionVisitor
     {
-        public void visit(Function? function)
+        public void Visit(Function? function)
         {
             
         }
@@ -232,7 +270,7 @@ public class Visitor
     
     public class BodyVisitor
     {
-        public void visit(Body? body)
+        public void Visit(Body? body)
         {
             
         }
@@ -240,7 +278,7 @@ public class Visitor
     
     public class ParameterDeclarationVisitor
     {
-        public void visit(ParameterDeclaration? parameterDeclaration)
+        public void Visit(ParameterDeclaration? parameterDeclaration)
         {
             
         }
@@ -248,7 +286,7 @@ public class Visitor
     
     public class ParametersVisitor
     {
-        public void visit(Parameters? parameters)
+        public void Visit(Parameters? parameters)
         {
             
         }
@@ -256,7 +294,7 @@ public class Visitor
     
     public class OperationVisitor
     {
-        public void visit(Operation? operation)
+        public void Visit(Operation? operation)
         {
             
         }
@@ -264,7 +302,7 @@ public class Visitor
     
     public class ComparisonVisitor
     {
-        public void visit(Comparison? comparison)
+        public void Visit(Comparison? comparison)
         {
             
         }
@@ -272,7 +310,7 @@ public class Visitor
     
     public class OperandVisitor
     {
-        public void visit(Operand? operand)
+        public void Visit(Operand? operand)
         {
             
         }
@@ -280,7 +318,7 @@ public class Visitor
     
     public class OperatorVisitor
     {
-        public void visit(Operator? oOperator)
+        public void Visit(Operator? oOperator)
         {
             
         }
@@ -288,7 +326,7 @@ public class Visitor
     
     public class SingleVisitor
     {
-        public void visit(Single? single)
+        public void Visit(Single? single)
         {
             
         }
@@ -296,7 +334,7 @@ public class Visitor
     
     public class VariableVisitor
     {
-        public void visit(Variable? variable)
+        public void Visit(Variable? variable)
         {
             
         }
@@ -304,7 +342,7 @@ public class Visitor
     
     public class ComparisonOperatorVisitor
     {
-        public void visit(ComparisonOperator? comparisonOperator)
+        public void Visit(ComparisonOperator? comparisonOperator)
         {
             
         }
@@ -312,7 +350,7 @@ public class Visitor
     
     public class MathematicalOperatorVisitor
     {
-        public void visit(MathematicalOperator? mathematicalOperator)
+        public void Visit(MathematicalOperator? mathematicalOperator)
         {
             
         }
@@ -320,7 +358,7 @@ public class Visitor
     
     public class LogicalOperatorVisitor
     {
-        public void visit(LogicalOperator? logicalOperator)
+        public void Visit(LogicalOperator? logicalOperator)
         {
             
         }
@@ -328,7 +366,7 @@ public class Visitor
     
     public class RangeVisitor
     {
-        public void visit(Range? range)
+        public void Visit(Range? range)
         {
             
         }
@@ -336,7 +374,7 @@ public class Visitor
     
     public class ReturnVisitor
     {
-        public void visit(Return? rReturn)
+        public void Visit(Return? rReturn)
         {
             
         }
