@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices.JavaScript;
+﻿using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.JavaScript;
 using ConsoleApp1.SyntaxAnalyser;
 using Action = System.Action;
 using Range = ConsoleApp1.SyntaxAnalyser.Range;
@@ -9,8 +11,8 @@ namespace DefaultNamespace.SemantycalAnalyser;
 
 public class Visitor
 {
-    private Dictionary<String, Object> functions;
-    private Dictionary<String, Object> localVariables;
+    public static Dictionary<String, Object> functions;
+    public static Dictionary<String, Object> localVariables;
 
     public Visitor(){}
 
@@ -86,17 +88,20 @@ public class Visitor
     
     public class RoutineInsightsVisitor
     {
-        public void Visit(RoutineInsights? routineInsights)
+        public void Visit(RoutineInsights routineInsights)
         {
-            
+            if (!(routineInsights._body is null))
+            {
+                routineInsights._body.Accept(new BodyVisitor());
+            }
         }
     }
     
     public class RoutineReturnTypeVisitor
     {
-        public void Visit(RoutineReturnType? routineReturnType)
+        public Type? Visit(RoutineReturnType routineReturnType)
         {
-            
+            return routineReturnType._type;
         }
     }
     
@@ -104,7 +109,22 @@ public class Visitor
     {
         public void Visit(VariableDeclaration? variableDeclaration)
         {
-            
+            if (variableDeclaration != null)
+            {
+                string varName = variableDeclaration._identifier.ToString();
+                if (localVariables.ContainsKey(varName))
+                {
+                    throw new Exception(String.Format("Variable {0} already declared", varName));
+                }
+                
+                // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
+                // var n : Integer is 10 - хорошо
+                // var n : Integer is "10" - плохо
+                Type expectedVariableType = variableDeclaration._type;
+                variableDeclaration._value.Accept(new ValueVisitor());
+                
+                localVariables.Add(varName, variableDeclaration._type);
+            }
         }
     }
     
@@ -112,30 +132,77 @@ public class Visitor
     {
         public void Visit(TypeDeclaration? typeDeclaration)
         {
-            
+            if (typeDeclaration != null)
+            {
+                string typeName = typeDeclaration._identifier.ToString();
+                if (localVariables.ContainsKey(typeName))
+                {
+                    throw new Exception(String.Format("Type {0} already declared", typeName));
+                }
+                
+                // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
+                // type arr is array [1] Integer - хорошо
+                // type arr is array ["1"] Integer - плохо
+
+                localVariables.Add(typeName, typeDeclaration._type);
+            }
         }
     }
     
     public class StatementVisitor
     {
-        public void Visit(Statement? statement)
+        public void Visit(Statement statement)
         {
-            
+            if (!(statement._assignment is null))
+            {
+                statement._assignment.Accept(new AssignmentVisitor());
+            }
+
+            if (!(statement._ifStatement is null))
+            {
+                statement._ifStatement.Accept(new IfStatementVisitor());
+            }
+
+            if (!(statement._forLoop is null))
+            {
+                statement._forLoop.Accept(new ForLoopVisitor());
+            }
+
+            if (!(statement._routineCall is null))
+            {
+                statement._routineCall.Accept(new RoutineCallVisitor());
+            }
+
+            if (!(statement._whileLoop is null))
+            {
+                statement._whileLoop.Accept(new WhileLoopVisitor());
+            }
         }
     }
     
     public class IfStatementVisitor
     {
-        public void Visit(IfStatement? ifStatement)
+        public void Visit(IfStatement ifStatement)
         {
+            // TODO надо проверить, что condition - bool
             
+            ifStatement._condition.Accept(new ExpressionVisitor());
+            ifStatement._ifBody.Accept(new BodyVisitor());
+            if (!(ifStatement._elseBody is null))
+            {
+                ifStatement._elseBody.Accept(new BodyVisitor());
+            }
         }
     }
     
     public class AssignmentVisitor
     {
-        public void Visit(Assignment? assignment)
+        public void Visit(Assignment assignment)
         {
+            // TODO: проверить, что мы присваеваем нужный тип к нужному типу
+            // Type expressionType = assignment._expression.Accept(new ExpressionVisitor());
+            
+            // Надо сделать так, чтобы все accept могли что-то возвращать
             
         }
     }
