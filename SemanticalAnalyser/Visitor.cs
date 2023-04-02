@@ -1,6 +1,7 @@
 ﻿using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
+using System.Security.Cryptography.X509Certificates;
 using ConsoleApp1.SyntaxAnalyser;
 using Action = System.Action;
 using Range = ConsoleApp1.SyntaxAnalyser.Range;
@@ -11,7 +12,7 @@ namespace DefaultNamespace.SemantycalAnalyser;
 
 public class Visitor
 {
-    public static Dictionary<String, Object> functions;
+    public static Dictionary<String, Tuple<Object, Object>> functions;
     public static Dictionary<String, Object> localVariables;
 
     public Visitor(){}
@@ -76,24 +77,25 @@ public class Visitor
         {
             if (!(routineDeclaration._mainRoutine is null))
             {
-                routineDeclaration._mainRoutine.Accept(new MainRoutineVisitor());
+                routineDeclaration._mainRoutine.Accept(new RelationVisitor.MainRoutineVisitor());
             }
-            
             if (!(routineDeclaration._function is null))
             {
-                routineDeclaration._function.Accept(new FunctionVisitor());
+                routineDeclaration._function.Accept(new RelationVisitor.FunctionVisitor());
             }
         }
     }
     
     public class RoutineInsightsVisitor
     {
-        public void Visit(RoutineInsights routineInsights)
+        public Object Visit(RoutineInsights routineInsights)
         {
             if (!(routineInsights._body is null))
             {
-                routineInsights._body.Accept(new BodyVisitor());
+                // return routineInsights._body.Accept(new BodyVisitor());
             }
+
+            return null;
         }
     }
     
@@ -121,7 +123,7 @@ public class Visitor
                 // var n : Integer is 10 - хорошо
                 // var n : Integer is "10" - плохо
                 Type expectedVariableType = variableDeclaration._type;
-                variableDeclaration._value.Accept(new ValueVisitor());
+                Type actualVariableRtpe = variableDeclaration._value.Accept(new RelationVisitor.ValueVisitor());
                 
                 localVariables.Add(varName, variableDeclaration._type);
             }
@@ -187,10 +189,10 @@ public class Visitor
             // TODO надо проверить, что condition - bool
             
             ifStatement._condition.Accept(new ExpressionVisitor());
-            ifStatement._ifBody.Accept(new BodyVisitor());
+            ifStatement._ifBody.Accept(new RelationVisitor.BodyVisitor());
             if (!(ifStatement._elseBody is null))
             {
-                ifStatement._elseBody.Accept(new BodyVisitor());
+                ifStatement._elseBody.Accept(new RelationVisitor.BodyVisitor());
             }
         }
     }
@@ -209,17 +211,37 @@ public class Visitor
     
     public class WhileLoopVisitor
     {
-        public void Visit(WhileLoop? whileLoop)
+        public void Visit(WhileLoop whileLoop)
         {
-            
+            if (whileLoop._body != null)
+            {
+                whileLoop._body.Accept(new RelationVisitor.BodyVisitor());
+            }
+            // TODO: Экспрешионы всегда должны быть типа Bool?
+            whileLoop._expression.Accept(new ExpressionVisitor());
         }
     }
     
     public class ForLoopVisitor
     {
-        public void Visit(ForLoop? forLoop)
+        public void Visit(ForLoop forLoop)
         {
+            String identifierType = forLoop._identifier.Accept(new IdentifierVisitor());
+            if (identifierType != "Integer")
+            {
+                throw new Exception(String.Format("Identifier can not be of type {0}", identifierType));
+            }
             
+            if (forLoop._body != null)
+            {
+                forLoop._body.Accept(new RelationVisitor.BodyVisitor());
+            }
+            
+            // TODO: проверить Range
+            if (forLoop._reverse)
+            {
+                
+            }
         }
     }
     
@@ -233,17 +255,24 @@ public class Visitor
 
     public class IdentifierVisitor
     {
-        public void Visit(Identifier? identifier)
+        public string? Visit(Identifier? identifier)
         {
-            
+            if (identifier != null)
+            {
+                return identifier._type;
+            }
+
+            return null;
         }
     }
     
     public class TypeVisitor
     {
-        public void Visit(Type? type)
+        public Type Visit(Type type)
         {
-            
+            // TODO: Выглядит странно, но ладно
+            // TODO: написать accept для type
+            return type;
         }
     }
     
@@ -251,7 +280,7 @@ public class Visitor
     {
         public void Visit(PrimitiveType? primitiveType)
         {
-            
+            // return primitiveType.GetType();
         }
     }
     
@@ -273,9 +302,15 @@ public class Visitor
 
     public class ExpressionVisitor
     {
-        public void Visit(Expression? expression)
+        public Type Visit(Expression? expression)
         {
-            
+            if (expression != null)
+            {
+                return expression._relation.Accept(new RelationVisitor());
+            }
+
+            if (expression._multipleRelation != null)
+                    expression._multipleRelation.Accept(new RelationVisitor.MultipleRelationVisitor());
         }
     }
     
@@ -289,17 +324,22 @@ public class Visitor
 
     public class RelationVisitor
     {
-        public void Visit(Relation? relation)
+        public Type Visit(Relation? relation)
         {
-            
+            if (relation._operation != null)
+            {
+                return relation._operation.Accept(new OperationVisitor());
+            }
+
+            return relation._comparison.Accept(new ComparisonVisitor());
         }
     }
 
     public class ValueVisitor
     {
-        public void Visit(Value? value)
+        public Type Visit(Value? value)
         {
-            
+            return value._expression.Accept(new ExpressionVisitor());
         }
     }
 
@@ -321,17 +361,32 @@ public class Visitor
     
     public class MainRoutineVisitor
     {
-        public void Visit(MainRoutine? mainRoutine)
+        public void Visit(MainRoutine mainRoutine)
         {
-            
+            string routineName = mainRoutine._identifier.ToString();
+            if (functions.ContainsKey(routineName))
+            {
+                throw new Exception(String.Format("{0} routine already exists", routineName));
+            }
         }
     }
     
     public class FunctionVisitor
     {
-        public void Visit(Function? function)
+        public void Visit(Function function)
         {
-            
+            string functionName = function._identifier.ToString();
+            if (function._routineReturnType._type != null)
+            {
+                Type expectedReturnType = function._routineReturnType._type;
+            }
+
+            // Type actualReturnType = function._routineInsights.Accept(new RoutineInsightsVisitor());
+
+            if (functions.ContainsKey(functionName))
+            {
+                throw new Exception(String.Format("{0} function already exists", functionName));
+            }
         }
     }
     
@@ -358,15 +413,62 @@ public class Visitor
             
         }
     }
-    
+
     public class OperationVisitor
     {
-        public void Visit(Operation? operation)
+        public Type Visit(Operation? operation)
         {
+            // Operation - Value1, Operator - sign(+, - ...), Operand - Value2
+            Type? operationType = null;
+            Type? operatorType = null;
+            Type? operandType;
             
+            operandType = operation._operand.Accept(new OperandVisitor());
+            if (operation._operation != null)
+            {
+                operationType = operation._operation.Accept(new OperationVisitor());
+            }
+
+            if (operation._operator != null)
+            {
+                if (operation._operator._comparisonOperator != null)
+                {
+                    if (!(operationType._primitiveType._isInt && operandType._primitiveType._isInt ||
+                        operationType._primitiveType._isReal && operandType._primitiveType._isReal))
+                    {
+                        throw new Exception("Type Error for the comparison operator");
+                    } 
+                }
+                
+                if (operation._operator._logicalOperator != null)
+                {
+                    if (!(operationType._primitiveType._isBoolean && operandType._primitiveType._isBoolean))
+                    {
+                        throw new Exception("Type Error for the logical operator");
+                    } 
+                }
+                operatorType = operation._operator.Accept(new OperatorVisitor());
+            }
+
+            
+            
+            if (operationType != null)
+            {
+                if (!operationType.Equals(operandType))
+                {
+                    throw new Exception("Type Error");
+                }
+            }
+            
+            if (operatorType != null)
+            {
+                return operatorType;
+            }
+
+            return operandType;
         }
     }
-    
+
     public class ComparisonVisitor
     {
         public void Visit(Comparison? comparison)
@@ -377,17 +479,31 @@ public class Visitor
     
     public class OperandVisitor
     {
-        public void Visit(Operand? operand)
+        public Type? Visit(Operand operand)
         {
-            
+            if (operand._single._variable != null)
+            {
+                string key = operand._single._variable._identifier.ToString();
+                if (localVariables.ContainsKey(key))
+                {
+                    return (Type) localVariables[key];
+                }
+                throw new Exception(String.Format("Variable {0} undefined", key));
+            }
+            return operand._single._type;
         }
     }
     
     public class OperatorVisitor
     {
-        public void Visit(Operator? oOperator)
+        public Type? Visit(Operator? oOperator)
         {
-            
+            if (oOperator._comparisonOperator != null || oOperator._logicalOperator != null)
+            {
+                return new Type(new PrimitiveType(false, false, true), null, null);
+            }
+
+            return null;
         }
     }
     

@@ -16,9 +16,10 @@ public class Identifier
         _name = name;
     }
     
-    public void Accept(Visitor.IdentifierVisitor identifierVisitor)
+    public string Accept(Visitor.IdentifierVisitor identifierVisitor)
     {
         identifierVisitor.Visit(this);
+        return _type.ToString();
     }
 
     public override string ToString()
@@ -384,9 +385,9 @@ public class Value
         _expression = expression;
     }
     
-    public void Accept(Visitor.ValueVisitor valueVisitor)
+    public Type Accept(Visitor.ValueVisitor valueVisitor)
     {
-        valueVisitor.Visit(this);
+        return valueVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -409,9 +410,9 @@ public class Expression
         _multipleRelation = multipleRelation;
     }
     
-    public void Accept(Visitor.ExpressionVisitor expressionVisitor)
+    public Type Accept(Visitor.ExpressionVisitor expressionVisitor)
     {
-        expressionVisitor.Visit(this);
+        return expressionVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -484,9 +485,9 @@ public class Relation
         _comparison = comparison;
     }
     
-    public void Accept(Visitor.RelationVisitor relationVisitor)
+    public Type Accept(Visitor.RelationVisitor relationVisitor)
     {
-        relationVisitor.Visit(this);
+        return relationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -524,9 +525,9 @@ public class Operation
         _operation = operation;
     }
     
-    public void Accept(Visitor.OperationVisitor operationVisitor)
+    public Type Accept(Visitor.OperationVisitor operationVisitor)
     {
-        operationVisitor.Visit(this);
+        return operationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -565,9 +566,9 @@ public class Operand
         _expression = expression;
     }
     
-    public void Accept(Visitor.OperandVisitor operandVisitor)
+    public Type Accept(Visitor.OperandVisitor operandVisitor)
     {
-        operandVisitor.Visit(this);
+        return operandVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -708,9 +709,9 @@ public class Operator
         _logicalOperator = logicalOperator;
     }
     
-    public void Accept(Visitor.OperatorVisitor operatorVisitor)
+    public Type Accept(Visitor.OperatorVisitor operatorVisitor)
     {
-        operatorVisitor.Visit(this);
+        return operatorVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -855,6 +856,12 @@ public class Type
         _primitiveType = primitiveType;
         _arrayType = arrayType;
         _recordType = recordType;
+    }
+
+    public bool Equals(Type t)
+    {
+        return _primitiveType == t._primitiveType && _arrayType == t._arrayType &&
+                _recordType == t._recordType;
     }
     
     public void Accept(Visitor.TypeVisitor typeVisitor)
@@ -1206,9 +1213,9 @@ public class Body
         _return = @return;
     }
     
-    public void Accept(Visitor.BodyVisitor bodyVisitor)
+    public Object Accept(Visitor.BodyVisitor bodyVisitor)
     {
-        bodyVisitor.Visit(this);
+        return bodyVisitor.Visit(this);
     }
 
     public string ToString(string shift)
