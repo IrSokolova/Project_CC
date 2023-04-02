@@ -1,7 +1,6 @@
 ﻿using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
-using System.Security.Cryptography.X509Certificates;
 using ConsoleApp1.SyntaxAnalyser;
 using Action = System.Action;
 using Range = ConsoleApp1.SyntaxAnalyser.Range;
@@ -12,8 +11,8 @@ namespace DefaultNamespace.SemantycalAnalyser;
 
 public class Visitor
 {
-    public static Dictionary<String, Tuple<Object, Object>> functions;
-    public static Dictionary<String, Object> localVariables;
+    public static Dictionary<String, Tuple<Object, Object>> functions = new Dictionary<string, Tuple<object, object>>();
+    public static Dictionary<String, Object> localVariables = new Dictionary<string, object>();
 
     public Visitor(){}
 
@@ -77,11 +76,11 @@ public class Visitor
         {
             if (!(routineDeclaration._mainRoutine is null))
             {
-                routineDeclaration._mainRoutine.Accept(new RelationVisitor.MainRoutineVisitor());
+                routineDeclaration._mainRoutine.Accept(new MainRoutineVisitor());
             }
             if (!(routineDeclaration._function is null))
             {
-                routineDeclaration._function.Accept(new RelationVisitor.FunctionVisitor());
+                routineDeclaration._function.Accept(new FunctionVisitor());
             }
         }
     }
@@ -109,24 +108,26 @@ public class Visitor
     
     public class VariableDeclarationVisitor
     {
-        public void Visit(VariableDeclaration? variableDeclaration)
+        public string Visit(VariableDeclaration variableDeclaration)
         {
-            if (variableDeclaration != null)
+            string varName = variableDeclaration._identifier.ToString();
+            if (localVariables.ContainsKey(varName))
             {
-                string varName = variableDeclaration._identifier.ToString();
-                if (localVariables.ContainsKey(varName))
-                {
-                    throw new Exception(String.Format("Variable {0} already declared", varName));
-                }
-                
-                // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
-                // var n : Integer is 10 - хорошо
-                // var n : Integer is "10" - плохо
-                Type expectedVariableType = variableDeclaration._type;
-                Type actualVariableRtpe = variableDeclaration._value.Accept(new RelationVisitor.ValueVisitor());
-                
-                localVariables.Add(varName, variableDeclaration._type);
+                throw new Exception(String.Format("Variable {0} already declared", varName));
             }
+            
+            // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
+            // var n : Integer is 10 - хорошо
+            // var n : Integer is "10" - плохо
+            Type expectedVariableType = variableDeclaration._type;
+            Type actualVariabletype = variableDeclaration._value.Accept(new ValueVisitor());
+
+            if (!(actualVariabletype.Equals(expectedVariableType)))
+            {
+                throw new Exception("Type Error in variable declaration");
+            }
+            localVariables.Add(varName, variableDeclaration._type);
+            return actualVariabletype.ToString();
         }
     }
     
@@ -141,6 +142,8 @@ public class Visitor
                 {
                     throw new Exception(String.Format("Type {0} already declared", typeName));
                 }
+                
+                typeDeclaration._type.Accept(new TypeVisitor());
                 
                 // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
                 // type arr is array [1] Integer - хорошо
@@ -189,10 +192,10 @@ public class Visitor
             // TODO надо проверить, что condition - bool
             
             ifStatement._condition.Accept(new ExpressionVisitor());
-            ifStatement._ifBody.Accept(new RelationVisitor.BodyVisitor());
+            ifStatement._ifBody.Accept(new BodyVisitor());
             if (!(ifStatement._elseBody is null))
             {
-                ifStatement._elseBody.Accept(new RelationVisitor.BodyVisitor());
+                ifStatement._elseBody.Accept(new BodyVisitor());
             }
         }
     }
@@ -215,7 +218,7 @@ public class Visitor
         {
             if (whileLoop._body != null)
             {
-                whileLoop._body.Accept(new RelationVisitor.BodyVisitor());
+                whileLoop._body.Accept(new BodyVisitor());
             }
             // TODO: Экспрешионы всегда должны быть типа Bool?
             whileLoop._expression.Accept(new ExpressionVisitor());
@@ -234,7 +237,7 @@ public class Visitor
             
             if (forLoop._body != null)
             {
-                forLoop._body.Accept(new RelationVisitor.BodyVisitor());
+                forLoop._body.Accept(new BodyVisitor());
             }
             
             // TODO: проверить Range
@@ -268,35 +271,52 @@ public class Visitor
     
     public class TypeVisitor
     {
-        public Type Visit(Type type)
+        public string Visit(Type type)
         {
-            // TODO: Выглядит странно, но ладно
-            // TODO: написать accept для type
-            return type;
+            if (type._primitiveType != null)
+            {
+                return type._primitiveType.Accept(new PrimitiveTypeVisitor());
+            }
+            if (type._arrayType != null)
+            {
+                return type._arrayType.Accept(new ArrayTypeVisitor());
+            }
+
+            if (type._recordType != null)
+            {
+                return type._recordType.Accept(new RecordTypeVisitor());
+            }
+
+            return null;
         }
     }
     
     public class PrimitiveTypeVisitor
     {
-        public void Visit(PrimitiveType? primitiveType)
+        public string Visit(PrimitiveType primitiveType)
         {
-            // return primitiveType.GetType();
+            return primitiveType.ToString();
         }
     }
     
     public class ArrayTypeVisitor
     {
-        public void Visit(ArrayType? arrayType)
+        public string Visit(ArrayType? arrayType)
         {
-            
+            return arrayType._type.Accept(new TypeVisitor());
         }
     }
     
     public class RecordTypeVisitor
     {
-        public void Visit(RecordType? recordType)
+        public string Visit(RecordType recordType)
         {
-            
+            if (recordType._variableDeclarations != null)
+            {
+                return recordType._variableDeclarations.Accept(new VariableDeclarationsVisitor());
+            }
+
+            return recordType._variableDeclaration.Accept(new VariableDeclarationVisitor());
         }
     }
 
@@ -304,13 +324,9 @@ public class Visitor
     {
         public Type Visit(Expression? expression)
         {
-            if (expression != null)
-            {
-                return expression._relation.Accept(new RelationVisitor());
-            }
-
             if (expression._multipleRelation != null)
-                    expression._multipleRelation.Accept(new RelationVisitor.MultipleRelationVisitor());
+                expression._multipleRelation.Accept(new MultipleRelationVisitor());
+            return expression._relation.Accept(new RelationVisitor());
         }
     }
     
@@ -353,9 +369,14 @@ public class Visitor
     
     public class VariableDeclarationsVisitor
     {
-        public void Visit(VariableDeclarations? variableDeclarations)
+        public string Visit(VariableDeclarations? variableDeclarations)
         {
-            
+            if (variableDeclarations._variableDeclarations != null)
+            {
+                return variableDeclarations._variableDeclarations.Accept(new VariableDeclarationsVisitor());
+            }
+
+            return variableDeclarations._variableDeclaration.Accept(new VariableDeclarationVisitor());
         }
     }
     
@@ -368,6 +389,7 @@ public class Visitor
             {
                 throw new Exception(String.Format("{0} routine already exists", routineName));
             }
+            mainRoutine._body.Accept(new BodyVisitor());
         }
     }
     
@@ -392,8 +414,27 @@ public class Visitor
     
     public class BodyVisitor
     {
-        public void Visit(Body? body)
+        public void Visit(Body body)
         {
+            if (body._declaration != null)
+            {
+                body._declaration.Accept(new DeclarationVisitor());
+            }
+
+            if (body._statement != null)
+            {
+                body._statement.Accept(new StatementVisitor());
+            }
+
+            if (body._return != null)
+            {
+                body._return.Accept(new ReturnVisitor());
+            }
+
+            if (body._body != null)
+            {
+                body._body.Accept(new BodyVisitor());
+            }
             
         }
     }
@@ -471,9 +512,10 @@ public class Visitor
 
     public class ComparisonVisitor
     {
-        public void Visit(Comparison? comparison)
+        public Type Visit(Comparison comparison)
         {
-            
+            if (comparison._operation != null) return comparison._operation.Accept(new OperationVisitor());
+            return comparison._operator.Accept(new OperatorVisitor());
         }
     }
     

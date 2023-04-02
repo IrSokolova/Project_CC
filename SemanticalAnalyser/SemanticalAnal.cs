@@ -9,5 +9,7 @@ public class SemanticAnal
     public SemanticAnal(Action? action)
     {
         syntaxAnalysis = action;
+        Visitor.ActionVisitor actionVisitor = new Visitor.ActionVisitor();
+        actionVisitor.Visit(action);
     }
 }

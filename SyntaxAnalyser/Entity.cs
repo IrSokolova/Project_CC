@@ -95,9 +95,9 @@ public class VariableDeclaration
         // _expression = expression;
     }
     
-    public void Accept(Visitor.VariableDeclarationVisitor declarationVisitor)
+    public string Accept(Visitor.VariableDeclarationVisitor declarationVisitor)
     {
-        declarationVisitor.Visit(this);
+        return declarationVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -132,9 +132,9 @@ public class VariableDeclarations
         _variableDeclarations = variableDeclarations;
     }
     
-    public void Accept(Visitor.VariableDeclarationsVisitor declarationVisitor)
+    public string Accept(Visitor.VariableDeclarationsVisitor declarationVisitor)
     {
-        declarationVisitor.Visit(this);
+       return declarationVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -605,9 +605,9 @@ public class Comparison
         _operation = operation;
     }
     
-    public void Accept(Visitor.ComparisonVisitor comparisonVisitor)
+    public Type Accept(Visitor.ComparisonVisitor comparisonVisitor)
     {
-        comparisonVisitor.Visit(this);
+       return comparisonVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -864,9 +864,9 @@ public class Type
                 _recordType == t._recordType;
     }
     
-    public void Accept(Visitor.TypeVisitor typeVisitor)
+    public string Accept(Visitor.TypeVisitor typeVisitor)
     {
-        typeVisitor.Visit(this);
+        return typeVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -939,9 +939,9 @@ public class PrimitiveType
         _isBoolean = isBoolean;
     }
     
-    public void Accept(Visitor.PrimitiveTypeVisitor primitiveTypeVisitor)
+    public string Accept(Visitor.PrimitiveTypeVisitor primitiveTypeVisitor)
     {
-        primitiveTypeVisitor.Visit(this);
+        return primitiveTypeVisitor.Visit(this);
     }
 
     public override string ToString()
@@ -967,9 +967,9 @@ public class ArrayType
         _type = type;
     }
     
-    public void Accept(Visitor.ArrayTypeVisitor arrayTypeVisitor)
+    public string Accept(Visitor.ArrayTypeVisitor arrayTypeVisitor)
     {
-        arrayTypeVisitor.Visit(this);
+        return arrayTypeVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -998,9 +998,9 @@ public class RecordType
         _variableDeclarations = variableDeclarations;
     }
     
-    public void Accept(Visitor.RecordTypeVisitor recordTypeVisitor)
+    public string Accept(Visitor.RecordTypeVisitor recordTypeVisitor)
     {
-        recordTypeVisitor.Visit(this);
+        return recordTypeVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1213,9 +1213,9 @@ public class Body
         _return = @return;
     }
     
-    public Object Accept(Visitor.BodyVisitor bodyVisitor)
+    public void Accept(Visitor.BodyVisitor bodyVisitor)
     {
-        return bodyVisitor.Visit(this);
+        bodyVisitor.Visit(this);
     }
 
     public string ToString(string shift)
