@@ -1,6 +1,5 @@
 ﻿using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.JavaScript;
 using ConsoleApp1.SyntaxAnalyser;
 using Action = System.Action;
 using Range = ConsoleApp1.SyntaxAnalyser.Range;
@@ -201,8 +200,7 @@ public class Visitor
     {
         public void Visit(IfStatement ifStatement)
         {
-            // TODO надо проверить, что condition - bool
-            
+
             Type conditionType = ifStatement._condition.Accept(new ExpressionVisitor());
             if (!conditionType.ToString().Equals("Boolean"))
             {
@@ -227,11 +225,43 @@ public class Visitor
             }
 
             Type expectedType = (Type)localVariables[varName];
-            Type actualType = assignment._expression.Accept(new ExpressionVisitor());
-
-            if (!expectedType.ToString().Equals(actualType.ToString()))
+            if (assignment._expression != null)
             {
-                throw new Exception(String.Format("Type error in assignment of variable {0}", varName));
+                Type actualType = assignment._expression.Accept(new ExpressionVisitor());
+                if (!expectedType.ToString().Equals(actualType.ToString()))
+                {
+                    throw new Exception(String.Format("Type error in assignment of variable {0}", varName));
+                }
+            }
+            else
+            {
+                String functionName = assignment._routineCall._identifier.ToString();
+                if (!functions.ContainsKey(functionName))
+                {
+                    throw new Exception(String.Format("The routine {0} is undefined", functionName));
+                }
+                
+                List<Tuple<String,Object>>parametersList = functions[functionName];
+                String actualType = "";
+                foreach (Tuple<String,Object> parameter in parametersList)
+                {
+                    if (parameter.Item1.Equals("return"))
+                    {
+                        actualType = (String) parameter.Item2;
+                        break;
+                    }
+                }
+                List<Type> actualParameters = assignment._routineCall.Accept(new RoutineCallVisitor());
+                if (actualType.Equals(""))
+                {
+                    throw new Exception(String.Format("The variable {0} can't be assigned to result of {1}", varName, functionName));
+                }
+                if (!expectedType.ToString().Equals(actualType.ToString()))
+                {
+                    throw new Exception(String.Format("The variable {0} can't be assigned to result of {1}", varName, functionName));
+                }
+                
+                // TODO Compare Parameters in actualParameters and parametersList
             }
         }
     }
@@ -240,12 +270,16 @@ public class Visitor
     {
         public void Visit(WhileLoop whileLoop)
         {
+            Type conditionType = whileLoop._expression.Accept(new ExpressionVisitor());
+            if (!conditionType.ToString().Equals("Boolean"))
+            {
+                throw new Exception(String.Format("Condition expected to be boolean type, not {0}", conditionType));
+            }
+
             if (whileLoop._body != null)
             {
                 whileLoop._body.Accept(new BodyVisitor());
             }
-            // TODO: Экспрешионы всегда должны быть типа Bool?
-            whileLoop._expression.Accept(new ExpressionVisitor());
         }
     }
     
@@ -274,9 +308,14 @@ public class Visitor
     
     public class RoutineCallVisitor
     {
-        public void Visit(RoutineCall? routineCall)
+        public List<Type> Visit(RoutineCall? routineCall)
         {
-            
+            if (routineCall._expressions != null)
+            {
+                return routineCall._expressions.Accept(new ExpressionsVisitor());    
+            }
+
+            return null;
         }
     }
 
@@ -356,9 +395,20 @@ public class Visitor
     
     public class ExpressionsVisitor
     {
-        public void Visit(Expressions? expressions)
+        public List<Type> actualParameters = new List<Type>();
+
+        public void GoDeeper(Expressions? expressions)
         {
-            
+            if (expressions != null)
+            {
+                actualParameters.Add(expressions._expression.Accept(new ExpressionVisitor()));
+                GoDeeper(expressions._expressions);
+            }
+        }
+        public List<Type> Visit(Expressions? expressions)
+        {
+            GoDeeper(expressions);
+            return actualParameters;
         }
     }
 
@@ -425,6 +475,7 @@ public class Visitor
         public void Visit(Function function)
         {
             string functionName = function._identifier.ToString();
+            int numberOfParameters = 0;
             
             if (functions.ContainsKey(functionName))
             {
@@ -439,11 +490,11 @@ public class Visitor
             List<Tuple<String, Object>> parameters = new List<Tuple<string, object>>();
             foreach (var variable in localVariables)
             {
-                parameters.Add(new Tuple<string, object>(variable.Key, variable.Value));
+                numberOfParameters++;
+                string parameterName = "parameter" + numberOfParameters;
+                parameters.Add(new Tuple<string, object>(parameterName, variable.Value));
             }
-            
-            functions.Add(functionName, parameters);
-            
+
             if (function._routineReturnType._type != null)
             {
                 Type expectedReturnType = function._routineReturnType._type;
@@ -452,8 +503,9 @@ public class Visitor
                 {
                     throw new Exception(String.Format("Return type mismatch in {0} function", functionName));
                 }
+                parameters.Add(new Tuple<string, object>("return", actualReturnType.ToString()));
             }
-
+            functions.Add(functionName, parameters);
             localVariables.Clear();
         }
     }

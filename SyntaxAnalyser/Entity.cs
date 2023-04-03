@@ -448,9 +448,9 @@ public class Expressions // WHY
         _expressions = expressions;
     }
     
-    public void Accept(Visitor.ExpressionsVisitor expressionsVisitor)
+    public List<Type> Accept(Visitor.ExpressionsVisitor expressionsVisitor)
     {
-        expressionsVisitor.Visit(this);
+        return expressionsVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1396,9 +1396,9 @@ public class RoutineCall
         _expressions = expressions;
     }
     
-    public void Accept(Visitor.RoutineCallVisitor routineCallVisitor)
+    public List<Type> Accept(Visitor.RoutineCallVisitor routineCallVisitor)
     {
-        routineCallVisitor.Visit(this);
+        return routineCallVisitor.Visit(this);
     }
     
     public string ToString(string shift)
