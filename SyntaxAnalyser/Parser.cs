@@ -143,12 +143,24 @@ public class Parser
                     token = _tokens.GetNextToken();
                     CheckNull(token, TokenTypes.Assign, "BuildStatement");
 
+                    RoutineCall? rc = null;
                     switch (token!.Item1)
                     {
                         case TokenTypes.Assign:
+                            token = _tokens.Current();
                             Expression? expression = BuildExpression();
                             Variable variable = new Variable(identifier, arrayType);
-                            assignment = new Assignment(variable, expression);
+                            if (expression == null && _tokens.Current()!.Item1 is TokenTypes.ParenthesesL)
+                            {
+                                _tokens.GetNextToken();
+                                Identifier callIdentifier = new Identifier(false, null, token.Item2);
+                                Expressions? callExpressions = BuildExpressions();
+                                token = _tokens.GetNextToken();
+                                CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
+                                CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
+                                routineCall = new RoutineCall(callIdentifier, callExpressions);
+                            }
+                            assignment = new Assignment(variable, expression, routineCall);
                             break;
                         case TokenTypes.ParenthesesL:
                             Expressions? expressions = BuildExpressions();
@@ -630,8 +642,13 @@ public class Parser
         Single? single = BuildSingle();
         Expression? expression = null;
         
-        // If it's not Single, try to build Expression
         var nextToken = _tokens.Current();
+        if (single != null && nextToken != null && nextToken.Item1 is TokenTypes.ParenthesesL)
+        {
+            return null;
+        }
+        
+        // If it's not Single, try to build Expression
         if (single == null && nextToken != null)
         {
             if (nextToken.Item1 is TokenTypes.ParenthesesL)

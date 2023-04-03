@@ -1,15 +1,9 @@
+function Integer aaaa (Integer a1 Integer a2) is
+  var x : Real is 2.5
+  return a1
+end
+
 routine main () is
- var n : Integer is 10
- var size : Integer is 4
- type arr is array [1] Integer
- var temp : Integer
- for i := 1 to size - 1 loop
-   for j := 1 to size - i loop
-     if ( arr [j] > arr [j + 1] ) then
-       temp := arr [j]
-       arr [j] := arr [j + 1]
-       arr [j + 1] := temp
-     end
-   end
- end
+ var x : Integer is 3
+ x := aaaa (x x)
 end

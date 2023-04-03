@@ -1347,11 +1347,13 @@ public class Assignment
 {
     public Variable _variable;
     public Expression _expression;
+    public RoutineCall _routineCall;
 
-    public Assignment(Variable variable, Expression expression)
+    public Assignment(Variable variable, Expression expression, RoutineCall routineCall)
     {
         _variable = variable;
         _expression = expression;
+        _routineCall = routineCall;
     }
     
     public void Accept(Visitor.AssignmentVisitor assignmentVisitor)
@@ -1364,12 +1366,20 @@ public class Assignment
         string assignmentToString = "──Assignment \n";
         string variableToString;
         string expressionToString;
+        string callToString;
         
         string shift1 = shift + "  │";
         string shift2 = shift + "  └";
         shift += "   ";
         
         variableToString = _variable.ToString(shift1);
+        
+        if(_routineCall != null)
+        {
+            callToString = _routineCall.ToString(shift);
+            return assignmentToString + shift1 + variableToString + shift2 + callToString;
+        }
+
         expressionToString = _expression.ToString(shift);
         return assignmentToString + shift1 + variableToString + shift2 + expressionToString;
     }

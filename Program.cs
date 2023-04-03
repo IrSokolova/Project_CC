@@ -11,7 +11,8 @@ internal class Program
     {
         // ADD YOUR PATH HERE
         // string path = @"C:\Users\alena\RiderProjects\Project_CC\Project_CC\program.txt";
-        string path = @"C:\Users\User\RiderProjects\Compiler Construction\СС_Project\program.txt";
+        // string path = @"C:\Users\User\RiderProjects\Compiler Construction\СС_Project\program.txt";
+        string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt"; // do not delete please
         string text = "";
 
         using (FileStream stream = File.OpenRead(path))
