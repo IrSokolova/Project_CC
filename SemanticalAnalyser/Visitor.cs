@@ -11,7 +11,7 @@ namespace DefaultNamespace.SemantycalAnalyser;
 
 public class Visitor
 {
-    public static Dictionary<String, Tuple<Object, Object>> functions = new Dictionary<string, Tuple<object, object>>();
+    public static Dictionary<String, List<Tuple<String, Object>>> functions = new Dictionary<string, List<Tuple<string, object>>>();
     public static Dictionary<String, Object> localVariables = new Dictionary<string, object>();
 
     public Visitor(){}
@@ -87,11 +87,11 @@ public class Visitor
     
     public class RoutineInsightsVisitor
     {
-        public Object Visit(RoutineInsights routineInsights)
+        public Type Visit(RoutineInsights routineInsights)
         {
             if (!(routineInsights._body is null))
             {
-                // return routineInsights._body.Accept(new BodyVisitor());
+                return routineInsights._body.Accept(new BodyVisitor());
             }
 
             return null;
@@ -128,10 +128,9 @@ public class Visitor
                 {
                     throw new Exception("Type Error in variable declaration");
                 }
-                localVariables.Add(varName, variableDeclaration._type);
                 return actualVariabletype;
             }
-
+            localVariables.Add(varName, variableDeclaration._type);
             return null;
         }
     }
@@ -217,16 +216,18 @@ public class Visitor
         public void Visit(Assignment assignment)
         {
             String varName = assignment._variable._identifier._name;
-            // TODO: проверить, что мы присваеваем нужный тип к нужному типу
             if (!localVariables.ContainsKey(varName))
             {
                 throw new Exception(String.Format("The variable {0} is undefined", varName));
             }
-            
-            // Type expressionType = assignment._expression.Accept(new ExpressionVisitor());
-            
-            // Надо сделать так, чтобы все accept могли что-то возвращать
-            
+
+            Type expectedType = (Type)localVariables[varName];
+            Type actualType = assignment._expression.Accept(new ExpressionVisitor());
+
+            if (!expectedType.ToString().Equals(actualType.ToString()))
+            {
+                throw new Exception(String.Format("Type error in assignment of variable {0}", varName));
+            }
         }
     }
     
@@ -407,7 +408,10 @@ public class Visitor
             {
                 throw new Exception(String.Format("{0} routine already exists", routineName));
             }
+            functions.Add(routineName, new List<Tuple<string, object>>());
             mainRoutine._body.Accept(new BodyVisitor());
+            
+            localVariables.Clear();
         }
     }
     
@@ -416,23 +420,42 @@ public class Visitor
         public void Visit(Function function)
         {
             string functionName = function._identifier.ToString();
-            if (function._routineReturnType._type != null)
-            {
-                Type expectedReturnType = function._routineReturnType._type;
-            }
-
-            // Type actualReturnType = function._routineInsights.Accept(new RoutineInsightsVisitor());
-
+            
             if (functions.ContainsKey(functionName))
             {
                 throw new Exception(String.Format("{0} function already exists", functionName));
             }
+
+            if (function._parameters != null)
+            {
+                function._parameters.Accept(new ParametersVisitor());
+            }
+
+            List<Tuple<String, Object>> parameters = new List<Tuple<string, object>>();
+            foreach (var variable in localVariables)
+            {
+                parameters.Add(new Tuple<string, object>(variable.Key, variable.Value));
+            }
+            
+            functions.Add(functionName, parameters);
+            
+            if (function._routineReturnType._type != null)
+            {
+                Type expectedReturnType = function._routineReturnType._type;
+                Type actualReturnType = function._routineInsights.Accept(new RoutineInsightsVisitor());
+                if (!expectedReturnType.ToString().Equals(actualReturnType.ToString()))
+                {
+                    throw new Exception(String.Format("Return type mismatch in {0} function", functionName));
+                }
+            }
+
+            localVariables.Clear();
         }
     }
     
     public class BodyVisitor
     {
-        public void Visit(Body body)
+        public Type Visit(Body body)
         {
             if (body._declaration != null)
             {
@@ -443,33 +466,45 @@ public class Visitor
             {
                 body._statement.Accept(new StatementVisitor());
             }
-
-            if (body._return != null)
-            {
-                body._return.Accept(new ReturnVisitor());
-            }
-
+            
             if (body._body != null)
             {
-                body._body.Accept(new BodyVisitor());
+                 return body._body.Accept(new BodyVisitor());
             }
-            
+            if (body._return != null)
+            {
+                return body._return.Accept(new ReturnVisitor());
+            }
+            return null;
         }
     }
     
     public class ParameterDeclarationVisitor
     {
-        public void Visit(ParameterDeclaration? parameterDeclaration)
+        public void Visit(ParameterDeclaration parameterDeclaration)
         {
-            
+            string parameterName = parameterDeclaration._identifier.ToString();
+            if (localVariables.ContainsKey(parameterName))
+            {
+                throw new Exception(String.Format("Parameter {0} already declared", parameterName));
+            }
+            localVariables.Add(parameterName, parameterDeclaration._type);
         }
     }
     
     public class ParametersVisitor
     {
-        public void Visit(Parameters? parameters)
+        public void Visit(Parameters parameters)
         {
-            
+            if (parameters._parameterDeclaration != null)
+            {
+                parameters._parameterDeclaration.Accept(new ParameterDeclarationVisitor());
+            }
+
+            if (parameters._parameters != null)
+            {
+                parameters._parameters.Accept(new ParametersVisitor());
+            }
         }
     }
 
@@ -617,9 +652,9 @@ public class Visitor
     
     public class ReturnVisitor
     {
-        public void Visit(Return? rReturn)
+        public Type Visit(Return? rReturn)
         {
-            
+            return rReturn._expression.Accept(new ExpressionVisitor());
         }
     }
 }

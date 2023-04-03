@@ -1154,9 +1154,9 @@ public class RoutineInsights
         _body = body;
     }
     
-    public void Accept(Visitor.RoutineInsightsVisitor routineInsightsVisitor)
+    public Type Accept(Visitor.RoutineInsightsVisitor routineInsightsVisitor)
     {
-        routineInsightsVisitor.Visit(this);
+        return routineInsightsVisitor.Visit(this);
     }
 
     public string ToString(string shift)
@@ -1184,9 +1184,9 @@ public class Return
         _expression = expression;
     }
     
-    public void Accept(Visitor.ReturnVisitor returnVisitor)
+    public Type Accept(Visitor.ReturnVisitor returnVisitor)
     {
-        returnVisitor.Visit(this);
+        return returnVisitor.Visit(this);
     }
     
     public string ToString(string shift)
@@ -1213,9 +1213,9 @@ public class Body
         _return = @return;
     }
     
-    public void Accept(Visitor.BodyVisitor bodyVisitor)
+    public Type Accept(Visitor.BodyVisitor bodyVisitor)
     {
-        bodyVisitor.Visit(this);
+        return bodyVisitor.Visit(this);
     }
 
     public string ToString(string shift)
