@@ -21,10 +21,6 @@ public class Visitor
         public void Visit(ConsoleApp1.SyntaxAnalyser.Action action)
         {
             
-            if (!(action._actions is null))
-            {
-                action._actions.Accept(new ActionsVisitor());
-            }
             if (!(action._declaration is null))
             {
                 action._declaration.Accept(new DeclarationVisitor());
@@ -32,6 +28,10 @@ public class Visitor
             if (!(action._statement is null))
             {
                 action._statement.Accept(new StatementVisitor());
+            }
+            if (!(action._actions is null))
+            {
+                action._actions.Accept(new ActionsVisitor());
             }
         }
     }
@@ -119,15 +119,20 @@ public class Visitor
             // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
             // var n : Integer is 10 - хорошо
             // var n : Integer is "10" - плохо
-            Type expectedVariableType = variableDeclaration._type;
-            Type actualVariabletype = variableDeclaration._value.Accept(new ValueVisitor());
-
-            if (!(actualVariabletype.Equals(expectedVariableType)))
+            if (variableDeclaration._value != null)
             {
-                throw new Exception("Type Error in variable declaration");
+                String expectedVariableType = variableDeclaration._type.ToString();
+                String actualVariabletype = variableDeclaration._value.Accept(new ValueVisitor()).ToString();
+                
+                if (!(actualVariabletype.Equals(expectedVariableType)))
+                {
+                    throw new Exception("Type Error in variable declaration");
+                }
+                localVariables.Add(varName, variableDeclaration._type);
+                return actualVariabletype;
             }
-            localVariables.Add(varName, variableDeclaration._type);
-            return actualVariabletype.ToString();
+
+            return null;
         }
     }
     
@@ -143,13 +148,20 @@ public class Visitor
                     throw new Exception(String.Format("Type {0} already declared", typeName));
                 }
                 
-                typeDeclaration._type.Accept(new TypeVisitor());
-                
+                if (typeDeclaration._type.ToString().Equals("Array"))
+                {
+                    String expextedArrayType = typeDeclaration._type +  " " + typeDeclaration._type._arrayType._type;
+                    String actualArrayType =  typeDeclaration._type + " " + typeDeclaration._type._arrayType._expression.Accept(new ExpressionVisitor());
+                    if (!(actualArrayType.Equals(expextedArrayType)))
+                    {
+                        throw new Exception("Type Error in array type declaration");
+                    }
+                    localVariables.Add(typeName, actualArrayType);
+                }
+
                 // TODO: тут нам надо бы проверить,что тип, который мы вручную присваиваем также совпадает с настоящим типом значения
                 // type arr is array [1] Integer - хорошо
                 // type arr is array ["1"] Integer - плохо
-
-                localVariables.Add(typeName, typeDeclaration._type);
             }
         }
     }
@@ -204,7 +216,13 @@ public class Visitor
     {
         public void Visit(Assignment assignment)
         {
+            String varName = assignment._variable._identifier._name;
             // TODO: проверить, что мы присваеваем нужный тип к нужному типу
+            if (!localVariables.ContainsKey(varName))
+            {
+                throw new Exception(String.Format("The variable {0} is undefined", varName));
+            }
+            
             // Type expressionType = assignment._expression.Accept(new ExpressionVisitor());
             
             // Надо сделать так, чтобы все accept могли что-то возвращать
@@ -495,7 +513,7 @@ public class Visitor
             
             if (operationType != null)
             {
-                if (!operationType.Equals(operandType))
+                if (!operationType.ToString().Equals(operandType.ToString()))
                 {
                     throw new Exception("Type Error");
                 }
