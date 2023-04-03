@@ -128,6 +128,7 @@ public class Visitor
                 {
                     throw new Exception("Type Error in variable declaration");
                 }
+                localVariables.Add(varName, variableDeclaration._type);
                 return actualVariabletype;
             }
             localVariables.Add(varName, variableDeclaration._type);
@@ -202,7 +203,11 @@ public class Visitor
         {
             // TODO надо проверить, что condition - bool
             
-            ifStatement._condition.Accept(new ExpressionVisitor());
+            Type conditionType = ifStatement._condition.Accept(new ExpressionVisitor());
+            if (!conditionType.ToString().Equals("Boolean"))
+            {
+                throw new Exception(String.Format("Condition expected to be boolean type, not {0}", conditionType));
+            }
             ifStatement._ifBody.Accept(new BodyVisitor());
             if (!(ifStatement._elseBody is null))
             {
