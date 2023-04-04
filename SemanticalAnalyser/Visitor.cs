@@ -188,7 +188,7 @@ public class Visitor
                         Console.WriteLine("Type Error in array type declaration");
                         Environment.Exit(1);
                     }
-                    localVariables.Add(typeName, actualArrayType);
+                    localVariables.Add(typeName, typeDeclaration._type._arrayType._type);
                 }
 
                 if (typeDeclaration._type.ToString().Equals("Record"))
@@ -354,16 +354,23 @@ public class Visitor
                 Environment.Exit(1);
             }
             
+            string expectedType = "Integer";
+            Type fromActualType = forLoop._range._from.Accept(new ExpressionVisitor()); 
+            Type toActualType = forLoop._range._to.Accept(new ExpressionVisitor()); 
+            if (fromActualType is null || toActualType is null || !(expectedType.Equals(fromActualType.ToString()) && expectedType.Equals(toActualType.ToString()))) 
+            { 
+                Console.WriteLine("Wrong type of range values"); 
+                Environment.Exit(1);
+            }
+                        
+            localVariables.Add(forLoop._identifier.ToString(), fromActualType);            
+            
             if (forLoop._body != null)
             {
                 forLoop._body.Accept(new BodyVisitor());
             }
-            
-            // TODO: проверить Range
-            if (forLoop._reverse)
-            {
-                
-            }
+
+            localVariables.Remove(forLoop._identifier.ToString());
         }
     }
     
