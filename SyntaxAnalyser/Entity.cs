@@ -998,9 +998,9 @@ public class RecordType
         _variableDeclarations = variableDeclarations;
     }
     
-    public string Accept(Visitor.RecordTypeVisitor recordTypeVisitor)
+    public void Accept(Visitor.RecordTypeVisitor recordTypeVisitor)
     {
-        return recordTypeVisitor.Visit(this);
+        recordTypeVisitor.Visit(this);
     }
     
     public string ToString(string shift)
