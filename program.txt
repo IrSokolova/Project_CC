@@ -1,9 +1,14 @@
-function Integer aaaa (Integer a1 Integer a2) is
-  var x : Real is 2.5
-  return a1
-end
-
 routine main () is
- var x : Integer is 3
- x := aaaa (x x)
+  type a is record {
+    var a : Integer
+    var b : boolean
+  }
+  type b is record {
+      var x : Integer
+      var y : array [3] Integer
+  }
+  var n : array [10] a
+  var x : a is (2 true)
+  x := (3 false)
+  
 end

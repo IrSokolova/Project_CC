@@ -378,14 +378,14 @@ public class ParameterDeclaration // TYPE DEC IS THE SAME
 
 public class Value
 {
-    public Expression _expression;
+    public Expressions _expressions;
 
-    public Value(Expression expression)
+    public Value(Expressions expressions)
     {
-        _expression = expression;
+        _expressions = expressions;
     }
     
-    public Type Accept(Visitor.ValueVisitor valueVisitor)
+    public List<Type> Accept(Visitor.ValueVisitor valueVisitor)
     {
         return valueVisitor.Visit(this);
     }
@@ -393,7 +393,7 @@ public class Value
     public string ToString(string shift)
     {
         shift += "   ";
-        string expressionToString = _expression.ToString(shift);
+        string expressionToString = _expressions.ToString(shift);
         return "──Value \n" + shift + "└" + expressionToString;
     }
 }
@@ -850,18 +850,20 @@ public class Type
     public PrimitiveType? _primitiveType;
     public ArrayType? _arrayType;
     public RecordType? _recordType;
+    public UserType? _userType;
 
-    public Type(PrimitiveType? primitiveType, ArrayType? arrayType, RecordType? recordType)
+    public Type(PrimitiveType? primitiveType, ArrayType? arrayType, RecordType? recordType, UserType? userType)
     {
         _primitiveType = primitiveType;
         _arrayType = arrayType;
         _recordType = recordType;
+        _userType = userType;
     }
 
     public bool Equals(Type t)
     {
         return _primitiveType == t._primitiveType && _arrayType == t._arrayType &&
-                _recordType == t._recordType;
+                _recordType == t._recordType && _userType == t._userType;
     }
     
     public string Accept(Visitor.TypeVisitor typeVisitor)
@@ -875,6 +877,7 @@ public class Type
         string primitiveTypeToString;
         string arrayTypeToString;
         string recordTypeToString;
+        string userTypeToString;
 
         if (_primitiveType != null)
         {
@@ -894,6 +897,11 @@ public class Type
             shift += "   ";
             recordTypeToString = _recordType.ToString(shift);
             return "──Type \n" + shift1 + recordTypeToString;
+        }
+        if (_userType != null)
+        {
+            userTypeToString = _userType.ToString();
+            return "──Type (" + userTypeToString + ") \n";
         }
 
         return "";
@@ -1021,6 +1029,26 @@ public class RecordType
         
         variableDeclarationToString = _variableDeclaration.ToString(shift);
         return recordTypeToString + shift + "└" + variableDeclarationToString;
+    }
+}
+
+public class UserType
+{
+    public String? _name;
+
+    public UserType(String? name)
+    {
+        _name = name;
+    }
+    
+    // public string Accept(Visitor.UserTypeVisitor userTypeVisitor)
+    // {
+    //     return userTypeVisitor.Visit(this);
+    // }
+
+    public override string ToString()
+    {
+        return _name;
     }
 }
 
@@ -1346,13 +1374,13 @@ public class Statement
 public class Assignment
 {
     public Variable _variable;
-    public Expression _expression;
+    public Expressions _expressions;
     public RoutineCall _routineCall;
 
-    public Assignment(Variable variable, Expression expression, RoutineCall routineCall)
+    public Assignment(Variable variable, Expressions expressions, RoutineCall routineCall)
     {
         _variable = variable;
-        _expression = expression;
+        _expressions = expressions;
         _routineCall = routineCall;
     }
     
@@ -1365,7 +1393,7 @@ public class Assignment
     {
         string assignmentToString = "──Assignment \n";
         string variableToString;
-        string expressionToString;
+        string expressionsToString;
         string callToString;
         
         string shift1 = shift + "  │";
@@ -1380,8 +1408,8 @@ public class Assignment
             return assignmentToString + shift1 + variableToString + shift2 + callToString;
         }
 
-        expressionToString = _expression.ToString(shift);
-        return assignmentToString + shift1 + variableToString + shift2 + expressionToString;
+        expressionsToString = _expressions.ToString(shift);
+        return assignmentToString + shift1 + variableToString + shift2 + expressionsToString;
     }
 }
 

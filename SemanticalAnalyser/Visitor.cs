@@ -265,9 +265,9 @@ public class Visitor
             }
 
             Type expectedType = (Type)localVariables[varName];
-            if (assignment._expression != null)
+            if (assignment._expressions != null)
             {
-                Type actualType = assignment._expression.Accept(new ExpressionVisitor());
+                List<Type> actualType = assignment._expressions.Accept(new ExpressionsVisitor());
                 if (!expectedType.ToString().Equals(actualType.ToString()))
                 {
                     Console.WriteLine("Type error in assignment of variable {0}", varName);
@@ -496,9 +496,9 @@ public class Visitor
 
     public class ValueVisitor
     {
-        public Type Visit(Value? value)
+        public List<Type> Visit(Value? value)
         {
-            return value._expression.Accept(new ExpressionVisitor());
+            return value._expressions.Accept(new ExpressionsVisitor());
         }
     }
 
@@ -730,7 +730,7 @@ public class Visitor
         {
             if (oOperator._comparisonOperator != null || oOperator._logicalOperator != null)
             {
-                return new Type(new PrimitiveType(false, false, true), null, null);
+                return new Type(new PrimitiveType(false, false, true), null, null, null);
             }
 
             return null;

@@ -137,20 +137,32 @@ public class Parser
                     if (token!.Item1 == TokenTypes.BracketsL)
                     {
                         var array = BuildArrayType(false);
-                        arrayType = new Type(null, array, null);
+                        arrayType = new Type(null, array, null, null);
                     }
                     
                     token = _tokens.GetNextToken();
                     CheckNull(token, TokenTypes.Assign, "BuildStatement");
-
+                
                     RoutineCall? rc = null;
+                    Expressions? expressions = null;
                     switch (token!.Item1)
                     {
                         case TokenTypes.Assign:
                             token = _tokens.Current();
-                            Expression? expression = BuildExpression();
+                            if (token.Item1 is TokenTypes.ParenthesesL)
+                            {
+                                _tokens.GetNextToken();
+                                expressions = BuildExpressions();
+                                token = _tokens.GetNextToken();
+                                CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
+                                CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
+                            }
+                            else {expressions = BuildExpressions();}
+                            
+                            
+                            token = _tokens.Current();
                             Variable variable = new Variable(identifier, arrayType);
-                            if (expression == null && _tokens.Current()!.Item1 is TokenTypes.ParenthesesL)
+                            if (expressions == null && _tokens.Current()!.Item1 is TokenTypes.ParenthesesL)
                             {
                                 _tokens.GetNextToken();
                                 Identifier callIdentifier = new Identifier(false, null, token.Item2);
@@ -160,10 +172,10 @@ public class Parser
                                 CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
                                 routineCall = new RoutineCall(callIdentifier, callExpressions);
                             }
-                            assignment = new Assignment(variable, expression, routineCall);
+                            assignment = new Assignment(variable, expressions, routineCall);
                             break;
                         case TokenTypes.ParenthesesL:
-                            Expressions? expressions = BuildExpressions();
+                            expressions = BuildExpressions();
                             token = _tokens.GetNextToken();
                             CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
                             CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
@@ -296,7 +308,7 @@ public class Parser
         bool readOnly = false;
 
         Type varType = null;
-        Expression? expression = null;
+        Expressions? expressions = null;
         Value? value = null;
 
         // Get Identifiers Token
@@ -319,7 +331,7 @@ public class Parser
         
         Identifier identifier = new Identifier(readOnly, type, name);
 
-        // Get "is" and Expression
+        // Get "is" and Expression (or several Expressions)
         nextToken = _tokens.Current();
 
         if (nextToken?.Item1 is TokenTypes.Is)
@@ -328,8 +340,17 @@ public class Parser
             nextToken = _tokens.Current();
             CheckNull(nextToken, "Expression", "BuildVariableDeclaration");
 
-            expression = BuildExpression();
-            value = new Value(expression);
+            if (nextToken.Item1 is TokenTypes.ParenthesesL)
+            {
+                _tokens.GetNextToken();
+                expressions = BuildExpressions();
+                nextToken = _tokens.GetNextToken();
+                CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
+                CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
+            }
+            else {expressions = BuildExpressions();}
+            
+            value = new Value(expressions);
             return new VariableDeclaration(identifier, varType, value);
         }
 
@@ -436,6 +457,7 @@ public class Parser
         PrimitiveType? primitiveType = null;
         ArrayType? arrayType = null;
         RecordType? recordType = null;
+        UserType? userType = null;
         
         var nextToken = _tokens.Current();
         switch (nextToken.Item1)
@@ -460,16 +482,20 @@ public class Parser
                 _tokens.GetNextToken();
                 recordType = BuildRecordType();
                 break;
+            case TokenTypes.Identifiers:
+                _tokens.GetNextToken();
+                userType = new UserType(nextToken.Item2);
+                break;
         }
         
         if (isInt || isReal || isBoolean)
             primitiveType = new PrimitiveType(isInt, isReal, isBoolean);
 
-        if (primitiveType == null && arrayType == null && recordType == null)
+        if (primitiveType == null && arrayType == null && recordType == null && userType == null)
         {
             return null;
         }
-        return new Type(primitiveType, arrayType, recordType);
+        return new Type(primitiveType, arrayType, recordType, userType);
     }
     
     /// <summary>
@@ -699,7 +725,7 @@ public class Parser
             if (token!.Item1 == TokenTypes.BracketsL)
             {
                 var array = BuildArrayType(false);
-                arrayType = new Type(null, array, null);
+                arrayType = new Type(null, array, null, null);
             }
             variable = new Variable(identifier, arrayType);
             return new Single(type, value, variable);
@@ -710,7 +736,7 @@ public class Parser
         {
             _tokens.GetNextToken();
             primitiveType = new PrimitiveType(false, true, false);
-            type = new Type(primitiveType, null, null);
+            type = new Type(primitiveType, null, null, null);
             string floatValue = nextToken.Item2;
             return new Single(type, floatValue, null);
         }
@@ -720,16 +746,17 @@ public class Parser
         {
             _tokens.GetNextToken();
             primitiveType = new PrimitiveType(true, false, false);
-            type = new Type(primitiveType, null, null);
+            type = new Type(primitiveType, null, null, null);
             string intValue = nextToken.Item2;
             return new Single(type, intValue, null);
         }
-
+        
+        // If Single is Boolean
         if (nextToken.Item1 is TokenTypes.True || nextToken.Item1 is TokenTypes.False)
         {
-            _tokens.GetNextToken();
+            var nextT = _tokens.GetNextToken();
             primitiveType = new PrimitiveType(false, false, true);
-            type = new Type(primitiveType, null, null);
+            type = new Type(primitiveType, null, null, null);
             string boolValue = nextToken.Item2;
             return new Single(type, boolValue, null);
         }
@@ -978,7 +1005,6 @@ public class Parser
 
         var token = _tokens.Current();
         // CheckNull(token, TokenTypes.Return, "BuildReturn");
-
         Declaration? declaration = BuildDeclaration();
         if (declaration == null)
         {

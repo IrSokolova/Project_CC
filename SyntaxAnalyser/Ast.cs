@@ -224,17 +224,17 @@ public class Ast
             case TokenTypes.Integer:
             {
                 PrimitiveType primitiveType = new PrimitiveType(true, false, false);
-                return new Type(primitiveType, null, null);
+                return new Type(primitiveType, null, null, null);
             }
             case TokenTypes.Real:
             {
                 PrimitiveType primitiveType = new PrimitiveType(false, true, false);
-                return new Type(primitiveType, null, null);
+                return new Type(primitiveType, null, null, null);
             }
             case TokenTypes.Boolean:
             {
                 PrimitiveType primitiveType = new PrimitiveType(false, false, true);
-                return new Type(primitiveType, null, null);
+                return new Type(primitiveType, null, null, null);
             }
             case TokenTypes.Array: // TODO Array
                 // ArrayType arrayType = new ArrayType();
