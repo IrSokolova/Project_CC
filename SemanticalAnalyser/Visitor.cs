@@ -118,48 +118,122 @@ public class Visitor
         public string Visit(VariableDeclaration variableDeclaration)
         {
             string varName = variableDeclaration._identifier.ToString();
+            if (localVariables.ContainsKey(varName))
+            {
+                Console.WriteLine("Variable {0} already declared", varName);
+                Environment.Exit(1);
+            }
             if (!inRecord)
             {
-                if (localVariables.ContainsKey(varName))
-                {
-                    Console.WriteLine("Variable {0} already declared", varName);
-                    Environment.Exit(1);
-                }
                 if (variableDeclaration._value != null)
                 {
-                    String expectedVariableType = variableDeclaration._type.ToString();
-                    String actualVariabletype = variableDeclaration._value.Accept(new ValueVisitor()).ToString();
-                
-                    if (!(actualVariabletype.Equals(expectedVariableType)))
+                    if (variableDeclaration._type._userType != null)
                     {
-                        Console.WriteLine("Type Error in variable declaration");
-                        Environment.Exit(1);
+                        String expectedVariableType = variableDeclaration._type._userType.ToString();
+                        if (!declaredTypes.ContainsKey(expectedVariableType))
+                        {
+                            Console.WriteLine("Type Error");
+                            Console.WriteLine("The type {0} wasn't declared", expectedVariableType);
+                            Environment.Exit(1);
+                        }
+
+                        List<Tuple<String, Object>> expectedTypesFromDeclaration = declaredTypes[expectedVariableType];
+                        List<Object> expectedTypes = new List<Object>();
+                        foreach (Tuple<String, Object> tuple in expectedTypesFromDeclaration)
+                        {
+                            expectedTypes.Add(tuple.Item2);
+                        }
+                        List<Type> actualTypes =
+                            variableDeclaration._value._expressions.Accept(new ExpressionsVisitor());
+                        if (!(expectedTypes.Count == actualTypes.Count))
+                        {
+                            Console.WriteLine("Type Error");
+                            Console.WriteLine("The wrong number of fields for the record {0}. Expected number is {1}, but got {2}", expectedVariableType, expectedTypes.Count, actualTypes.Count);
+                            Environment.Exit(1);
+                        }
+
+                        for (int i = 0; i < expectedTypes.Count; i++)
+                        {
+                            if (!expectedTypes[i].ToString().Equals(actualTypes[i].ToString()))
+                            {
+                                Console.WriteLine("Type Error");
+                                Console.WriteLine("Type mismatch in declaration of variable {0}. Expected type is {1}, but got {2}", varName, expectedTypes[i], actualTypes[i]);
+                                Environment.Exit(1);
+                            }
+                        }
+                        localVariables.Add(varName, expectedVariableType);
+                        return expectedVariableType;
+                    }
+                    else
+                    {
+                        String expectedVariableType = variableDeclaration._type.ToString();
+                        String actualVariableType = "";
+                        if (variableDeclaration._value.Accept(new ValueVisitor()).Count == 1)
+                        {
+                            actualVariableType = variableDeclaration._value.Accept(new ValueVisitor())[0].ToString();
+                        }
+
+                        if (!(actualVariableType.Equals(expectedVariableType)))
+                        {
+                            Console.WriteLine("Type Error in variable declaration " + varName);
+                            Environment.Exit(1);
+                        }
+                        localVariables.Add(varName, variableDeclaration._type);
+                        return actualVariableType;
+                    }
+                }
+                else
+                {
+                    if (variableDeclaration._type._arrayType != null)
+                    {
+                        if (variableDeclaration._type._arrayType._type._userType != null)
+                        {
+                            localVariables.Add(varName,
+                                "Array " + variableDeclaration._type._arrayType._type._userType);
+                            return "Array " + variableDeclaration._type._arrayType._type._userType;
+                        }
+                        else
+                        {
+                            localVariables.Add(varName, "Array " + variableDeclaration._type._arrayType._type);
+                            return "Array " + variableDeclaration._type._arrayType._type;
+                        }
                     }
                     localVariables.Add(varName, variableDeclaration._type);
-                    return actualVariabletype;
                 }
-                localVariables.Add(varName, variableDeclaration._type);
             }
+            
             else
             {
-                if (variableDeclaration._value != null)
-                {
-                    String expectedVariableType = variableDeclaration._type.ToString();
-                    String actualVariabletype = variableDeclaration._value.Accept(new ValueVisitor()).ToString();
-                
-                    if (!(actualVariabletype.Equals(expectedVariableType)))
+                    if (variableDeclaration._value != null)
                     {
-                        Console.WriteLine("Type Error in variable declaration");
-                        Environment.Exit(1);
+                        String expectedVariableType = variableDeclaration._type.ToString();
+                        String actualVariabletype = variableDeclaration._value.Accept(new ValueVisitor()).ToString();
+
+                        if (!(actualVariabletype.Equals(expectedVariableType)))
+                        {
+                            Console.WriteLine("Type Error in variable declaration " + varName);
+                            Environment.Exit(1);
+                        }
+
+                        List<Tuple<String, Object>> insideVariables = declaredTypes[typeName];
+                        insideVariables.Add(new Tuple<string, object>(varName, actualVariabletype));
+                        declaredTypes[typeName] = insideVariables;
                     }
-                    List<Tuple<String, Object>> insideVariables = declaredTypes[typeName];
-                    insideVariables.Add(new Tuple<string, object>(varName, actualVariabletype));
-                    declaredTypes[typeName] = insideVariables;
-                } else {
-                    List<Tuple<String, Object>> someInsideVariables = declaredTypes[typeName];
-                    someInsideVariables.Add(new Tuple<string, object>(varName, variableDeclaration._type));
-                    declaredTypes[typeName] = someInsideVariables;
-                }
+                    else
+                    {
+                        List<Tuple<String, Object>> someInsideVariables = declaredTypes[typeName];
+                        if (variableDeclaration._type.ToString().Equals("Array"))
+                        {
+                            someInsideVariables.Add(new Tuple<string, object>(varName,
+                                variableDeclaration._type + variableDeclaration._type._arrayType._type.ToString()));
+                        }
+                        else
+                        {
+                            someInsideVariables.Add(new Tuple<string, object>(varName, variableDeclaration._type));
+                        }
+
+                        declaredTypes[typeName] = someInsideVariables;
+                    }
             }
             
             return null;
@@ -264,63 +338,127 @@ public class Visitor
                 Environment.Exit(1);
             }
 
-            Type expectedType = (Type)localVariables[varName];
-            if (assignment._expressions != null)
+            if (localVariables[varName] is string)
             {
-                List<Type> actualType = assignment._expressions.Accept(new ExpressionsVisitor());
-                if (!expectedType.ToString().Equals(actualType.ToString()))
+                if (declaredTypes.ContainsKey(localVariables[varName].ToString()))
                 {
-                    Console.WriteLine("Type error in assignment of variable {0}", varName);
-                    Environment.Exit(1);
-                }
-            }
-            else
-            {
-                String functionName = assignment._routineCall._identifier.ToString();
-                if (!functions.ContainsKey(functionName))
-                {
-                    Console.WriteLine("The routine {0} is undefined", functionName);
-                    Environment.Exit(1);
-                }
-                
-                List<Tuple<String,Object>>parametersList = functions[functionName];
-                String actualType = "";
-                for (int i = 0; i < parametersList.Count; i++)
-                {
-                    if (parametersList[i].Item1.Equals("return"))
+                    if (assignment._expressions != null)
                     {
-                        actualType = (String) parametersList[i].Item2;
-                        parametersList.Remove(parametersList[i]);
-                        break;
-                    }
-                }
-                List<Type> actualParameters = assignment._routineCall.Accept(new RoutineCallVisitor());
-                if (actualType.Equals(""))
-                {
-                    Console.WriteLine("The variable {0} can't be assigned to result of {1}", varName, functionName);
-                    Environment.Exit(1);
-                }
-                if (!expectedType.ToString().Equals(actualType.ToString()))
-                {
-                    Console.WriteLine("The variable {0} can't be assigned to result of {1}", varName, functionName);
-                    Environment.Exit(1);
-                }
-
-                if (parametersList.Count == actualParameters.Count)
-                {
-                    for (int i = 0; i < parametersList.Count; i++)
-                    {
-                        if (!parametersList[i].Item2.ToString().Equals(actualParameters[i].ToString()))
+                        String expectedVariableType = localVariables[varName].ToString();
+                        List<Tuple<String, Object>> expectedTypesFromDeclaration = declaredTypes[expectedVariableType];
+                        List<Object> expectedTypes = new List<Object>();
+                        foreach (Tuple<String, Object> tuple in expectedTypesFromDeclaration)
                         {
-                            Console.WriteLine("Type Error in passing parameters to a function");
+                            expectedTypes.Add(tuple.Item2);
+                        }
+
+                        List<Type> actualTypes =
+                            assignment._expressions.Accept(new ExpressionsVisitor());
+                        if (!(expectedTypes.Count == actualTypes.Count))
+                        {
+                            Console.WriteLine("Type Error");
+                            Console.WriteLine(
+                                "The wrong number of fields for the record {0}. Expected number is {1}, but got {2}",
+                                expectedVariableType, expectedTypes.Count, actualTypes.Count);
                             Environment.Exit(1);
                         }
+
+                        for (int i = 0; i < expectedTypes.Count; i++)
+                        {
+                            if (!expectedTypes[i].ToString().Equals(actualTypes[i].ToString()))
+                            {
+                                Console.WriteLine("Type Error");
+                                Console.WriteLine(
+                                    "Type mismatch in assignment of variable {0}. Expected type is {1}, but got {2}",
+                                    varName, expectedTypes[i], actualTypes[i]);
+                                Environment.Exit(1);
+                            }
+                        }
+                    }
+
+                    Console.WriteLine("Type Error");
+                    Console.WriteLine("The type {0} wasn't declared", localVariables[varName]);
+                    Environment.Exit(1);
+                }
+                else
+                {
+                    if (localVariables[varName].ToString().Contains("Array"))
+                    {
+                        if (assignment._variable._arrayType is null)
+                        {
+                            Console.WriteLine("Type Error");
+                            Console.WriteLine("The variable {0} should have array type", varName);
+                            Environment.Exit(1);
+                        }
+                        
+                    }
+                }
+            }
+            
+
+            else
+            {
+                Type expectedType = (Type)localVariables[varName];
+                if (assignment._expressions != null)
+                {
+                    List<Type> actualType = assignment._expressions.Accept(new ExpressionsVisitor());
+                    if (!expectedType.ToString().Equals(actualType.ToString()))
+                    {
+                        Console.WriteLine("Type error in assignment of variable {0}", varName);
+                        Environment.Exit(1);
                     }
                 }
                 else
                 {
-                    Console.WriteLine("The function {0} should have {1} parameters but got {2} parameters", functionName, parametersList.Count, actualParameters.Count);
-                    Environment.Exit(1);
+                    String functionName = assignment._routineCall._identifier.ToString();
+                    if (!functions.ContainsKey(functionName))
+                    {
+                        Console.WriteLine("The routine {0} is undefined", functionName);
+                        Environment.Exit(1);
+                    }
+
+                    List<Tuple<String, Object>> parametersList = functions[functionName];
+                    String actualType = "";
+                    for (int i = 0; i < parametersList.Count; i++)
+                    {
+                        if (parametersList[i].Item1.Equals("return"))
+                        {
+                            actualType = (String)parametersList[i].Item2;
+                            parametersList.Remove(parametersList[i]);
+                            break;
+                        }
+                    }
+
+                    List<Type> actualParameters = assignment._routineCall.Accept(new RoutineCallVisitor());
+                    if (actualType.Equals(""))
+                    {
+                        Console.WriteLine("The variable {0} can't be assigned to result of {1}", varName, functionName);
+                        Environment.Exit(1);
+                    }
+
+                    if (!expectedType.ToString().Equals(actualType.ToString()))
+                    {
+                        Console.WriteLine("The variable {0} can't be assigned to result of {1}", varName, functionName);
+                        Environment.Exit(1);
+                    }
+
+                    if (parametersList.Count == actualParameters.Count)
+                    {
+                        for (int i = 0; i < parametersList.Count; i++)
+                        {
+                            if (!parametersList[i].Item2.ToString().Equals(actualParameters[i].ToString()))
+                            {
+                                Console.WriteLine("Type Error in passing parameters to a function");
+                                Environment.Exit(1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("The function {0} should have {1} parameters but got {2} parameters",
+                            functionName, parametersList.Count, actualParameters.Count);
+                        Environment.Exit(1);
+                    }
                 }
             }
         }
@@ -513,14 +651,14 @@ public class Visitor
     public class VariableDeclarationsVisitor
     {
 
-        public string Visit(VariableDeclarations? variableDeclarations)
+        public void Visit(VariableDeclarations? variableDeclarations)
         {
+            variableDeclarations._variableDeclaration.Accept(new VariableDeclarationVisitor());
+            
             if (variableDeclarations._variableDeclarations != null)
             {
-                return variableDeclarations._variableDeclarations.Accept(new VariableDeclarationsVisitor());
+                variableDeclarations._variableDeclarations.Accept(new VariableDeclarationsVisitor());
             }
-
-            return variableDeclarations._variableDeclaration.Accept(new VariableDeclarationVisitor());
         }
     }
     
@@ -658,8 +796,8 @@ public class Visitor
             {
                 if (operation._operator._comparisonOperator != null)
                 {
-                    if (!(operationType._primitiveType._isInt && operandType._primitiveType._isInt ||
-                        operationType._primitiveType._isReal && operandType._primitiveType._isReal))
+                    if (!(operationType.ToString().Equals("Integer") && operandType.ToString().Equals("Integer") || 
+                          operationType.ToString().Equals("Real") && operandType.ToString().Equals("Real")))
                     {
                         Console.WriteLine("Type Error for the comparison operator");
                         Environment.Exit(1);
@@ -668,12 +806,23 @@ public class Visitor
                 
                 if (operation._operator._logicalOperator != null)
                 {
-                    if (!(operationType._primitiveType._isBoolean && operandType._primitiveType._isBoolean))
+                    if (!(operationType.ToString().Equals("Boolean") && operandType.ToString().Equals("Boolean")))
                     {
                         Console.WriteLine("Type Error for the logical operator");
                         Environment.Exit(1);
                     } 
                 }
+                
+                if (operation._operator._mathematicalOperator != null)
+                {
+                    if (!(operationType.ToString().Equals("Integer") && operandType.ToString().Equals("Integer") || 
+                        operationType.ToString().Equals("Real") && operandType.ToString().Equals("Real")))
+                    {
+                        Console.WriteLine("Type Error for the mathematical operator");
+                        Environment.Exit(1);
+                    } 
+                }
+                
                 operatorType = operation._operator.Accept(new OperatorVisitor());
             }
 

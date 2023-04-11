@@ -132,9 +132,9 @@ public class VariableDeclarations
         _variableDeclarations = variableDeclarations;
     }
     
-    public string Accept(Visitor.VariableDeclarationsVisitor declarationVisitor)
+    public void Accept(Visitor.VariableDeclarationsVisitor declarationVisitor)
     {
-       return declarationVisitor.Visit(this);
+       declarationVisitor.Visit(this);
     }
     
     public string ToString(string shift)
