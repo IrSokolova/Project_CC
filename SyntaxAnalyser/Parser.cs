@@ -157,10 +157,17 @@ public class Parser
                                 CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
                                 CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
                             }
-                            else {expressions = BuildExpressions();}
+                            else
+                            {
+                                Expression? exp = BuildExpression();
+                                if (exp == null)
+                                    expressions = null;
+                                else
+                                    expressions = new Expressions(exp, null);
+                            }
                             
                             
-                            token = _tokens.Current();
+                            // token = _tokens.Current();
                             Variable variable = new Variable(identifier, arrayType);
                             if (expressions == null && _tokens.Current()!.Item1 is TokenTypes.ParenthesesL)
                             {
@@ -348,7 +355,14 @@ public class Parser
                 CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
                 CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
             }
-            else {expressions = BuildExpressions();}
+            else
+            {
+                Expression? exp = BuildExpression();
+                if (exp == null)
+                    expressions = null;
+                else
+                    expressions = new Expressions(exp, null);
+            }
             
             value = new Value(expressions);
             return new VariableDeclaration(identifier, varType, value);
