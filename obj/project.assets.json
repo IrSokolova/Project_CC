@@ -1,26 +1,98 @@
 {
   "version": 3,
   "targets": {
-    "net7.0": {}
+    "net7.0": {
+      "libLLVM/15.0.0": {
+        "type": "package"
+      },
+      "LLVMSharp/15.0.0-beta1": {
+        "type": "package",
+        "dependencies": {
+          "LLVMSharp.Interop": "15.0.0-beta1"
+        },
+        "compile": {
+          "lib/net7.0/LLVMSharp.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/LLVMSharp.dll": {}
+        }
+      },
+      "LLVMSharp.Interop/15.0.0-beta1": {
+        "type": "package",
+        "dependencies": {
+          "libLLVM": "15.0.0"
+        },
+        "compile": {
+          "lib/net7.0/LLVMSharp.Interop.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/LLVMSharp.Interop.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "libLLVM/15.0.0": {
+      "sha512": "A8Dyv24TD8Sn2ej2dipSu4DIap5z+gaCe8g0Em2d+wbUr4dr01wojd4EVtMQYdkG4pLGvDEb2u8sn/wyJNSDGg==",
+      "type": "package",
+      "path": "libllvm/15.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "libllvm.15.0.0.nupkg.sha512",
+        "libllvm.nuspec",
+        "runtime.json"
+      ]
+    },
+    "LLVMSharp/15.0.0-beta1": {
+      "sha512": "FpP/LDqF+/739hWOIjKLXVtIgEl3OePhNnVvgUvLoyATx1uYZ7QzVhoaTcVYUnM9ub0nPFMt1qiSLhH0w1mwhA==",
+      "type": "package",
+      "path": "llvmsharp/15.0.0-beta1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/LLVMSharp.dll",
+        "lib/net7.0/LLVMSharp.dll",
+        "lib/netstandard2.0/LLVMSharp.dll",
+        "llvmsharp.15.0.0-beta1.nupkg.sha512",
+        "llvmsharp.nuspec"
+      ]
+    },
+    "LLVMSharp.Interop/15.0.0-beta1": {
+      "sha512": "Js6iiv7qMEA4eumcDmBrck+TjXFq99QlxbY3ixT1AZWBx4BKC4NTzoF9XvW8l+fRB8UCGbVk6xNdMF/f0knZMg==",
+      "type": "package",
+      "path": "llvmsharp.interop/15.0.0-beta1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/LLVMSharp.Interop.dll",
+        "lib/net7.0/LLVMSharp.Interop.dll",
+        "lib/netstandard2.0/LLVMSharp.Interop.dll",
+        "llvmsharp.interop.15.0.0-beta1.nupkg.sha512",
+        "llvmsharp.interop.nuspec"
+      ]
+    }
+  },
   "projectFileDependencyGroups": {
-    "net7.0": []
+    "net7.0": [
+      "LLVMSharp >= 15.0.0-beta1"
+    ]
   },
   "packageFolders": {
-    "C:\\Users\\alena\\.nuget\\packages\\": {}
+    "C:\\Users\\79953\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj",
+      "projectUniqueName": "C:\\Users\\79953\\RiderProjects\\Project_CC\\ConsoleApp1.csproj",
       "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj",
-      "packagesPath": "C:\\Users\\alena\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\obj\\",
+      "projectPath": "C:\\Users\\79953\\RiderProjects\\Project_CC\\ConsoleApp1.csproj",
+      "packagesPath": "C:\\Users\\79953\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\79953\\RiderProjects\\Project_CC\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\alena\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\79953\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -43,6 +115,12 @@
     "frameworks": {
       "net7.0": {
         "targetAlias": "net7.0",
+        "dependencies": {
+          "LLVMSharp": {
+            "target": "Package",
+            "version": "[15.0.0-beta1, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",
@@ -59,7 +137,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\alena\\.dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\79953\\.dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }

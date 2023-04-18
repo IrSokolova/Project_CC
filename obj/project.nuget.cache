@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "0frcSZxXXozTzw9ac4n2GN9FCxB1esWL7/ab3enQmOK6fAVmYGhCvmDFn1oLuk9zYyx+gm9QtRDxTe7vlM9pgg==",
+  "dgSpecHash": "o+DIdnuFL/61OfkL7BL13aSziioBlh1PeN/4okbHouoPqRLkIMIqJ/X892z8y2QM+fYg2ksqzXfsNd+t5v8rqQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\79953\\RiderProjects\\Project_CC\\ConsoleApp1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\79953\\.nuget\\packages\\libllvm\\15.0.0\\libllvm.15.0.0.nupkg.sha512",
+    "C:\\Users\\79953\\.nuget\\packages\\llvmsharp\\15.0.0-beta1\\llvmsharp.15.0.0-beta1.nupkg.sha512",
+    "C:\\Users\\79953\\.nuget\\packages\\llvmsharp.interop\\15.0.0-beta1\\llvmsharp.interop.15.0.0-beta1.nupkg.sha512"
+  ],
   "logs": []
 }
