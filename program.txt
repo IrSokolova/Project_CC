@@ -1,11 +1,1 @@
-function Integer aaaa (Integer a1 Integer a2) is
- var x : Real is 2.5
- return a1
-end
-
-
-routine main () is
 var x : Real is 3.0
-var y : Integer is 2
-x := aaaa (y y)
-end

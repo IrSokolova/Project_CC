@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using ConsoleApp1.LexicalAnalyser;
+using ConsoleApp1.LexicalAnalyser;      
 using ConsoleApp1.SyntaxAnalyser;
 using DefaultNamespace.SemantycalAnalyser;
 

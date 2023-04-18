@@ -73,3 +73,6 @@ C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\refint\Conso
 C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.pdb
 C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.genruntimeconfig.cache
 C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ref\ConsoleApp1.dll
+C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\LLVMSharp.dll
+C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\LLVMSharp.Interop.dll
+C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.csproj.CopyComplete
