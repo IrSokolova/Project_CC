@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using ConsoleApp1.LexicalAnalyser;      
 using ConsoleApp1.SyntaxAnalyser;
+using DefaultNamespace.CodeGenerator;
 using DefaultNamespace.SemantycalAnalyser;
+using Action = ConsoleApp1.SyntaxAnalyser.Action;
 
 namespace DefaultNamespace;
 
@@ -12,7 +14,8 @@ internal class Program
         // ADD YOUR PATH HERE
         // string path = @"C:\Users\alena\RiderProjects\Project_CC\Project_CC\program.txt";
         // string path = @"C:\Users\User\RiderProjects\Compiler Construction\СС_Project\program.txt";
-        string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt"; // do not delete please
+        // string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt"; // do not delete please
+        string path = @"/home/tatiana/RiderProjects/Project_CC/program.txt"; // do not delete please
         string text = "";
 
         using (FileStream stream = File.OpenRead(path))
@@ -51,14 +54,14 @@ internal class Program
         }
 
         Parser parser = new Parser(lexicalAnalysis);
-        var action = parser.BuildAction();
+        Action action = parser.BuildAction();
         Console.WriteLine("=========================");
         Console.WriteLine("        *  AST  *        ");
         Console.WriteLine("=========================");
         Console.WriteLine("└" + action.ToString(""));
 
         SemanticAnal semanticAnal = new SemanticAnal(action);
-
+        Generator generator = new Generator();
     }
 }
 

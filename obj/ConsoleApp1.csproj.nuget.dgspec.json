@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj": {}
+    "/home/tatiana/RiderProjects/Project_CC/ConsoleApp1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj": {
+    "/home/tatiana/RiderProjects/Project_CC/ConsoleApp1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj",
+        "projectUniqueName": "/home/tatiana/RiderProjects/Project_CC/ConsoleApp1.csproj",
         "projectName": "ConsoleApp1",
-        "projectPath": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\ConsoleApp1.csproj",
-        "packagesPath": "C:\\Users\\alena\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alena\\RiderProjects\\Project_CC\\Project_CC\\obj\\",
+        "projectPath": "/home/tatiana/RiderProjects/Project_CC/ConsoleApp1.csproj",
+        "packagesPath": "/home/tatiana/.nuget/packages/",
+        "outputPath": "/home/tatiana/RiderProjects/Project_CC/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\alena\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/tatiana/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -63,7 +63,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Users\\alena\\.dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/tatiana/.dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,78 +1,100 @@
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\bin\Debug\net7.0\ConsoleApp1.exe
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\bin\Debug\net7.0\ConsoleApp1.deps.json
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\bin\Debug\net7.0\ConsoleApp1.runtimeconfig.json
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\bin\Debug\net7.0\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\bin\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.csproj.AssemblyReference.cache
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.AssemblyInfoInputs.cache
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.AssemblyInfo.cs
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.csproj.CoreCompileInputs.cache
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\refint\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ConsoleApp1.genruntimeconfig.cache
-C:\Users\User\RiderProjects\Compiler Construction\ConsoleApp1\ConsoleApp1\obj\Debug\net7.0\ref\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\bin\Debug\net7.0\ConsoleApp1.exe
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\bin\Debug\net7.0\ConsoleApp1.deps.json
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\bin\Debug\net7.0\ConsoleApp1.runtimeconfig.json
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\bin\Debug\net7.0\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\bin\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.csproj.AssemblyReference.cache
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.AssemblyInfoInputs.cache
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.AssemblyInfo.cs
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.csproj.CoreCompileInputs.cache
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\refint\ConsoleApp1.dll
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ConsoleApp1.genruntimeconfig.cache
-C:\Users\User\RiderProjects\Compiler Construction\СС_Project\obj\Debug\net7.0\ref\ConsoleApp1.dll
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\ConsoleApp1.exe
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\ConsoleApp1.deps.json
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\ConsoleApp1.runtimeconfig.json
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\ConsoleApp1.dll
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.csproj.AssemblyReference.cache
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.AssemblyInfoInputs.cache
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.AssemblyInfo.cs
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.csproj.CoreCompileInputs.cache
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.dll
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\refint\ConsoleApp1.dll
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.genruntimeconfig.cache
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ref\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC-master\bin\Debug\net7.0\ConsoleApp1.exe
-C:\Users\alena\RiderProjects\Project_CC-master\bin\Debug\net7.0\ConsoleApp1.deps.json
-C:\Users\alena\RiderProjects\Project_CC-master\bin\Debug\net7.0\ConsoleApp1.runtimeconfig.json
-C:\Users\alena\RiderProjects\Project_CC-master\bin\Debug\net7.0\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC-master\bin\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.csproj.AssemblyReference.cache
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.AssemblyInfoInputs.cache
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.AssemblyInfo.cs
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.csproj.CoreCompileInputs.cache
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\refint\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ConsoleApp1.genruntimeconfig.cache
-C:\Users\alena\RiderProjects\Project_CC-master\obj\Debug\net7.0\ref\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\bin\Debug\net7.0\ConsoleApp1.exe
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\bin\Debug\net7.0\ConsoleApp1.deps.json
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\bin\Debug\net7.0\ConsoleApp1.runtimeconfig.json
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\bin\Debug\net7.0\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\bin\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.csproj.AssemblyReference.cache
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.AssemblyInfoInputs.cache
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.AssemblyInfo.cs
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.csproj.CoreCompileInputs.cache
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\refint\ConsoleApp1.dll
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.pdb
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ConsoleApp1.genruntimeconfig.cache
-C:\Users\alena\RiderProjects\Project_CC\Project_CC\obj\Debug\net7.0\ref\ConsoleApp1.dll
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\LLVMSharp.dll
-C:\Users\79953\RiderProjects\Project_CC\bin\Debug\net7.0\LLVMSharp.Interop.dll
-C:\Users\79953\RiderProjects\Project_CC\obj\Debug\net7.0\ConsoleApp1.csproj.CopyComplete
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/bin/Debug/net7.0/ConsoleApp1.exe
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/bin/Debug/net7.0/ConsoleApp1.deps.json
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/bin/Debug/net7.0/ConsoleApp1.runtimeconfig.json
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/bin/Debug/net7.0/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/bin/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.csproj.AssemblyReference.cache
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.AssemblyInfoInputs.cache
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.AssemblyInfo.cs
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.csproj.CoreCompileInputs.cache
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/refint/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ConsoleApp1.genruntimeconfig.cache
+C:/Users/User/RiderProjects/Compiler Construction/ConsoleApp1/ConsoleApp1/obj/Debug/net7.0/ref/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/bin/Debug/net7.0/ConsoleApp1.exe
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/bin/Debug/net7.0/ConsoleApp1.deps.json
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/bin/Debug/net7.0/ConsoleApp1.runtimeconfig.json
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/bin/Debug/net7.0/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/bin/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.csproj.AssemblyReference.cache
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.AssemblyInfoInputs.cache
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.AssemblyInfo.cs
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.csproj.CoreCompileInputs.cache
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/refint/ConsoleApp1.dll
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ConsoleApp1.genruntimeconfig.cache
+C:/Users/User/RiderProjects/Compiler Construction/СС_Project/obj/Debug/net7.0/ref/ConsoleApp1.dll
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.exe
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.deps.json
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.runtimeconfig.json
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.dll
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.AssemblyReference.cache
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.AssemblyInfoInputs.cache
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.AssemblyInfo.cs
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.CoreCompileInputs.cache
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.dll
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/refint/ConsoleApp1.dll
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.genruntimeconfig.cache
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ref/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC-master/bin/Debug/net7.0/ConsoleApp1.exe
+C:/Users/alena/RiderProjects/Project_CC-master/bin/Debug/net7.0/ConsoleApp1.deps.json
+C:/Users/alena/RiderProjects/Project_CC-master/bin/Debug/net7.0/ConsoleApp1.runtimeconfig.json
+C:/Users/alena/RiderProjects/Project_CC-master/bin/Debug/net7.0/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC-master/bin/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.csproj.AssemblyReference.cache
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.AssemblyInfoInputs.cache
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.AssemblyInfo.cs
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.csproj.CoreCompileInputs.cache
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/refint/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ConsoleApp1.genruntimeconfig.cache
+C:/Users/alena/RiderProjects/Project_CC-master/obj/Debug/net7.0/ref/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/bin/Debug/net7.0/ConsoleApp1.exe
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/bin/Debug/net7.0/ConsoleApp1.deps.json
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/bin/Debug/net7.0/ConsoleApp1.runtimeconfig.json
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/bin/Debug/net7.0/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/bin/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.AssemblyReference.cache
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.AssemblyInfoInputs.cache
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.AssemblyInfo.cs
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.CoreCompileInputs.cache
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/refint/ConsoleApp1.dll
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.pdb
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ConsoleApp1.genruntimeconfig.cache
+C:/Users/alena/RiderProjects/Project_CC/Project_CC/obj/Debug/net7.0/ref/ConsoleApp1.dll
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/LLVMSharp.dll
+C:/Users/79953/RiderProjects/Project_CC/bin/Debug/net7.0/LLVMSharp.Interop.dll
+C:/Users/79953/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.CopyComplete
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.deps.json
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.runtimeconfig.json
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.dll
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/ConsoleApp1.pdb
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/LLVMSharp.dll
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/LLVMSharp.Interop.dll
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/Mono.Cecil.Mdb.dll
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/Mono.Cecil.Pdb.dll
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/Mono.Cecil.Rocks.dll
+/home/tatiana/RiderProjects/Project_CC/bin/Debug/net7.0/Mono.Cecil.dll
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.AssemblyReference.cache
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.GeneratedMSBuildEditorConfig.editorconfig
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.AssemblyInfoInputs.cache
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.AssemblyInfo.cs
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.CoreCompileInputs.cache
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.csproj.CopyComplete
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.dll
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/refint/ConsoleApp1.dll
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.pdb
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ConsoleApp1.genruntimeconfig.cache
+/home/tatiana/RiderProjects/Project_CC/obj/Debug/net7.0/ref/ConsoleApp1.dll
