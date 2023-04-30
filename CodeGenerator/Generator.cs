@@ -26,7 +26,9 @@ public class Generator
     private MethodDefinition _mainModule;
     private ILProcessor _mainProc;
     
-    private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    // private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    
     private MainRoutine? _mainRoutine;
     private Dictionary<string, VariableDefinition> _vars;
     public Generator(Action action)
@@ -275,7 +277,10 @@ public class Generator
     
     public void example()
     {
-	    var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/file.exe";
+	    // var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/file.exe";
+	    var path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\file.exe";
+	    
+	    
         // setup a `reflection importer` to ensure references to System.Private.CoreLib are replaced with references to `netstandard`. 
         
         // setup a reflection importer to ensure references to System.Private.CoreLib are replaced with references to netstandard. 

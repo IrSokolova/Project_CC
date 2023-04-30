@@ -350,6 +350,9 @@ public class Parser
             if (nextToken.Item1 is TokenTypes.ParenthesesL)
             {
                 _tokens.GetNextToken();
+                Expression? expression = BuildExpression();
+                // nextToken = _tokens.GetNextToken();
+                // if (nextToken != null && nextToken.Item1 is TokenTypes.ParenthesesR)
                 expressions = BuildExpressions();
                 nextToken = _tokens.GetNextToken();
                 CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
