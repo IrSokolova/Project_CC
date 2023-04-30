@@ -23,70 +23,68 @@ public class Generator
     // private Action _action;
     private AssemblyDefinition _asm;
     private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe";
+    private MainRoutine? _mainRoutine;
     public Generator(Action action)
     {
-	    var name = new AssemblyNameDefinition("SuperGreeterBinary", new Version(1, 0, 0, 0));
-	    _asm = AssemblyDefinition.CreateAssembly(name, "generator.exe", ModuleKind.Console);
-	    GenerateAction(action);
+	    _mainRoutine = null;
+	    var mp = new ModuleParameters { Architecture = TargetArchitecture.AMD64, Kind =  ModuleKind.Console, ReflectionImporterProvider = new SystemPrivateCoreLibFixerReflectionProvider() };
+	    _asm = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Program", Version.Parse("1.0.0.0")), Path.GetFileName(_path), mp);
+
+	    StartGeneration(action);
+		    
+	    
 	    
 	    // Assembly info = typeof(int).Assembly;
 	    // Console.WriteLine(info);
-        // Compile("tat");
         example();
     }
 
-    public void AddMainModule(MethodDefinition method, string className)
+    public void StartGeneration(Action action)
     {
-	    var type = new TypeDefinition("", className, TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, _asm.MainModule.Import(typeof(object)));
-	    _asm.MainModule.Types.Add(type);
-	    
-	    type.Methods.Add(method);
-	    _asm.EntryPoint = method;
-    }
+	    Actions? actions = action._actions;
+	    MainRoutine? mainRoutine = null;
 
-    public void AddModule(MethodDefinition method, string name, TypeReference typeReference)
-    {
-	    var type = new TypeDefinition("", name, TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, typeReference);
-		// _asm.
-    }
-
-    public void FinishExe()
-    {
-	    
-
-	    // var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Win32/Win32.exe";
-	    _asm.Write(_path);
+	    while (actions != null)
+	    {
+		    GenerateAction(action);
+		    action = actions._action;
+		    actions = actions._actions;
+	    }
+	    GenerateAction(action);
     }
 
     public void GenerateAction(Action action)
     {
-	    // decl
+	    
 	    if (action._declaration != null)
 	    {
-		    // routine
-		    
-		    // type
-		    
-		    // var
-		    if (action._declaration._variableDeclaration != null)
+		    if (action._declaration._routineDeclaration != null)
 		    {
-			    GenerateVariableDeclaration(action._declaration._variableDeclaration);
+			    if (action._declaration._routineDeclaration._mainRoutine != null)
+			    {
+				    _mainRoutine = action._declaration._routineDeclaration._mainRoutine;
+			    } 
+			    else if (action._declaration._routineDeclaration._function != null)
+			    {
+				    // todo
+			    }
+		    }
+		    else if (action._declaration._typeDeclaration != null)
+		    {
+			    // todo
+		    }
+		    else if (action._declaration._variableDeclaration != null)
+		    {
+			    // todo
 		    }
 	    }
-	    
-	    // stat
-	    
-	    // actions
+	    else if (action._statement != null)
+	    {
+		    // todo
+	    } // else error
     }
 
-    public void GenerateVariableDeclaration(VariableDeclaration variableDeclaration)
-    {
-	    String name = variableDeclaration._identifier._name;
-	    Type type = variableDeclaration._type;
-	    Value value = variableDeclaration._value;
-	    
-	    
-    }
+
     
 
     public void example()
