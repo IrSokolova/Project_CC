@@ -16,4 +16,9 @@
       <Content Include="CodeGenerator\Cecilified.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="CodeGenerator\Exe\" />
+      <Folder Include="CodeGenerator\Win32\" />
+    </ItemGroup>
+
 </Project>

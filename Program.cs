@@ -61,7 +61,7 @@ internal class Program
         Console.WriteLine("└" + action.ToString(""));
 
         SemanticAnal semanticAnal = new SemanticAnal(action);
-        Generator generator = new Generator();
+        Generator generator = new Generator(action);
     }
 }
 
