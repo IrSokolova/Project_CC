@@ -752,6 +752,12 @@ public class Visitor
             if (function._routineReturnType._type != null)
             {
                 Type expectedReturnType = function._routineReturnType._type;
+                if (function._routineInsights.Accept(new RoutineInsightsVisitor()) == null)
+                {
+                    Console.WriteLine("The function {0} doesn't have return statement", functionName);
+                    Environment.Exit(1);
+                }
+
                 Type actualReturnType = function._routineInsights.Accept(new RoutineInsightsVisitor());
                 if (!expectedReturnType.ToString().Equals(actualReturnType.ToString()))
                 {
