@@ -33,6 +33,7 @@ public class Generator
     {
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _mainRoutine = null;
+	    
 	    var mp = new ModuleParameters { Architecture = TargetArchitecture.AMD64, Kind =  ModuleKind.Console, ReflectionImporterProvider = new SystemPrivateCoreLibFixerReflectionProvider() };
 	    _asm = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Program", Version.Parse("1.0.0.0")), Path.GetFileName(_path), mp);
 	    
@@ -92,10 +93,11 @@ public class Generator
 			    if (action._declaration._routineDeclaration._mainRoutine != null)
 			    {
 				    _mainRoutine = action._declaration._routineDeclaration._mainRoutine;
+				    // todo
 			    } 
 			    else if (action._declaration._routineDeclaration._function != null)
 			    {
-				    // todo
+				    GenerateFuncDecl(action._declaration._routineDeclaration._function);
 			    }
 		    }
 		    else if (action._declaration._typeDeclaration != null)
@@ -104,16 +106,144 @@ public class Generator
 		    }
 		    else if (action._declaration._variableDeclaration != null)
 		    {
-			    GenerateVarDecl(action._declaration._variableDeclaration);
+			    GenerateVarDecl(action._declaration._variableDeclaration, _mainProc);
 		    }
 	    }
 	    else if (action._statement != null)
 	    {
-		    // todo
+		    GenerateStmt(action._statement, _mainProc);
 	    } // else error
     }
 
-    public void GenerateVarDecl(VariableDeclaration varDecl)
+    public void GenerateFuncDecl(Function func)
+    {
+	    string? name = func._identifier._name;
+	    Parameters? parameters = func._parameters;
+	    Type? returnType = func._routineReturnType._type; // in the fun always should be return
+	    Body? body = func._routineInsights._body;
+	    
+	    var funModule = new MethodDefinition(name, MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, GetTypeRef(returnType!));
+	    _typeDef.Methods.Add(funModule);
+	    funModule.Body.InitLocals = true;
+	    var funProc = funModule.Body.GetILProcessor();
+	    
+	    while (parameters != null)
+	    {
+		    ParameterDeclaration? pd = parameters._parameterDeclaration;
+		    parameters = parameters._parameters;
+		    if (pd != null) GenerateParamDecl(pd, funModule);
+	    }
+
+	    GenerateBody(body, funProc, GetTypeRef(returnType!));
+    }
+
+    public void GenerateBody(Body body, ILProcessor proc, TypeReference returnType)
+    {
+	    if (body._declaration != null)
+	    {
+		    if (body._declaration._routineDeclaration != null)
+		    {
+			    if (body._declaration._routineDeclaration._mainRoutine != null)
+			    {
+				    _mainRoutine = body._declaration._routineDeclaration._mainRoutine;
+				    // todo
+			    } 
+			    else if (body._declaration._routineDeclaration._function != null)
+			    {
+				    GenerateFuncDecl(body._declaration._routineDeclaration._function);
+			    }
+		    }
+		    else if (body._declaration._typeDeclaration != null)
+		    {
+			    // todo
+		    }
+		    else if (body._declaration._variableDeclaration != null)
+		    {
+			    GenerateVarDecl(body._declaration._variableDeclaration, proc);
+		    }
+	    }
+	    else if (body._statement != null)
+	    {
+		    GenerateStmt(body._statement, proc);
+	    }
+	    else if (body._return != null)
+	    {
+		    Expression exp = body._return._expression;
+		    string value = ""; // todo something with exp
+		    
+		    EmitValue(value, proc, returnType);
+		    proc.Emit(OpCodes.Ret);
+	    } // else error
+    }
+
+    public void GenerateStmt(Statement stmt, ILProcessor proc)
+    {
+	    // todo
+    }
+
+    public void GenerateParamDecl(ParameterDeclaration pd, MethodDefinition md) // no kostil
+    {
+	    string? name = pd._identifier._name;
+	    Type type = pd._type;
+	    
+	    var paramDef = new ParameterDefinition(name, ParameterAttributes.None, GetTypeRef(type));
+	    md.Parameters.Add(paramDef);
+    }
+
+    public void EmitValue(string value, ILProcessor proc, TypeReference type)
+    {
+	    if (type.Equals(_asm.MainModule.TypeSystem.Int32))
+	    {
+		    proc.Emit(OpCodes.Ldc_I4, Int32.Parse(value));
+	    }
+	    else if (type.Equals(_asm.MainModule.TypeSystem.Double))
+	    {
+		    proc.Emit(OpCodes.Ldc_R8, Double.Parse(value));
+	    }
+	    else if (type.Equals(_asm.MainModule.TypeSystem.Boolean))
+	    {
+		    if (value.Equals("true"))
+		    {
+			    proc.Emit(OpCodes.Ldc_I4, 1);
+		    }
+		    else if (value.Equals("false"))
+		    {
+			    proc.Emit(OpCodes.Ldc_I4, 0);
+		    }
+	    }
+    }
+
+    public TypeReference GetTypeRef(Type type)
+    {
+	    if (type._primitiveType != null)
+	    {
+		    if (type._primitiveType._isInt)
+		    {
+			    return _asm.MainModule.TypeSystem.Int32;
+		    }
+	
+		    if (type._primitiveType._isReal)
+		    {
+			    return _asm.MainModule.TypeSystem.Double;
+		    }
+
+		    if (type._primitiveType._isBoolean)
+		    {
+			    return _asm.MainModule.TypeSystem.Boolean;
+		    }
+	    } 
+	    else if (type._arrayType != null)
+	    {
+		    // todo
+	    }
+	    else if (type._recordType != null)
+	    {
+		    // todo
+	    }
+	    return null;
+    }
+
+    public void GenerateVarDecl(VariableDeclaration varDecl, ILProcessor proc)
     {
 	    string? name = varDecl._identifier._name;
 	    Type type = varDecl._type;
@@ -123,13 +253,12 @@ public class Generator
 	    OpCode typeOpCodeCostil = OpCodes.Ldc_R8;
 	    TypeReference typeRefCostil = _asm.MainModule.TypeSystem.Double;
 	    
-	    
 	    var varDef = new VariableDefinition(typeRefCostil);
 	    _mainModule.Body.Variables.Add(varDef);
-	    _mainProc.Emit(typeOpCodeCostil, valCostil);
-	    _mainProc.Emit(OpCodes.Stloc, varDef);
+	    proc.Emit(typeOpCodeCostil, valCostil);
+	    proc.Emit(OpCodes.Stloc, varDef);
 	    
-	    Print(varDef, "System.Double");
+	    // Print(varDef, "System.Double");
 	    
 	    _vars.Add(name, varDef);
     }
