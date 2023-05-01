@@ -405,12 +405,12 @@ public class Generator
 		    _mainModule.Body.Variables.Add(varDef);
 	    
 		    if (value != null)
-			    GenerateOperation(value._expressions._expression._relation._operation, proc);
+			    GenerateExpression(value._expressions._expression, proc);
 	    
 		    // proc.Emit(typeOpCodeCostil, valCostil);
 		    proc.Emit(OpCodes.Stloc, varDef);
 	    
-		    // Print(varDef, "System.Double");
+		    Print(varDef, "System.Int32");
 	    
 		    _vars.Add(name, varDef);
 		    _varsTypes.Add(name, type);
@@ -445,6 +445,12 @@ public class Generator
 	    }
     }
 
+    public void GenerateExpression(Expression exp, ILProcessor proc)
+    {
+	    if (exp != null)
+		    GenerateOperation(exp._relation._operation, proc);
+    }
+
     public void GenerateOperation(Operation op, ILProcessor proc)
     {
 	    GenerateOperand(op._operand, proc);
@@ -473,7 +479,7 @@ public class Generator
 		    GenerateOperation(operand._expression._relation._operation, proc);
 	    else if (operand._single._variable != null)
 	    {
-		    // todo
+		    proc.Emit(OpCodes.Ldloc, _vars[operand._single._variable._identifier._name]);
 	    }
 	    else
 		    EmitValue(operand._single._value, proc, GetTypeRef(operand._single._type));
@@ -548,7 +554,19 @@ public class Generator
     
     public void GenerateLogicOp(LogicalOperator logicOp, ILProcessor proc)
     {
-	    // todo
+	    string sign = logicOp._sign;
+	    switch (sign)
+	    {
+		    case "and":
+			    proc.Emit(OpCodes.And);
+			    break;
+		    case "or":
+			    proc.Emit(OpCodes.Or);
+			    break;
+		    case "xor":
+			    proc.Emit(OpCodes.Xor);
+			    break;
+	    }
     }
 
     public void Print(VariableDefinition varDef, string type)
