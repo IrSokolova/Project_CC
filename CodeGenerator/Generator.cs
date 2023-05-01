@@ -14,6 +14,7 @@ using Action = ConsoleApp1.SyntaxAnalyser.Action;
 using ConsoleApp1.SyntaxAnalyser;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
+using Range = ConsoleApp1.SyntaxAnalyser.Range;
 using Type = ConsoleApp1.SyntaxAnalyser.Type;
 
 namespace DefaultNamespace.CodeGenerator;
@@ -30,10 +31,19 @@ public class Generator
     // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
+    
+    private Dictionary<string, Type> _varsTypes;
     private Dictionary<string, VariableDefinition> _vars;
+    private Dictionary<string, MethodDefinition> _funs;
+    private Dictionary<string, ILProcessor> _funsProcs;
+    
     public Generator(Action action)
     {
+	    _varsTypes = new Dictionary<string, Type>();
 	    _vars = new Dictionary<string, VariableDefinition>();
+	    _funs = new Dictionary<string, MethodDefinition>();
+	    _funsProcs = new Dictionary<string, ILProcessor>();
+	    
 	    _mainRoutine = null;
 	    
 	    var mp = new ModuleParameters { Architecture = TargetArchitecture.AMD64, Kind =  ModuleKind.Console, ReflectionImporterProvider = new SystemPrivateCoreLibFixerReflectionProvider() };
@@ -51,9 +61,7 @@ public class Generator
 	    _mainModule.Parameters.Add(mainParams);
 
 	    StartGeneration(action);
-	    
-	    // Assembly info = typeof(int).Assembly;
-	    // Console.WriteLine(info);
+
         example();
     }
 
@@ -113,7 +121,7 @@ public class Generator
 	    }
 	    else if (action._statement != null)
 	    {
-		    GenerateStmt(action._statement, _mainProc);
+		    GenerateStmt(action._statement, null, _mainProc, _mainModule);
 	    } // else error
     }
 
@@ -136,10 +144,10 @@ public class Generator
 		    if (pd != null) GenerateParamDecl(pd, funModule);
 	    }
 
-	    GenerateBody(body, funProc, GetTypeRef(returnType!));
+	    GenerateBody(body, GetTypeRef(returnType!), funProc, funModule);
     }
 
-    public void GenerateBody(Body body, ILProcessor proc, TypeReference returnType)
+    public void GenerateBody(Body body, TypeReference returnType, ILProcessor proc, MethodDefinition md)
     {
 	    if (body._declaration != null)
 	    {
@@ -166,7 +174,7 @@ public class Generator
 	    }
 	    else if (body._statement != null)
 	    {
-		    GenerateStmt(body._statement, proc);
+		    GenerateStmt(body._statement, returnType, proc, md);
 	    }
 	    else if (body._return != null)
 	    {
@@ -178,9 +186,111 @@ public class Generator
 	    } // else error
     }
 
-    public void GenerateStmt(Statement stmt, ILProcessor proc)
+    public void GenerateStmt(Statement stmt, TypeReference returnType, ILProcessor proc, MethodDefinition md)
     {
-	    // todo
+	    if (stmt._assignment != null)
+	    {
+		    Variable v = stmt._assignment._variable;
+		    
+		    if (stmt._assignment._expressions != null)
+		    {
+			    Expressions exp = stmt._assignment._expressions;
+			    string value = ""; // todo value if var and if no var
+			    
+			    Type type = _varsTypes[v._identifier._name];
+			    EmitValue(value, proc, GetTypeRef(type));
+		    }
+		    else if (stmt._assignment._routineCall != null)
+		    {
+			    RoutineCall rc = stmt._assignment._routineCall;
+			    Expressions callParams = rc._expressions; // todo callParams
+			    
+			    ILProcessor p = _funsProcs[stmt._routineCall._identifier._name];
+			    p.Emit(OpCodes.Call, _funs[rc._identifier._name]);
+		    
+			    // p.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    }
+		    
+		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+	    }
+	    else if (stmt._whileLoop != null)
+	    {
+		    
+	    }
+	    else if (stmt._forLoop != null)
+	    {
+		    string name = stmt._forLoop._identifier._name;
+		    Body body = stmt._forLoop._body;
+
+		    Expression from = stmt._forLoop._range._from;
+		    Expression to = stmt._forLoop._range._to;
+
+		    var var_i = new VariableDefinition(_asm.MainModule.TypeSystem.Int32);
+		    md.Body.Variables.Add(var_i);
+		    proc.Emit(OpCodes.Ldc_I4, 5); // todo from
+		    proc.Emit(OpCodes.Stloc, var_i);
+		    
+		    var lblFel = proc.Create(OpCodes.Nop);
+		    var nop = proc.Create(OpCodes.Nop);
+		    proc.Append(nop);
+		    
+		    proc.Emit(OpCodes.Ldloc, var_i);
+		    proc.Emit(OpCodes.Ldc_I4, 1); // todo to
+		    
+		    if (stmt._forLoop._reverse)
+		    {
+			    proc.Emit(OpCodes.Cgt);
+		    }
+		    else
+		    {
+			    proc.Emit(OpCodes.Clt);
+		    }
+		    proc.Emit(OpCodes.Brfalse, lblFel);
+		    
+		    _vars.Add(name, var_i);
+		    _varsTypes.Add(name, new Type(new PrimitiveType(true, false, false), null, null, null));
+		    
+		    GenerateBody(body, returnType, proc, md);
+	    }
+	    else if (stmt._ifStatement != null)
+	    {
+		    Expression exp = stmt._ifStatement._condition;
+		    Body ifb = stmt._ifStatement._ifBody;
+		    Body elb = stmt._ifStatement._elseBody;
+		    
+		    // todo make normal condition
+		    proc.Emit(OpCodes.Ldloc, 6); // 6
+		    proc.Emit(OpCodes.Ldc_I4, 6); // 6
+		    proc.Emit(OpCodes.Ceq); // =
+		    
+		    var elseEntryPoint = proc.Create(OpCodes.Nop);
+		    proc.Emit(OpCodes.Brfalse, elseEntryPoint);
+		    
+		    GenerateBody(ifb, returnType, proc, md);
+		    var elseEnd = proc.Create(OpCodes.Nop);
+
+		    if (elb != null)
+		    {
+			    var endOfIf = proc.Create(OpCodes.Br, elseEnd);
+			    proc.Append(endOfIf);
+			    proc.Append(elseEntryPoint);
+			    // else
+			    GenerateBody(elb, returnType, proc, md);
+		    }
+		    else
+		    {
+			    proc.Append(elseEntryPoint);
+		    }
+		    proc.Append(elseEnd);
+		    md.Body.OptimizeMacros();
+
+	    }
+	    else if (stmt._routineCall != null)
+	    {
+		    ILProcessor p = _funsProcs[stmt._routineCall._identifier._name];
+		    p.Emit(OpCodes.Call, _funs[stmt._routineCall._identifier._name]);
+		    proc.Emit(OpCodes.Ret);
+	    }
     }
 
     public void GenerateParamDecl(ParameterDeclaration pd, MethodDefinition md) // no kostil
@@ -267,6 +377,7 @@ public class Generator
 	    // Print(varDef, "System.Double");
 	    
 	    _vars.Add(name, varDef);
+	    _varsTypes.Add(name, type);
     }
 
     public void GenerateOperation(Operation op, ILProcessor proc)
