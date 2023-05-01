@@ -1,2 +1,7 @@
-var x : Integer is 0
-var n : Integer is (3 + 2) * (6 - 4)
+routine main () is
+  type a is record {
+    var a : Integer
+    var b : boolean
+  }
+  var x : a is (2 true)
+end

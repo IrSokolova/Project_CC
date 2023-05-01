@@ -17,7 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CodeGenerator\Exe\" />
       <Folder Include="CodeGenerator\Win32\" />
     </ItemGroup>
 

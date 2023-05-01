@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using BindingFlags = System.Reflection.BindingFlags;
 using Cecilifier.Runtime;
+using ConsoleApp1.CodeGenerator.Exe;
 using ConsoleApp1.SyntaxAnalyser;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
@@ -32,7 +33,8 @@ public class Generator
     // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
-    
+
+    private List<TypeDeclaration> _records;
     private Dictionary<string, Type> _varsTypes;
     private Dictionary<string, VariableDefinition> _vars;
     private Dictionary<string, MethodDefinition> _funs;
@@ -40,6 +42,9 @@ public class Generator
     
     public Generator(Action action)
     {
+	    Processing processing = new Processing();
+	    _records = processing.FindRecords(action);
+	    
 	    _varsTypes = new Dictionary<string, Type>();
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _funs = new Dictionary<string, MethodDefinition>();
@@ -231,7 +236,29 @@ public class Generator
     public void GenerateAss(Assignment ass, TypeReference returnType, ILProcessor proc, MethodDefinition md)
     {
 	    Variable v = ass._variable;
+
+	    if (v._arrayType != null)
+	    {
+		    Expression expInd = v._arrayType._arrayType._expression; // index
+		    int ind = 0; // todo
 		    
+		    proc.Emit(OpCodes.Ldloc, _funs[v._identifier._name]);
+		    proc.Emit(OpCodes.Ldc_I4, ind);
+
+		    GenerateRightAss(ass, proc);
+		    proc.Emit(OpCodes.Stelem_Ref);
+	    }
+	    else
+	    {
+		    GenerateRightAss(ass, proc);
+		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+	    }
+    }
+
+    public void GenerateRightAss(Assignment ass, ILProcessor proc)
+    {
+	    Variable v = ass._variable;
+	    
 	    if (ass._expressions != null)
 	    {
 		    Expressions exp = ass._expressions;
@@ -244,14 +271,8 @@ public class Generator
 	    {
 		    RoutineCall rc = ass._routineCall;
 		    Expressions callParams = rc._expressions; // todo callParams
-			    
-		    ILProcessor p = _funsProcs[ass._routineCall._identifier._name];
-		    p.Emit(OpCodes.Call, _funs[rc._identifier._name]);
-		    
-		    // p.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    proc.Emit(OpCodes.Call, _funs[rc._identifier._name]);
 	    }
-		    
-	    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
     }
 
     public void GenerateWhile(WhileLoop loop, TypeReference returnType, ILProcessor proc, MethodDefinition md)
@@ -428,6 +449,9 @@ public class Generator
 		    proc.Emit(OpCodes.Ldc_I4, len);
 		    proc.Emit(OpCodes.Newarr, GetTypeRef(t));
 		    proc.Emit(OpCodes.Stloc, arr);
+		    
+		    _vars.Add(name, arr);
+		    _varsTypes.Add(name, type);
 	    }
 	    else if (type._recordType != null)
 	    {
