@@ -57,6 +57,7 @@ public class Generator
 	    
 	    _typeDef = new TypeDefinition("", "Program", TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.Public, _asm.MainModule.TypeSystem.Object);
 	    _asm.MainModule.Types.Add(_typeDef);
+	    GenerateRecords();
 	    
 	    _mainModule = new MethodDefinition("Main", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
 	    _typeDef.Methods.Add(_mainModule);
@@ -65,10 +66,38 @@ public class Generator
 	    
 	    var mainParams = new ParameterDefinition("args", ParameterAttributes.None, _asm.MainModule.TypeSystem.String.MakeArrayType());
 	    _mainModule.Parameters.Add(mainParams);
-
+	    
 	    StartGeneration(action);
 
         example();
+    }
+
+    public void GenerateRecords()
+    {
+	    foreach (var recDecl in _records)
+	    {
+		    var name = recDecl._identifier._name;
+		    var recType = new TypeDefinition("", name, TypeAttributes.Sealed |TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.SequentialLayout, _asm.MainModule.ImportReference(typeof(System.ValueType)));
+		    _typeDef.NestedTypes.Add(recType);
+
+		    VariableDeclaration field = recDecl._type._recordType._variableDeclaration;
+		    VariableDeclarations fields = recDecl._type._recordType._variableDeclarations;
+		    while (fields != null)
+		    {
+			    ProcessField(recType, field);
+			    field = fields._variableDeclaration;
+			    fields = fields._variableDeclarations;
+		    }
+		    ProcessField(recType, field);
+	    }
+    }
+
+    public void ProcessField(TypeDefinition recType, VariableDeclaration field)
+    {
+	    string name = field._identifier._name;
+	    Type type = field._type;
+	    var fld = new FieldDefinition(name, FieldAttributes.Public, GetTypeRef(type));
+	    recType.Fields.Add(fld);
     }
 
     public void StartGeneration(Action action)
@@ -455,17 +484,17 @@ public class Generator
 	    }
 	    else if (type._recordType != null)
 	    {
-		    RecordType rt = type._recordType;
-
-		    VariableDeclaration v = rt._variableDeclaration;
-		    VariableDeclarations? declarations = rt._variableDeclarations;
-		    while (declarations != null)
-		    {
-			    GenerateVarDecl(v, md, proc, name + v._identifier._name);
-			    v = declarations._variableDeclaration;
-			    declarations = declarations._variableDeclarations;
-		    }
-		    GenerateVarDecl(v, md, proc, name + v._identifier._name);
+		    // RecordType rt = type._recordType;
+		    //
+		    // VariableDeclaration v = rt._variableDeclaration;
+		    // VariableDeclarations? declarations = rt._variableDeclarations;
+		    // while (declarations != null)
+		    // {
+			   //  GenerateVarDecl(v, md, proc, name + v._identifier._name);
+			   //  v = declarations._variableDeclaration;
+			   //  declarations = declarations._variableDeclarations;
+		    // }
+		    // GenerateVarDecl(v, md, proc, name + v._identifier._name);
 	    }
     }
 
