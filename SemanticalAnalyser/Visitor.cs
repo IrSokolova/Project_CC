@@ -835,7 +835,6 @@ public class Visitor
             Type? operationType = null;
             Type? operatorType = null;
             Type? operandType;
-            
             operandType = operation._operand.Accept(new OperandVisitor());
             if (operation._operation != null)
             {
@@ -912,17 +911,22 @@ public class Visitor
     {
         public Type? Visit(Operand operand)
         {
-            if (operand._single._variable != null)
+            if (operand._single != null)
             {
-                string key = operand._single._variable._identifier.ToString();
-                if (localVariables.ContainsKey(key))
+                if (operand._single._variable != null)
                 {
-                    return (Type) localVariables[key];
+                    string key = operand._single._variable._identifier.ToString();
+                    if (localVariables.ContainsKey(key))
+                    {
+                        return (Type) localVariables[key];
+                    }
+                    Console.WriteLine("Variable {0} is undefined", key);
+                    Environment.Exit(1);
                 }
-                Console.WriteLine("Variable {0} is undefined", key);
-                Environment.Exit(1);
-            }
-            return operand._single._type;
+                return operand._single._type;
+            }  
+            return operand._expression.Accept(new ExpressionVisitor());
+            
         }
     }
     

@@ -27,6 +27,8 @@ public class Generator
     private ILProcessor _mainProc;
     
     private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    
     private MainRoutine? _mainRoutine;
     private Dictionary<string, VariableDefinition> _vars;
     public Generator(Action action)
@@ -248,19 +250,102 @@ public class Generator
 	    string? name = varDecl._identifier._name;
 	    Type type = varDecl._type;
 	    Value? value = varDecl._value;
-
-	    Double valCostil = Double.Parse(value._expressions._expression._relation._operation._operand._single._value);
+	    
+	    // Double valCostil = Double.Parse(value._expressions._expression._relation._operation._operand._single._value);
 	    OpCode typeOpCodeCostil = OpCodes.Ldc_R8;
 	    TypeReference typeRefCostil = _asm.MainModule.TypeSystem.Double;
 	    
 	    var varDef = new VariableDefinition(typeRefCostil);
 	    _mainModule.Body.Variables.Add(varDef);
-	    proc.Emit(typeOpCodeCostil, valCostil);
+	    
+	    if (value != null)
+		    GenerateOperation(value._expressions._expression._relation._operation, proc);
+	    
+	    // proc.Emit(typeOpCodeCostil, valCostil);
 	    proc.Emit(OpCodes.Stloc, varDef);
 	    
 	    // Print(varDef, "System.Double");
 	    
 	    _vars.Add(name, varDef);
+    }
+
+    public void GenerateOperation(Operation op, ILProcessor proc)
+    {
+	    GenerateOperand(op._operand, proc);
+
+	    if (op._operation != null)
+	    {
+		    if (op._operation._operator == null)
+		    {
+			    GenerateOperation(op._operation, proc);
+			    GenerateOperator(op._operator, proc);
+		    }
+		    else
+		    {
+			    GenerateOperand(op._operation._operand, proc);
+			    GenerateOperator(op._operator, proc);
+			    
+			    GenerateOperation(op._operation._operation, proc);
+			    GenerateOperator(op._operation._operator, proc);
+		    }
+	    }
+    }
+
+    public void GenerateOperand(Operand operand, ILProcessor proc)
+    {
+	    if (operand._expression != null)
+		    GenerateOperation(operand._expression._relation._operation, proc);
+	    else if (operand._single._variable != null)
+	    {
+		    // todo
+	    }
+	    else
+		    EmitValue(operand._single._value, proc, GetTypeRef(operand._single._type));
+	    
+    }
+
+    public void GenerateOperator(Operator op, ILProcessor proc)
+    {
+	    if (op._mathematicalOperator != null)
+		    GenerateMathOp(op._mathematicalOperator, proc);
+	    else if (op._comparisonOperator != null)
+		    GenerateCompOp(op._comparisonOperator, proc);
+	    else if(op._logicalOperator != null)
+		    GenerateLogicOp(op._logicalOperator, proc);
+	    
+    }
+
+    public void GenerateMathOp(MathematicalOperator mathOp, ILProcessor proc)
+    {
+	    string sign = mathOp._sign;
+	    switch (sign)
+	    {
+		    case "+":
+			    proc.Emit(OpCodes.Add);
+			    break;
+		    case "-":
+			    proc.Emit(OpCodes.Sub);
+			    break;
+		    case "*":
+			    proc.Emit(OpCodes.Mul);
+			    break;
+		    case "/":
+			    proc.Emit(OpCodes.Div);
+			    break;
+		    case "%":
+			    proc.Emit(OpCodes.Rem);
+			    break;
+	    }
+    }
+
+    public void GenerateCompOp(ComparisonOperator compOp, ILProcessor proc)
+    {
+	    // todo
+    }
+    
+    public void GenerateLogicOp(LogicalOperator logicOp, ILProcessor proc)
+    {
+	    // todo
     }
 
     public void Print(VariableDefinition varDef, string type)
@@ -276,6 +361,9 @@ public class Generator
     public void example()
     {
 	    var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/file.exe";
+	    // var path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\file.exe";
+	    
+	    
         // setup a `reflection importer` to ensure references to System.Private.CoreLib are replaced with references to `netstandard`. 
         
         // setup a reflection importer to ensure references to System.Private.CoreLib are replaced with references to netstandard. 
