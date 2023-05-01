@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using BindingFlags = System.Reflection.BindingFlags;
 using Cecilifier.Runtime;
+using ConsoleApp1.CodeGenerator.Exe;
 using ConsoleApp1.SyntaxAnalyser;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
@@ -32,7 +33,8 @@ public class Generator
     // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
-    
+
+    private List<TypeDeclaration> _records;
     private Dictionary<string, Type> _varsTypes;
     private Dictionary<string, VariableDefinition> _vars;
     private Dictionary<string, MethodDefinition> _funs;
@@ -40,6 +42,9 @@ public class Generator
     
     public Generator(Action action)
     {
+	    Processing processing = new Processing();
+	    _records = processing.FindRecords(action);
+	    
 	    _varsTypes = new Dictionary<string, Type>();
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _funs = new Dictionary<string, MethodDefinition>();

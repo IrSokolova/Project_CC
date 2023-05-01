@@ -1,3 +1,7 @@
-var n : array [1] Integer
-
-n [0] := 0
+routine main () is
+  type a is record {
+    var a : Integer
+    var b : boolean
+  }
+  var x : a is (2 true)
+end
