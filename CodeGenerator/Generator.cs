@@ -107,7 +107,6 @@ public class Generator
 			    if (action._declaration._routineDeclaration._mainRoutine != null)
 			    {
 				    _mainRoutine = action._declaration._routineDeclaration._mainRoutine;
-				    // todo
 			    } 
 			    else if (action._declaration._routineDeclaration._function != null)
 			    {
@@ -120,7 +119,7 @@ public class Generator
 		    }
 		    else if (action._declaration._variableDeclaration != null)
 		    {
-			    GenerateVarDecl(action._declaration._variableDeclaration, _mainProc);
+			    GenerateVarDecl(action._declaration._variableDeclaration, _mainProc, null);
 		    }
 	    }
 	    else if (action._statement != null)
@@ -185,7 +184,7 @@ public class Generator
 		    }
 		    else if (body._declaration._variableDeclaration != null)
 		    {
-			    GenerateVarDecl(body._declaration._variableDeclaration, proc);
+			    GenerateVarDecl(body._declaration._variableDeclaration, proc, null);
 		    }
 	    }
 	    else if (body._statement != null)
@@ -390,29 +389,49 @@ public class Generator
 	    return null;
     }
 
-    public void GenerateVarDecl(VariableDeclaration varDecl, ILProcessor proc)
+    public void GenerateVarDecl(VariableDeclaration varDecl, ILProcessor proc, string? name)
     {
-	    string? name = varDecl._identifier._name;
+	    if (name == null) { name = varDecl._identifier._name; }
 	    Type type = varDecl._type;
 	    Value? value = varDecl._value;
 	    
 	    // Double valCostil = Double.Parse(value._expressions._expression._relation._operation._operand._single._value);
-	    OpCode typeOpCodeCostil = OpCodes.Ldc_R8;
-	    TypeReference typeRefCostil = _asm.MainModule.TypeSystem.Double;
+	    // OpCode typeOpCodeCostil = OpCodes.Ldc_R8;
+	    // TypeReference typeRefCostil = _asm.MainModule.TypeSystem.Double;
+	    if (type._primitiveType != null)
+	    {
+		    var varDef = new VariableDefinition(GetTypeRef(type));
+		    _mainModule.Body.Variables.Add(varDef);
 	    
-	    var varDef = new VariableDefinition(typeRefCostil);
-	    _mainModule.Body.Variables.Add(varDef);
+		    if (value != null)
+			    GenerateOperation(value._expressions._expression._relation._operation, proc);
 	    
-	    if (value != null)
-		    GenerateOperation(value._expressions._expression._relation._operation, proc);
+		    // proc.Emit(typeOpCodeCostil, valCostil);
+		    proc.Emit(OpCodes.Stloc, varDef);
 	    
-	    // proc.Emit(typeOpCodeCostil, valCostil);
-	    proc.Emit(OpCodes.Stloc, varDef);
+		    // Print(varDef, "System.Double");
 	    
-	    // Print(varDef, "System.Double");
-	    
-	    _vars.Add(name, varDef);
-	    _varsTypes.Add(name, type);
+		    _vars.Add(name, varDef);
+		    _varsTypes.Add(name, type);
+	    }
+	    else if (type._arrayType != null)
+	    {
+		    
+	    }
+	    else if (type._recordType != null)
+	    {
+		    RecordType rt = type._recordType;
+
+		    VariableDeclaration v = rt._variableDeclaration;
+		    VariableDeclarations? declarations = rt._variableDeclarations;
+		    while (declarations != null)
+		    {
+			    GenerateVarDecl(v, proc, name + v._identifier._name);
+			    v = declarations._variableDeclaration;
+			    declarations = declarations._variableDeclarations;
+		    }
+		    GenerateVarDecl(v, proc, name + v._identifier._name);
+	    }
     }
 
     public void GenerateOperation(Operation op, ILProcessor proc)

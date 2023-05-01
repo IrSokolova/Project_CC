@@ -139,26 +139,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\alena\\.nuget\\packages\\": {}
+    "/home/tatiana/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alena\\RiderProjects\\compiler\\Project_CC\\ConsoleApp1.csproj",
+      "projectUniqueName": "/home/tatiana/RiderProjects/Project_CC/ConsoleApp1.csproj",
       "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\alena\\RiderProjects\\compiler\\Project_CC\\ConsoleApp1.csproj",
-      "packagesPath": "C:\\Users\\alena\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alena\\RiderProjects\\compiler\\Project_CC\\obj\\",
+      "projectPath": "/home/tatiana/RiderProjects/Project_CC/ConsoleApp1.csproj",
+      "packagesPath": "/home/tatiana/.nuget/packages/",
+      "outputPath": "/home/tatiana/RiderProjects/Project_CC/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\alena\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/tatiana/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -202,7 +200,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/home/tatiana/.dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
       }
     }
   }

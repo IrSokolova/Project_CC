@@ -1,3 +1,4 @@
-
-var b : Integer is 1 / ( 2 + 5 ) * ( 3 - 1 )
-
+var a : record {
+    var a : Integer is 42
+    var b : boolean is true
+  }
