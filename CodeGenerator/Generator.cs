@@ -35,6 +35,8 @@ public class Generator
     private MainRoutine? _mainRoutine;
 
     private List<TypeDeclaration> _records;
+    private Dictionary<string, TypeDefinition> _recTypeDefinitions;
+    private Dictionary<string, List<FieldDefinition>> _recFieldDefinitions;
     private Dictionary<string, Type> _varsTypes;
     private Dictionary<string, VariableDefinition> _vars;
     private Dictionary<string, MethodDefinition> _funs;
@@ -44,7 +46,8 @@ public class Generator
     {
 	    Processing processing = new Processing();
 	    _records = processing.FindRecords(action);
-	    
+
+	    _recTypeDefinitions = new Dictionary<string, TypeDefinition>();
 	    _varsTypes = new Dictionary<string, Type>();
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _funs = new Dictionary<string, MethodDefinition>();
@@ -82,22 +85,25 @@ public class Generator
 
 		    VariableDeclaration field = recDecl._type._recordType._variableDeclaration;
 		    VariableDeclarations fields = recDecl._type._recordType._variableDeclarations;
+		    _recFieldDefinitions.Add(name, new List<FieldDefinition>());
 		    while (fields != null)
 		    {
-			    ProcessField(recType, field);
+			    ProcessField(recType, field, name);
 			    field = fields._variableDeclaration;
 			    fields = fields._variableDeclarations;
 		    }
-		    ProcessField(recType, field);
+		    ProcessField(recType, field, name);
+		    _recTypeDefinitions.Add(name, recType);
 	    }
     }
 
-    public void ProcessField(TypeDefinition recType, VariableDeclaration field)
+    public void ProcessField(TypeDefinition recType, VariableDeclaration field, string recName)
     {
 	    string name = field._identifier._name;
 	    Type type = field._type;
 	    var fld = new FieldDefinition(name, FieldAttributes.Public, GetTypeRef(type));
 	    recType.Fields.Add(fld);
+	    _recFieldDefinitions[recName].Add(fld);
     }
 
     public void StartGeneration(Action action)
@@ -172,8 +178,11 @@ public class Generator
 	    _typeDef.Methods.Add(funModule);
 	    funModule.Body.InitLocals = true;
 	    var funProc = funModule.Body.GetILProcessor();
-
-	    GenerateBody(body, null, funProc, funModule);
+	    while (body != null)
+	    {
+		    GenerateBody(body, null, funProc, funModule);
+		    body = body._body;
+	    }
     }
 
     public void GenerateFuncDecl(Function func)
@@ -195,7 +204,11 @@ public class Generator
 		    if (pd != null) GenerateParamDecl(pd, funModule);
 	    }
 
-	    GenerateBody(body, GetTypeRef(returnType!), funProc, funModule);
+	    while (body != null)
+	    {
+		    GenerateBody(body, GetTypeRef(returnType!), funProc, funModule);
+		    body = body._body;
+	    }
     }
 
     public void GenerateBody(Body body, TypeReference returnType, ILProcessor proc, MethodDefinition md)
@@ -346,7 +359,11 @@ public class Generator
 	    _vars.Add(name, var_i);
 	    _varsTypes.Add(name, new Type(new PrimitiveType(true, false, false), null, null, null));
 		    
-	    GenerateBody(body, returnType, proc, md);
+	    while (body != null)
+	    {
+			GenerateBody(body, returnType, proc, md);
+		    body = body._body;
+	    }
     }
 
     public void GenerateIf(IfStatement stmt, TypeReference returnType, ILProcessor proc, MethodDefinition md)
@@ -362,8 +379,11 @@ public class Generator
 		    
 	    var elseEntryPoint = proc.Create(OpCodes.Nop);
 	    proc.Emit(OpCodes.Brfalse, elseEntryPoint);
-		    
-	    GenerateBody(ifb, returnType, proc, md);
+	    while (ifb != null)
+	    {
+			GenerateBody(ifb, returnType, proc, md);
+		    ifb = ifb._body;
+	    }
 	    var elseEnd = proc.Create(OpCodes.Nop);
 
 	    if (elb != null)
@@ -372,7 +392,11 @@ public class Generator
 		    proc.Append(endOfIf);
 		    proc.Append(elseEntryPoint);
 		    // else
-		    GenerateBody(elb, returnType, proc, md);
+		    while (elb != null)
+		    {
+			    GenerateBody(elb, returnType, proc, md);
+			    elb = elb._body;
+		    }
 	    }
 	    else
 	    {
@@ -500,6 +524,47 @@ public class Generator
 		    // }
 		    // GenerateVarDecl(v, md, proc, name + v._identifier._name);
 	    }
+	    else if (type._userType != null)
+	    {
+		    RecordType recordType = null;
+		    Type t = null;
+		    foreach (var record in _records)
+		    {
+			    if (record._identifier._name.Equals(type._userType._name))
+			    {
+				    recordType = record._type._recordType;
+				    t = record._type;
+				    break;
+			    }
+		    }
+		    
+		    var recordDefinition = new VariableDefinition(_recTypeDefinitions[type._userType._name]);
+		    md.Body.Variables.Add(recordDefinition);
+		    
+		    VariableDeclaration v = recordType!._variableDeclaration;
+		    VariableDeclarations? declarations = recordType._variableDeclarations;
+		    int i = 0;
+		    while (declarations != null)
+		    {
+		     ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
+		     v = declarations._variableDeclaration;
+		     declarations = declarations._variableDeclarations;
+		     i++;
+		    }
+		    ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
+		    
+		    _varsTypes.Add(name, t);
+		    _vars.Add(name, recordDefinition);
+	    }
+    }
+
+    public void ProcessField(VariableDeclaration field, VariableDefinition def, ILProcessor proc, FieldDefinition fieldDefinition)
+    {
+	    Value value = field._value;
+	    
+	    proc.Emit(OpCodes.Ldloc, def);
+	    proc.Emit(OpCodes.Ldstr, "Sam"); // todo enter value
+	    proc.Emit(OpCodes.Stfld, fieldDefinition);
     }
 
     public void GenerateExpression(Expression exp, ILProcessor proc)
