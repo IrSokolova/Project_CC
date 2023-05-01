@@ -1374,8 +1374,8 @@ public class Statement
 public class Assignment
 {
     public Variable _variable;
-    public Expressions _expressions;
-    public RoutineCall _routineCall;
+    public Expressions? _expressions;
+    public RoutineCall? _routineCall;
 
     public Assignment(Variable variable, Expressions expressions, RoutineCall routineCall)
     {

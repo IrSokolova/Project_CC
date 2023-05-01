@@ -77,6 +77,10 @@ public class Generator
 		    actions = actions._actions;
 	    }
 	    GenerateAction(action);
+	    if (_mainRoutine != null)
+	    {
+		    GenerateMainRoutine();
+	    }
 	    _mainProc.Emit(OpCodes.Ret);
 
 	    var ctorMethod = new MethodDefinition(".ctor", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName, _asm.MainModule.TypeSystem.Void);
@@ -124,6 +128,19 @@ public class Generator
 		    GenerateStmt(action._statement, null, _mainProc, _mainModule);
 	    } // else error
     }
+    
+    public void GenerateMainRoutine()
+    {
+	    string name = "main";
+	    Body? body = _mainRoutine!._body;
+	    
+	    var funModule = new MethodDefinition(name, MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
+	    _typeDef.Methods.Add(funModule);
+	    funModule.Body.InitLocals = true;
+	    var funProc = funModule.Body.GetILProcessor();
+
+	    GenerateBody(body, null, funProc, funModule);
+    }
 
     public void GenerateFuncDecl(Function func)
     {
@@ -156,7 +173,6 @@ public class Generator
 			    if (body._declaration._routineDeclaration._mainRoutine != null)
 			    {
 				    _mainRoutine = body._declaration._routineDeclaration._mainRoutine;
-				    // todo
 			    } 
 			    else if (body._declaration._routineDeclaration._function != null)
 			    {
@@ -190,100 +206,19 @@ public class Generator
     {
 	    if (stmt._assignment != null)
 	    {
-		    Variable v = stmt._assignment._variable;
-		    
-		    if (stmt._assignment._expressions != null)
-		    {
-			    Expressions exp = stmt._assignment._expressions;
-			    string value = ""; // todo value if var and if no var
-			    
-			    Type type = _varsTypes[v._identifier._name];
-			    EmitValue(value, proc, GetTypeRef(type));
-		    }
-		    else if (stmt._assignment._routineCall != null)
-		    {
-			    RoutineCall rc = stmt._assignment._routineCall;
-			    Expressions callParams = rc._expressions; // todo callParams
-			    
-			    ILProcessor p = _funsProcs[stmt._routineCall._identifier._name];
-			    p.Emit(OpCodes.Call, _funs[rc._identifier._name]);
-		    
-			    // p.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
-		    }
-		    
-		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    GenerateAss(stmt._assignment, returnType, proc, md);
 	    }
 	    else if (stmt._whileLoop != null)
 	    {
-		    
+		    GenerateWhile(stmt._whileLoop, returnType, proc, md);
 	    }
 	    else if (stmt._forLoop != null)
 	    {
-		    string name = stmt._forLoop._identifier._name;
-		    Body body = stmt._forLoop._body;
-
-		    Expression from = stmt._forLoop._range._from;
-		    Expression to = stmt._forLoop._range._to;
-
-		    var var_i = new VariableDefinition(_asm.MainModule.TypeSystem.Int32);
-		    md.Body.Variables.Add(var_i);
-		    proc.Emit(OpCodes.Ldc_I4, 5); // todo from
-		    proc.Emit(OpCodes.Stloc, var_i);
-		    
-		    var lblFel = proc.Create(OpCodes.Nop);
-		    var nop = proc.Create(OpCodes.Nop);
-		    proc.Append(nop);
-		    
-		    proc.Emit(OpCodes.Ldloc, var_i);
-		    proc.Emit(OpCodes.Ldc_I4, 1); // todo to
-		    
-		    if (stmt._forLoop._reverse)
-		    {
-			    proc.Emit(OpCodes.Cgt);
-		    }
-		    else
-		    {
-			    proc.Emit(OpCodes.Clt);
-		    }
-		    proc.Emit(OpCodes.Brfalse, lblFel);
-		    
-		    _vars.Add(name, var_i);
-		    _varsTypes.Add(name, new Type(new PrimitiveType(true, false, false), null, null, null));
-		    
-		    GenerateBody(body, returnType, proc, md);
+		    GenerateFor(stmt._forLoop, returnType, proc, md);
 	    }
 	    else if (stmt._ifStatement != null)
 	    {
-		    Expression exp = stmt._ifStatement._condition;
-		    Body ifb = stmt._ifStatement._ifBody;
-		    Body elb = stmt._ifStatement._elseBody;
-		    
-		    // todo make normal condition
-		    proc.Emit(OpCodes.Ldloc, 6); // 6
-		    proc.Emit(OpCodes.Ldc_I4, 6); // 6
-		    proc.Emit(OpCodes.Ceq); // =
-		    
-		    var elseEntryPoint = proc.Create(OpCodes.Nop);
-		    proc.Emit(OpCodes.Brfalse, elseEntryPoint);
-		    
-		    GenerateBody(ifb, returnType, proc, md);
-		    var elseEnd = proc.Create(OpCodes.Nop);
-
-		    if (elb != null)
-		    {
-			    var endOfIf = proc.Create(OpCodes.Br, elseEnd);
-			    proc.Append(endOfIf);
-			    proc.Append(elseEntryPoint);
-			    // else
-			    GenerateBody(elb, returnType, proc, md);
-		    }
-		    else
-		    {
-			    proc.Append(elseEntryPoint);
-		    }
-		    proc.Append(elseEnd);
-		    md.Body.OptimizeMacros();
-
+		    GenerateIf(stmt._ifStatement, returnType, proc, md);
 	    }
 	    else if (stmt._routineCall != null)
 	    {
@@ -291,6 +226,106 @@ public class Generator
 		    p.Emit(OpCodes.Call, _funs[stmt._routineCall._identifier._name]);
 		    proc.Emit(OpCodes.Ret);
 	    }
+    }
+
+    public void GenerateAss(Assignment ass, TypeReference returnType, ILProcessor proc, MethodDefinition md)
+    {
+	    Variable v = ass._variable;
+		    
+	    if (ass._expressions != null)
+	    {
+		    Expressions exp = ass._expressions;
+		    string value = ""; // todo value if var and if no var
+			    
+		    Type type = _varsTypes[v._identifier._name];
+		    EmitValue(value, proc, GetTypeRef(type));
+	    }
+	    else if (ass._routineCall != null)
+	    {
+		    RoutineCall rc = ass._routineCall;
+		    Expressions callParams = rc._expressions; // todo callParams
+			    
+		    ILProcessor p = _funsProcs[ass._routineCall._identifier._name];
+		    p.Emit(OpCodes.Call, _funs[rc._identifier._name]);
+		    
+		    // p.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+	    }
+		    
+	    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+    }
+
+    public void GenerateWhile(WhileLoop loop, TypeReference returnType, ILProcessor proc, MethodDefinition md)
+    {
+	    // todo
+    }
+
+    public void GenerateFor(ForLoop loop, TypeReference returnType, ILProcessor proc, MethodDefinition md)
+    {
+	    string name = loop._identifier._name;
+	    Body body = loop._body;
+
+	    Expression from = loop._range._from;
+	    Expression to = loop._range._to;
+
+	    var var_i = new VariableDefinition(_asm.MainModule.TypeSystem.Int32);
+	    md.Body.Variables.Add(var_i);
+	    proc.Emit(OpCodes.Ldc_I4, 5); // todo from
+	    proc.Emit(OpCodes.Stloc, var_i);
+		    
+	    var lblFel = proc.Create(OpCodes.Nop);
+	    var nop = proc.Create(OpCodes.Nop);
+	    proc.Append(nop);
+		    
+	    proc.Emit(OpCodes.Ldloc, var_i);
+	    proc.Emit(OpCodes.Ldc_I4, 1); // todo to
+		    
+	    if (loop._reverse)
+	    {
+		    proc.Emit(OpCodes.Cgt);
+	    }
+	    else
+	    {
+		    proc.Emit(OpCodes.Clt);
+	    }
+	    proc.Emit(OpCodes.Brfalse, lblFel);
+		    
+	    _vars.Add(name, var_i);
+	    _varsTypes.Add(name, new Type(new PrimitiveType(true, false, false), null, null, null));
+		    
+	    GenerateBody(body, returnType, proc, md);
+    }
+
+    public void GenerateIf(IfStatement stmt, TypeReference returnType, ILProcessor proc, MethodDefinition md)
+    {
+	    Expression exp = stmt._condition;
+	    Body ifb = stmt._ifBody;
+	    Body elb = stmt._elseBody;
+		    
+	    // todo make normal condition
+	    proc.Emit(OpCodes.Ldloc, 6); // 6
+	    proc.Emit(OpCodes.Ldc_I4, 6); // 6
+	    proc.Emit(OpCodes.Ceq); // =
+		    
+	    var elseEntryPoint = proc.Create(OpCodes.Nop);
+	    proc.Emit(OpCodes.Brfalse, elseEntryPoint);
+		    
+	    GenerateBody(ifb, returnType, proc, md);
+	    var elseEnd = proc.Create(OpCodes.Nop);
+
+	    if (elb != null)
+	    {
+		    var endOfIf = proc.Create(OpCodes.Br, elseEnd);
+		    proc.Append(endOfIf);
+		    proc.Append(elseEntryPoint);
+		    // else
+		    GenerateBody(elb, returnType, proc, md);
+	    }
+	    else
+	    {
+		    proc.Append(elseEntryPoint);
+	    }
+	    proc.Append(elseEnd);
+	    md.Body.OptimizeMacros();
     }
 
     public void GenerateParamDecl(ParameterDeclaration pd, MethodDefinition md) // no kostil
