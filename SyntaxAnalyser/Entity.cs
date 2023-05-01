@@ -80,18 +80,30 @@ public class Declaration
     }
 }
 
+public class Fields /////
+{
+    private List<string> fields;
+
+    public Fields(List<string> fields)
+    {
+        this.fields = fields;
+    }
+}
+
 public class VariableDeclaration
 {
     public Identifier _identifier;
     public Type _type;
     public Value? _value;
+    public Fields _fields; /////
     // private Expression? _expression;
     
-    public VariableDeclaration(Identifier identifier, Type type, Value? value)
+    public VariableDeclaration(Identifier identifier, Type type, Value? value, Fields fields) /////
     {
         _identifier = identifier;
         _type = type;
         _value = value;
+        _fields = fields; /////
         // _expression = expression;
     }
     

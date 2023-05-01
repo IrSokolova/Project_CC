@@ -3,4 +3,5 @@ routine main () is
     var a : Integer
     var b : boolean
   }
+  var x : a is (2 true)
 end

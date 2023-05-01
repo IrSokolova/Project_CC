@@ -9,20 +9,13 @@ public class Parser
     private static List<Tuple<TokenTypes, string>> _lexicalAnalysis;
     private readonly TokenQueue _tokens;
     //private Action _action;
-
-    /// <summary>
-    /// Создааём парсер и передаём ему лист токенов, чтобы создать TokenQueue
-    /// </summary>
-    /// <param name="lexicalAnalysis"></param>
+    
     public Parser(List<Tuple<TokenTypes, string>> lexicalAnalysis)
     {
         _lexicalAnalysis = lexicalAnalysis;
         _tokens = new TokenQueue(_lexicalAnalysis);
     }
     
-    /// <summary>
-    /// Создаём Action, который состоит из Declaration, Statement и Actions
-    /// </summary>
     public Action? BuildAction()
     {
         if (_tokens.Current() != null)
@@ -44,10 +37,6 @@ public class Parser
         return null;
     }
 
-    /// <summary>
-    /// Создаём Actions.
-    /// Если action в нём отсутствует, то Actions = null
-    /// </summary>
     public Actions? BuildActions()
     {
         Action? action = BuildAction();
@@ -56,15 +45,7 @@ public class Parser
         Actions? actions = BuildActions();
         return new Actions(action, actions);
     }
-
-    /// <summary>
-    /// Создаём Declaration.
-    /// Чекаем, является ли токен "var", "type" или "routine",
-    /// И вызываем соответствующую функцию.
-    /// Или, если ни один токен не подошёл, возвращаем null
-    ///
-    /// Если токен не подходит то очередь не меняется и декларэйшн не строится.
-    /// </summary>
+    
     public Declaration? BuildDeclaration()
     {
         VariableDeclaration? variableDeclaration = null;
@@ -317,6 +298,7 @@ public class Parser
         Type varType = null;
         Expressions? expressions = null;
         Value? value = null;
+        Fields fields = null;
 
         // Get Identifiers Token
         var nextToken = _tokens.GetNextToken();
@@ -360,18 +342,40 @@ public class Parser
             // }
             // else
             // {
+            if (varType._userType != null)
+            {
+                nextToken = _tokens.GetNextToken();
+                CheckNull(nextToken, TokenTypes.ParenthesesL, "BuildVariableDeclaration");
+                CheckTokenMatch(nextToken.Item1, TokenTypes.ParenthesesL, "BuildVariableDeclaration");
+
+                List<string> f = new List<string>();
+                nextToken = _tokens.GetNextToken();
+                CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
+                while (nextToken.Item1 != TokenTypes.ParenthesesR)
+                {
+                    f.Add(nextToken.Item2);
+                    nextToken = _tokens.GetNextToken();
+                    CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
+                }
+
+                fields = new Fields(f);
+            }
+            else
+            {
                 Expression? exp = BuildExpression();
                 if (exp == null)
                     expressions = null;
                 else
                     expressions = new Expressions(exp, null);
+            }
+                
             // }
             
             value = new Value(expressions);
-            return new VariableDeclaration(identifier, varType, value);
+            return new VariableDeclaration(identifier, varType, value, fields);
         }
 
-        return new VariableDeclaration(identifier, varType, null);
+        return new VariableDeclaration(identifier, varType, null, null);
     }
     
     /// <summary>
