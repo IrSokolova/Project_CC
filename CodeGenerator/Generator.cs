@@ -451,7 +451,34 @@ public class Generator
 
     public void GenerateCompOp(ComparisonOperator compOp, ILProcessor proc)
     {
-	    // todo
+	    string sign = compOp._sign;
+	    switch (sign)
+	    {
+		    case ">":
+			    proc.Emit(OpCodes.Cgt);
+			    break;
+		    case ">=":
+			    proc.Emit(OpCodes.Clt);
+			    proc.Emit(OpCodes.Ldc_I4_0);
+			    proc.Emit(OpCodes.Ceq);
+			    break;
+		    case "<":
+			    proc.Emit(OpCodes.Clt);
+			    break;
+		    case "<=":
+			    proc.Emit(OpCodes.Cgt);
+			    proc.Emit(OpCodes.Ldc_I4_0);
+			    proc.Emit(OpCodes.Ceq);
+			    break;
+		    case "==":
+			    proc.Emit(OpCodes.Ceq);
+			    break;
+		    case "!=":
+			    proc.Emit(OpCodes.Ceq);
+			    proc.Emit(OpCodes.Ldc_I4_0);
+			    proc.Emit(OpCodes.Ceq);
+			    break;
+	    }
     }
     
     public void GenerateLogicOp(LogicalOperator logicOp, ILProcessor proc)
