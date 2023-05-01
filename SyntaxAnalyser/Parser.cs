@@ -149,22 +149,34 @@ public class Parser
                     {
                         case TokenTypes.Assign:
                             token = _tokens.Current();
-                            // if (token.Item1 is TokenTypes.ParenthesesL)
-                            // {
-                            //     _tokens.GetNextToken();
-                            //     expressions = BuildExpressions();
-                            //     token = _tokens.GetNextToken();
-                            //     CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
-                            //     CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
-                            // }
-                            // else
-                            // {
+                            if (token.Item1 is TokenTypes.ParenthesesL)
+                            {
+                                _tokens.GetNextToken();
+                                // Expression? expression = BuildExpression();
+                                // nextToken = _tokens.GetNextToken();
+                                // if (nextToken != null && nextToken.Item1 is TokenTypes.ParenthesesR)
+                                expressions = BuildExpressions();
+                                token = _tokens.GetNextToken();
+                                CheckNull(token, TokenTypes.ParenthesesR, "BuildStatement");
+                                CheckTokenMatch(token!.Item1, TokenTypes.ParenthesesR, "BuildStatement");
+                                if (expressions._expressions == null)
+                                {
+                                    Operand o1 = new Operand(null, expressions._expression);
+                                    Operator? o2 = BuildOperator();
+                                    Operation? o3 = BuildOperation();
+                                    Expression e =
+                                        new Expression(new Relation(new Operation(o1, o2, o3), null), null);
+                                    expressions = new Expressions(e, null);
+                                }
+                            }
+                            else
+                            {
                                 Expression? exp = BuildExpression();
                                 if (exp == null)
                                     expressions = null;
                                 else
                                     expressions = new Expressions(exp, null);
-                            // }
+                            }
                             
                             
                             // token = _tokens.Current();
@@ -347,25 +359,34 @@ public class Parser
             nextToken = _tokens.Current();
             CheckNull(nextToken, "Expression", "BuildVariableDeclaration");
 
-            // if (nextToken.Item1 is TokenTypes.ParenthesesL)
-            // {
-            //     _tokens.GetNextToken();
-            //     // Expression? expression = BuildExpression();
-            //     // nextToken = _tokens.GetNextToken();
-            //     // if (nextToken != null && nextToken.Item1 is TokenTypes.ParenthesesR)
-            //     expressions = BuildExpressions();
-            //     nextToken = _tokens.GetNextToken();
-            //     CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
-            //     CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
-            // }
-            // else
-            // {
+            if (nextToken.Item1 is TokenTypes.ParenthesesL)
+            {
+                _tokens.GetNextToken();
+                // Expression? expression = BuildExpression();
+                // nextToken = _tokens.GetNextToken();
+                // if (nextToken != null && nextToken.Item1 is TokenTypes.ParenthesesR)
+                expressions = BuildExpressions();
+                nextToken = _tokens.GetNextToken();
+                CheckNull(nextToken, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
+                CheckTokenMatch(nextToken!.Item1, TokenTypes.ParenthesesR, "BuildVariableDeclaration");
+                if (expressions._expressions == null)
+                {
+                    Operand o1 = new Operand(null, expressions._expression);
+                    Operator? o2 = BuildOperator();
+                    Operation? o3 = BuildOperation();
+                    Expression e =
+                        new Expression(new Relation(new Operation(o1, o2, o3), null), null);
+                    expressions = new Expressions(e, null);
+                }
+            }
+            else
+            {
                 Expression? exp = BuildExpression();
                 if (exp == null)
                     expressions = null;
                 else
                     expressions = new Expressions(exp, null);
-            // }
+            }
             
             value = new Value(expressions);
             return new VariableDeclaration(identifier, varType, value);
