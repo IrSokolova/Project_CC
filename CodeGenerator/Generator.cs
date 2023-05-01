@@ -16,6 +16,7 @@ using FieldAttributes = Mono.Cecil.FieldAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
 using Range = ConsoleApp1.SyntaxAnalyser.Range;
 using Type = ConsoleApp1.SyntaxAnalyser.Type;
+using ArrayType = ConsoleApp1.SyntaxAnalyser.ArrayType;
 
 namespace DefaultNamespace.CodeGenerator;
 
@@ -119,7 +120,7 @@ public class Generator
 		    }
 		    else if (action._declaration._variableDeclaration != null)
 		    {
-			    GenerateVarDecl(action._declaration._variableDeclaration, _mainProc, null);
+			    GenerateVarDecl(action._declaration._variableDeclaration, _mainModule, _mainProc, null);
 		    }
 	    }
 	    else if (action._statement != null)
@@ -184,7 +185,7 @@ public class Generator
 		    }
 		    else if (body._declaration._variableDeclaration != null)
 		    {
-			    GenerateVarDecl(body._declaration._variableDeclaration, proc, null);
+			    GenerateVarDecl(body._declaration._variableDeclaration, md, proc, null);
 		    }
 	    }
 	    else if (body._statement != null)
@@ -389,7 +390,7 @@ public class Generator
 	    return null;
     }
 
-    public void GenerateVarDecl(VariableDeclaration varDecl, ILProcessor proc, string? name)
+    public void GenerateVarDecl(VariableDeclaration varDecl, MethodDefinition md, ILProcessor proc, string? name)
     {
 	    if (name == null) { name = varDecl._identifier._name; }
 	    Type type = varDecl._type;
@@ -416,7 +417,17 @@ public class Generator
 	    }
 	    else if (type._arrayType != null)
 	    {
+		    ArrayType at = type._arrayType;
+		    Expression exp = at._expression; // length
+		    Type t = at._type;
+
+		    int len = 0; // todo
 		    
+		    var arr = new VariableDefinition(GetTypeRef(t).MakeArrayType());
+		    md.Body.Variables.Add(arr);
+		    proc.Emit(OpCodes.Ldc_I4, len);
+		    proc.Emit(OpCodes.Newarr, GetTypeRef(t));
+		    proc.Emit(OpCodes.Stloc, arr);
 	    }
 	    else if (type._recordType != null)
 	    {
@@ -426,11 +437,11 @@ public class Generator
 		    VariableDeclarations? declarations = rt._variableDeclarations;
 		    while (declarations != null)
 		    {
-			    GenerateVarDecl(v, proc, name + v._identifier._name);
+			    GenerateVarDecl(v, md, proc, name + v._identifier._name);
 			    v = declarations._variableDeclaration;
 			    declarations = declarations._variableDeclarations;
 		    }
-		    GenerateVarDecl(v, proc, name + v._identifier._name);
+		    GenerateVarDecl(v, md, proc, name + v._identifier._name);
 	    }
     }
 

@@ -1,4 +1,3 @@
-var a : record {
-    var a : Integer is 42
-    var b : boolean is true
-  }
+var n : array [1] Integer
+
+n [0] := 0
