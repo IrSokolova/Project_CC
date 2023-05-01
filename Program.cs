@@ -55,10 +55,10 @@ internal class Program
 
         Parser parser = new Parser(lexicalAnalysis);
         Action action = parser.BuildAction();
-        // Console.WriteLine("=========================");
-        // Console.WriteLine("        *  AST  *        ");
-        // Console.WriteLine("=========================");
-        // Console.WriteLine("└" + action.ToString(""));
+        Console.WriteLine("=========================");
+        Console.WriteLine("        *  AST  *        ");
+        Console.WriteLine("=========================");
+        Console.WriteLine("└" + action.ToString(""));
 
         SemanticAnal semanticAnal = new SemanticAnal(action);
         Generator generator = new Generator(action);

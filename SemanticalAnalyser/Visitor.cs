@@ -143,28 +143,8 @@ public class Visitor
                             expectedTypes.Add(tuple.Item2);
                         }
 
-                        List<Object> actualTypes = new List<object>();
-                        foreach (String v in variableDeclaration._fields.fields) // kostils
-                        {
-                            if (v.Any(char.IsDigit))
-                            {
-                                if (v.Contains("."))
-                                {
-                                    Type t = new Type(new PrimitiveType(false, true, false), null, null, null);
-                                    actualTypes.Add(t);
-                                }
-                                else
-                                {
-                                    Type t = new Type(new PrimitiveType(true, false, false), null, null, null);
-                                    actualTypes.Add(t);
-                                }
-                            }
-                            else if (v.Equals("true") || v.Equals("false"))
-                            {
-                                Type t = new Type(new PrimitiveType(false, false, true), null, null, null);
-                                actualTypes.Add(t);
-                            }
-                        }
+                        List<Type> actualTypes =
+                            variableDeclaration._value._expressions.Accept(new ExpressionsVisitor());
 
                         if (!(expectedTypes.Count == actualTypes.Count))
                         {
