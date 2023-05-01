@@ -82,7 +82,7 @@ public class Declaration
 
 public class Fields /////
 {
-    private List<string> fields;
+    public List<string> fields;
 
     public Fields(List<string> fields)
     {

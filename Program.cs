@@ -60,7 +60,7 @@ internal class Program
         // Console.WriteLine("=========================");
         // Console.WriteLine("└" + action.ToString(""));
 
-        // SemanticAnal semanticAnal = new SemanticAnal(action);
+        SemanticAnal semanticAnal = new SemanticAnal(action);
         Generator generator = new Generator(action);
     }
 }
