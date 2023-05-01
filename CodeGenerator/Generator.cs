@@ -29,8 +29,8 @@ public class Generator
     private MethodDefinition _mainModule;
     private ILProcessor _mainProc;
     
-    private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
-    // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    // private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
 
@@ -200,9 +200,11 @@ public class Generator
 	    else if (body._return != null)
 	    {
 		    Expression exp = body._return._expression;
-		    string value = ""; // todo something with exp
+		    // string value = ""; // todo something with exp
 		    
-		    EmitValue(value, proc, returnType);
+		    GenerateExpression(exp, proc);
+		    
+		    // EmitValue(value, proc, returnType);
 		    proc.Emit(OpCodes.Ret);
 	    } // else error
     }
@@ -252,6 +254,7 @@ public class Generator
 	    {
 		    GenerateRightAss(ass, proc);
 		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    Print( _vars[v._identifier._name], "System.Int32");
 	    }
     }
 
@@ -262,10 +265,11 @@ public class Generator
 	    if (ass._expressions != null)
 	    {
 		    Expressions exp = ass._expressions;
-		    string value = ""; // todo value if var and if no var
+		    // string value = ""; // todo value if var and if no var
+		    GenerateExpression(exp._expression, proc);
 			    
 		    Type type = _varsTypes[v._identifier._name];
-		    EmitValue(value, proc, GetTypeRef(type));
+		    // EmitValue(value, proc, GetTypeRef(type));
 	    }
 	    else if (ass._routineCall != null)
 	    {
@@ -600,13 +604,13 @@ public class Generator
 	    
 	    _mainProc.Emit(OpCodes.Ldloc, varDef);
 	    _mainProc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, type)));
-	    _mainProc.Emit(OpCodes.Ret);
+	    // _mainProc.Emit(OpCodes.Ret);
     }
     
     public void example()
     {
-	    var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/file.exe";
-	    // var path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\file.exe";
+	    // var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/file.exe";
+	    var path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\file.exe";
 	    
 	    
         // setup a `reflection importer` to ensure references to System.Private.CoreLib are replaced with references to `netstandard`. 
