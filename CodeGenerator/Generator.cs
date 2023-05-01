@@ -154,10 +154,9 @@ public class Generator
 				    GenerateFuncDecl(action._declaration._routineDeclaration._function);
 			    }
 		    }
-		    else if (action._declaration._typeDeclaration != null)
-		    {
-			    // todo
-		    }
+		    // else if (action._declaration._typeDeclaration != null)
+		    // {
+		    // }
 		    else if (action._declaration._variableDeclaration != null)
 		    {
 			    GenerateVarDecl(action._declaration._variableDeclaration, _mainModule, _mainProc, null);
@@ -226,10 +225,9 @@ public class Generator
 				    GenerateFuncDecl(body._declaration._routineDeclaration._function);
 			    }
 		    }
-		    else if (body._declaration._typeDeclaration != null)
-		    {
-			    // todo
-		    }
+		    // else if (body._declaration._typeDeclaration != null)
+		    // {
+		    // }
 		    else if (body._declaration._variableDeclaration != null)
 		    {
 			    GenerateVarDecl(body._declaration._variableDeclaration, md, proc, null);
@@ -457,14 +455,12 @@ public class Generator
 			    return _asm.MainModule.TypeSystem.Boolean;
 		    }
 	    } 
-	    else if (type._arrayType != null)
-	    {
-		    // todo
-	    }
-	    else if (type._recordType != null)
-	    {
-		    // todo
-	    }
+	    // else if (type._arrayType != null)
+	    // {
+	    // }
+	    // else if (type._recordType != null)
+	    // {
+	    // }
 	    return null;
     }
 
