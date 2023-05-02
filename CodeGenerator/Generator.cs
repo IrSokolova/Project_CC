@@ -30,8 +30,8 @@ public class Generator
     private MethodDefinition _mainModule;
     private ILProcessor _mainProc;
     
-    private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
-    // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    // private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
 
@@ -151,12 +151,9 @@ public class Generator
 		    actions = action._actions;
 	    }
 	    GenerateAction(action);
-	    // if (_mainRoutine != null)
-	    // {
-		   //  GenerateMainRoutine();
-	    // }
-	    
-	    CallMainRoutine(_mainRoutineModule);
+	
+	    if (_mainRoutine != null)
+			CallMainRoutine(_mainRoutineModule);
 	    
 	    _mainProc.Emit(OpCodes.Ret);
 
