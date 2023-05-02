@@ -30,12 +30,13 @@ public class Generator
     private MethodDefinition _mainModule;
     private ILProcessor _mainProc;
     
-    private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
-    // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    // private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
 
     private List<TypeDeclaration> _records;
+    private List<Function> _functions;
     private Dictionary<string, TypeDefinition> _recTypeDefinitions;
     private Dictionary<string, MethodDefinition> _constructors;
     private Dictionary<string, List<FieldDefinition>> _recFieldDefinitions;
@@ -43,11 +44,16 @@ public class Generator
     private Dictionary<string, VariableDefinition> _vars;
     private Dictionary<string, MethodDefinition> _funs;
     private Dictionary<string, ILProcessor> _funsProcs;
-    
+    private MethodDefinition _mainRoutineModule;
+
     public Generator(Action action)
     {
 	    Processing processing = new Processing();
+	    FunProcessing funProcessing = new FunProcessing();
 	    _records = processing.FindRecords(action);
+	    _mainRoutine = null;
+	    _functions = funProcessing.FindFunctions(action);
+	    _mainRoutine = funProcessing._mainRoutine;
 
 	    _recTypeDefinitions = new Dictionary<string, TypeDefinition>();
 	    _recFieldDefinitions = new Dictionary<string, List<FieldDefinition>>();
@@ -56,16 +62,22 @@ public class Generator
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _funs = new Dictionary<string, MethodDefinition>();
 	    _funsProcs = new Dictionary<string, ILProcessor>();
-	    
-	    _mainRoutine = null;
-	    
+
+
 	    var mp = new ModuleParameters { Architecture = TargetArchitecture.AMD64, Kind =  ModuleKind.Console, ReflectionImporterProvider = new SystemPrivateCoreLibFixerReflectionProvider() };
 	    _asm = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Program", Version.Parse("1.0.0.0")), Path.GetFileName(_path), mp);
 	    
 	    _typeDef = new TypeDefinition("", "Program", TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.Public, _asm.MainModule.TypeSystem.Object);
 	    _asm.MainModule.Types.Add(_typeDef);
-	    GenerateRecords();
 	    
+	    _mainRoutineModule = new MethodDefinition("main", MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
+
+	    GenerateRecords();
+	    GenerateFunctions();
+	    GenerateMainRoutine(_mainRoutineModule);
+	    
+	    
+
 	    _mainModule = new MethodDefinition("Main", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
 	    _typeDef.Methods.Add(_mainModule);
 	    _mainModule.Body.InitLocals = true;
@@ -107,6 +119,15 @@ public class Generator
 	    }
     }
 
+    public void GenerateFunctions()
+    {
+	    foreach (var funDecl in _functions)
+	    {
+		    GenerateFuncDecl(funDecl);
+	    }
+    }
+
+    
     public void ProcessField(TypeDefinition recType, VariableDeclaration field, string recName)
     {
 	    string name = field._identifier._name;
@@ -128,10 +149,12 @@ public class Generator
 		    actions = action._actions;
 	    }
 	    GenerateAction(action);
-	    if (_mainRoutine != null)
-	    {
-		    GenerateMainRoutine();
-	    }
+	    // if (_mainRoutine != null)
+	    // {
+		   //  GenerateMainRoutine();
+	    // }
+	    
+	    CallMainRoutine(_mainRoutineModule);
 	    
 	    _mainProc.Emit(OpCodes.Ret);
 
@@ -160,10 +183,10 @@ public class Generator
 			    {
 				    _mainRoutine = action._declaration._routineDeclaration._mainRoutine;
 			    } 
-			    else if (action._declaration._routineDeclaration._function != null)
-			    {
-				    GenerateFuncDecl(action._declaration._routineDeclaration._function);
-			    }
+			    // else if (action._declaration._routineDeclaration._function != null)
+			    // {
+				   //  GenerateFuncDecl(action._declaration._routineDeclaration._function);
+			    // }
 		    }
 		    // else if (action._declaration._typeDeclaration != null)
 		    // {
@@ -179,12 +202,12 @@ public class Generator
 	    } // else error
     }
     
-    public void GenerateMainRoutine()
+    public void GenerateMainRoutine(MethodDefinition funModule)
     {
 	    string name = "main";
 	    Body? body = _mainRoutine!._body;
 	    
-	    var funModule = new MethodDefinition(name, MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
+	    // var funModule = new MethodDefinition(name, MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
 	    _typeDef.Methods.Add(funModule);
 	    funModule.Body.InitLocals = true;
 	    var funProc = funModule.Body.GetILProcessor();
@@ -198,7 +221,11 @@ public class Generator
 		    body = body._body;
 	    }
 	    funProc.Emit(OpCodes.Ret);
-	    funProc.Emit(OpCodes.Call, funModule);
+    }
+
+    public void CallMainRoutine(MethodDefinition funModule)
+    {
+	    _mainProc.Emit(OpCodes.Call, funModule);
     }
 
     public void GenerateFuncDecl(Function func)
@@ -240,10 +267,10 @@ public class Generator
 			    {
 				    _mainRoutine = body._declaration._routineDeclaration._mainRoutine;
 			    } 
-			    else if (body._declaration._routineDeclaration._function != null)
-			    {
-				    GenerateFuncDecl(body._declaration._routineDeclaration._function);
-			    }
+			    // else if (body._declaration._routineDeclaration._function != null)
+			    // {
+				   //  GenerateFuncDecl(body._declaration._routineDeclaration._function);
+			    // }
 		    }
 		    // else if (body._declaration._typeDeclaration != null)
 		    // {
@@ -350,15 +377,17 @@ public class Generator
 	    {
 		    GenerateRightAss(ass, proc);
 		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    
 		    if (_varsTypes[v._identifier._name]._primitiveType._isInt)
 		    {
-			    Print( _vars[v._identifier._name], "System.Int32");
+			    Print(_vars[v._identifier._name], "System.Int32", proc);
 		    }
 		    else if (_varsTypes[v._identifier._name]._primitiveType._isReal)
 		    {
-			    Print(_vars[v._identifier._name], "System.Double");
+			    Print(_vars[v._identifier._name], "System.Double", proc);
 		    }
 		    
+
 		    // Print( _vars[v._identifier._name], "System.Int32");
 	    }
     }
@@ -594,15 +623,17 @@ public class Generator
 		    {
 			    GenerateExpression(value._expressions._expression, proc);
 			    proc.Emit(OpCodes.Stloc, varDef);
+
 			    
 			    if (type._primitiveType._isInt || type._primitiveType._isBoolean)
 			    {
-				    Print(varDef, "System.Int32");
+				    Print(varDef, "System.Int32", proc);
 			    }
 			    else if (type._primitiveType._isReal)
 			    {
-				    Print(varDef, "System.Double");
+				    Print(varDef, "System.Double", proc);
 			    }
+			    
 		    }
 
 		    _vars.Add(name, varDef);
@@ -861,13 +892,13 @@ public class Generator
 	    }
     }
 
-    public void Print(VariableDefinition varDef, string type)
+    public void Print(VariableDefinition varDef, string type, ILProcessor proc)
     {
 	    // type = "System.Double";
 	    // type = "System.String";
 	    
-	    _mainProc.Emit(OpCodes.Ldloc, varDef);
-	    _mainProc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, type)));
+	    proc.Emit(OpCodes.Ldloc, varDef);
+	    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, type)));
     }
     
     public void PrintElement(VariableDefinition arrDef, string type, int index)
