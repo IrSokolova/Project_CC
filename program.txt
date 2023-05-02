@@ -1,7 +1,5 @@
-var n : array [5] real
+var n : array [2] Integer
 
-n [0] := 1.4
-n [1] := n [0]
 
-var a : integer is 1
-var b : integer is a
+n [0] := 5
+n [1] := 6

@@ -758,9 +758,9 @@ public class Parser
             _tokens.GetNextToken();
             identifier = new Identifier(true, null, nextToken.Item2);
             var token = _tokens.Current();
-            CheckNull(token, TokenTypes.Assign, "BuildSingle");
+            // CheckNull(token, TokenTypes.Assign, "BuildSingle");
             Type? arrayType = null;
-            if (token!.Item1 == TokenTypes.BracketsL)
+            if (token != null && token.Item1 == TokenTypes.BracketsL)
             {
                 var array = BuildArrayType(false);
                 arrayType = new Type(null, array, null, null);

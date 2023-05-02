@@ -13,6 +13,7 @@ using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 using Action = ConsoleApp1.SyntaxAnalyser.Action;
 using ConsoleApp1.SyntaxAnalyser;
+using Mono.CompilerServices.SymbolWriter;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
 using Range = ConsoleApp1.SyntaxAnalyser.Range;
@@ -479,7 +480,7 @@ public class Generator
 	    proc.Emit(OpCodes.Pop);
 	    proc.Emit(OpCodes.Br, nop);
 	    proc.Append(lblFel);
-	    proc.Emit(OpCodes.Ret);
+	    // proc.Emit(OpCodes.Ret);
     }
 
     public void GenerateIf(IfStatement stmt, TypeReference returnType, ILProcessor proc, MethodDefinition md)
@@ -588,24 +589,26 @@ public class Generator
 	    {
 		    var varDef = new VariableDefinition(GetTypeRef(type));
 		    md.Body.Variables.Add(varDef);
-	    
+
 		    if (value != null)
+		    {
 			    GenerateExpression(value._expressions._expression, proc);
-	    
-		    // proc.Emit(typeOpCodeCostil, valCostil);
-		    proc.Emit(OpCodes.Stloc, varDef);
-	    
+			    proc.Emit(OpCodes.Stloc, varDef);
+			    
+			    if (type._primitiveType._isInt || type._primitiveType._isBoolean)
+			    {
+				    Print(varDef, "System.Int32");
+			    }
+			    else if (type._primitiveType._isReal)
+			    {
+				    Print(varDef, "System.Double");
+			    }
+		    }
+
 		    _vars.Add(name, varDef);
 		    _varsTypes.Add(name, type);
 		    
-		    if (type._primitiveType._isInt || type._primitiveType._isBoolean)
-		    {
-			    Print(varDef, "System.Int32");
-		    }
-		    else if (type._primitiveType._isReal)
-		    {
-			    Print(varDef, "System.Double");
-		    }
+		    
 		    // Print(varDef, "System.Double");
 	    }
 	    else if (type._arrayType != null)
@@ -648,39 +651,42 @@ public class Generator
 		    
 		    // var recordDefinition = new VariableDefinition(_recTypeDefinitions[type._userType._name]);
 		    // md.Body.Variables.Add(recordDefinition);
-		    
-		    int i = 0;
-		    VariableDeclaration vd = recordType._variableDeclaration;
-		    VariableDeclarations vds = recordType._variableDeclarations;
-		    Expressions expressions = value._expressions;
-		    Expression expression = null;
-		    List<FieldDefinition> fieldDefs = _recFieldDefinitions[type._userType._name];
-		    while (expressions != null)
+		    if (value != null)
 		    {
-			    expression = expressions._expression;
-			    expressions = expressions._expressions;
-			    ProcessField(expression, recordDefinition, proc, fieldDefs[i]);
+			    int i = 0;
+			    VariableDeclaration vd = recordType._variableDeclaration;
+			    VariableDeclarations vds = recordType._variableDeclarations;
+			    Expressions expressions = value._expressions;
+			    Expression expression = null;
+			    List<FieldDefinition> fieldDefs = _recFieldDefinitions[type._userType._name];
+			    while (expressions != null)
+			    {
+				    expression = expressions._expression;
+				    expressions = expressions._expressions;
+				    ProcessField(expression, recordDefinition, proc, fieldDefs[i]);
 			    
-			    if (vd._type._primitiveType._isInt || vd._type._primitiveType._isBoolean)
-			    {
-				    proc.Emit(OpCodes.Ldloc, recordDefinition);
-				    proc.Emit(OpCodes.Ldfld, fieldDefs[i]);
-				    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Int32")));
-			    }
-			    else if (vd._type._primitiveType._isReal)
-			    {
-				    proc.Emit(OpCodes.Ldloc, recordDefinition);
-				    proc.Emit(OpCodes.Ldfld, fieldDefs[i]);
-				    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Double")));
-			    }
+				    if (vd._type._primitiveType._isInt || vd._type._primitiveType._isBoolean)
+				    {
+					    proc.Emit(OpCodes.Ldloc, recordDefinition);
+					    proc.Emit(OpCodes.Ldfld, fieldDefs[i]);
+					    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Int32")));
+				    }
+				    else if (vd._type._primitiveType._isReal)
+				    {
+					    proc.Emit(OpCodes.Ldloc, recordDefinition);
+					    proc.Emit(OpCodes.Ldfld, fieldDefs[i]);
+					    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Double")));
+				    }
 
-			    if (vds != null)
-			    {
-				    vd = vds._variableDeclaration;
-				    vds = vds._variableDeclarations;
+				    if (vds != null)
+				    {
+					    vd = vds._variableDeclaration;
+					    vds = vds._variableDeclarations;
+				    }
+				    i++;
 			    }
-			    i++;
 		    }
+		    
 		    
 		    _varsTypes.Add(name, t);
 		    _vars.Add(name, recordDefinition);
@@ -747,6 +753,25 @@ public class Generator
 	    else if (operand._single._variable != null)
 	    {
 		    proc.Emit(OpCodes.Ldloc, _vars[operand._single._variable._identifier._name]);
+		    if (_varsTypes[operand._single._variable._identifier._name]._arrayType != null)
+		    {
+			    Expression index = operand._single._variable._arrayType._arrayType._expression;
+			    //Expression indedex = _varsTypes[operand._single._variable._identifier._name]._arrayType._expression;
+			    GenerateExpression(index, proc);
+			    Type type = _varsTypes[operand._single._variable._identifier._name]._arrayType._type;
+			    if (type._primitiveType._isInt)
+			    {
+				    proc.Emit(OpCodes.Ldelem_I4);
+			    }
+			    else if (type._primitiveType._isBoolean)
+			    {
+				    proc.Emit(OpCodes.Ldelem_U1);
+			    }
+			    else if (type._primitiveType._isReal)
+			    {
+				    proc.Emit(OpCodes.Ldelem_R8);
+			    }
+		    }
 	    }
 	    else
 		    EmitValue(operand._single._value, proc, GetTypeRef(operand._single._type));
