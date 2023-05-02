@@ -319,7 +319,46 @@ public class Generator
 
     public void GenerateWhile(WhileLoop loop, TypeReference returnType, ILProcessor proc, MethodDefinition md)
     {
-	    // todo
+	    var condDef = new VariableDefinition(_asm.MainModule.TypeSystem.Boolean);
+	    md.Body.Variables.Add(condDef);
+	    GenerateCondition(loop._expression, proc, condDef);
+	    
+	    // int i = 0;
+	    var var_i = new VariableDefinition(_asm.MainModule.TypeSystem.Int32);
+	    md.Body.Variables.Add(var_i);
+	    proc.Emit(OpCodes.Ldc_I4, 0);
+	    proc.Emit(OpCodes.Stloc, var_i);
+	    
+	    // for(int i = 0; cond; i++) 
+	    var lv_i_8 = new VariableDefinition(_asm.MainModule.TypeSystem.Int32); // int i = 0;
+	    md.Body.Variables.Add(lv_i_8);
+	    proc.Emit(OpCodes.Ldc_I4, 0);
+	    proc.Emit(OpCodes.Stloc, lv_i_8);
+	    
+	    var lblFel = proc.Create(OpCodes.Nop);
+	    var nop = proc.Create(OpCodes.Nop);
+	    proc.Append(nop);
+	    
+	    proc.Emit(OpCodes.Ldloc, condDef); // while condDef is not false
+	    proc.Emit(OpCodes.Brfalse, lblFel);
+
+	    Body body = loop._body;
+	    while (body != null)
+	    {
+		    GenerateBody(body, returnType, proc, md);
+		    GenerateCondition(loop._expression, proc, condDef);
+		    body = body._body;
+	    }
+    }
+
+    public void GenerateCondition(Expression exp, ILProcessor proc, VariableDefinition condDef)
+    {
+	    // generate condition
+	    // proc.Emit(OpCodes.Ldc_I4, 3); // 3 
+	    // proc.Emit(OpCodes.Ldc_I4, 6); // 6 
+	    // proc.Emit(OpCodes.Cgt); // > 
+	    GenerateExpression(exp, proc);
+	    proc.Emit(OpCodes.Stloc, condDef);
     }
 
     public void GenerateFor(ForLoop loop, TypeReference returnType, ILProcessor proc, MethodDefinition md)
@@ -332,7 +371,7 @@ public class Generator
 
 	    var var_i = new VariableDefinition(_asm.MainModule.TypeSystem.Int32);
 	    md.Body.Variables.Add(var_i);
-	   GenerateExpression(from, proc);
+	    GenerateExpression(from, proc);
 	    proc.Emit(OpCodes.Stloc, var_i);
 		    
 	    var lblFel = proc.Create(OpCodes.Nop);
@@ -444,7 +483,6 @@ public class Generator
 		    {
 			    return _asm.MainModule.TypeSystem.Double;
 		    }
-
 		    if (type._primitiveType._isBoolean)
 		    {
 			    return _asm.MainModule.TypeSystem.Boolean;
