@@ -1,9 +1,1 @@
-routine main () is
-  type a is record {
-    var a : Integer
-    var b : boolean
-  }
-  var x : a is (2 true)
-  var y : Integer is (2 + 3) * (6 - 1)
-end
-
+var n : array [1] Integer

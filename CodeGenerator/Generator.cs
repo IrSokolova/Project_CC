@@ -71,8 +71,6 @@ public class Generator
 	    _mainModule.Parameters.Add(mainParams);
 	    
 	    StartGeneration(action);
-
-        example();
     }
 
     public void GenerateRecords()
@@ -115,13 +113,14 @@ public class Generator
 	    {
 		    GenerateAction(action);
 		    action = actions._action;
-		    actions = actions._actions;
+		    actions = action._actions;
 	    }
 	    GenerateAction(action);
 	    if (_mainRoutine != null)
 	    {
 		    GenerateMainRoutine();
 	    }
+	    
 	    _mainProc.Emit(OpCodes.Ret);
 
 	    var ctorMethod = new MethodDefinition(".ctor", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName, _asm.MainModule.TypeSystem.Void);
@@ -182,6 +181,8 @@ public class Generator
 		    GenerateBody(body, null, funProc, funModule);
 		    body = body._body;
 	    }
+	    funProc.Emit(OpCodes.Ret);
+	    funProc.Emit(OpCodes.Call, funModule);
     }
 
     public void GenerateFuncDecl(Function func)
@@ -291,7 +292,16 @@ public class Generator
 	    {
 		    GenerateRightAss(ass, proc);
 		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
-		    Print( _vars[v._identifier._name], "System.Int32");
+		    if (_varsTypes[v._identifier._name]._primitiveType._isInt)
+		    {
+			    Print( _vars[v._identifier._name], "System.Int32");
+		    }
+		    else if (_varsTypes[v._identifier._name]._primitiveType._isReal)
+		    {
+			    Print(_vars[v._identifier._name], "System.Double");
+		    }
+		    
+		    // Print( _vars[v._identifier._name], "System.Int32");
 	    }
     }
 
@@ -306,6 +316,7 @@ public class Generator
 			    
 		    Type type = _varsTypes[v._identifier._name];
 		    // EmitValue(value, proc, GetTypeRef(type));
+		    
 	    }
 	    else if (ass._routineCall != null)
 	    {
@@ -398,6 +409,16 @@ public class Generator
 	    {
 			GenerateBody(body, returnType, proc, md);
 		    body = body._body;
+		    
+		    proc.Emit(OpCodes.Ldloc, var_i);
+		    proc.Emit(OpCodes.Dup);
+		    proc.Emit(OpCodes.Ldc_I4_1);
+		    proc.Emit(OpCodes.Add);
+		    proc.Emit(OpCodes.Stloc, var_i);
+		    proc.Emit(OpCodes.Pop);
+		    proc.Emit(OpCodes.Br, nop);
+		    proc.Append(lblFel);
+		    proc.Emit(OpCodes.Ret);
 	    }
     }
 
@@ -509,7 +530,7 @@ public class Generator
 	    if (type._primitiveType != null)
 	    {
 		    var varDef = new VariableDefinition(GetTypeRef(type));
-		    _mainModule.Body.Variables.Add(varDef);
+		    md.Body.Variables.Add(varDef);
 	    
 		    if (value != null)
 			    GenerateExpression(value._expressions._expression, proc);
@@ -517,10 +538,18 @@ public class Generator
 		    // proc.Emit(typeOpCodeCostil, valCostil);
 		    proc.Emit(OpCodes.Stloc, varDef);
 	    
-		    Print(varDef, "System.Int32");
-	    
 		    _vars.Add(name, varDef);
 		    _varsTypes.Add(name, type);
+		    
+		    if (type._primitiveType._isInt)
+		    {
+			    Print(varDef, "System.Int32");
+		    }
+		    else if (type._primitiveType._isReal)
+		    {
+			    Print(varDef, "System.Double");
+		    }
+		    // Print(varDef, "System.Double");
 	    }
 	    else if (type._arrayType != null)
 	    {
@@ -583,6 +612,8 @@ public class Generator
 		    _varsTypes.Add(name, t);
 		    _vars.Add(name, recordDefinition);
 	    }
+	    
+	    
     }
 
     public void ProcessField(VariableDeclaration field, VariableDefinition def, ILProcessor proc, FieldDefinition fieldDefinition)
@@ -741,93 +772,6 @@ public class Generator
 	    _mainProc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, type)));
 	    // _mainProc.Emit(OpCodes.Ret);
     }
-    
-    public void example()
-    {
-	    var path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/file.exe";
-	    // var path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\file.exe";
-	    
-	    
-        // setup a `reflection importer` to ensure references to System.Private.CoreLib are replaced with references to `netstandard`. 
-        
-        // setup a reflection importer to ensure references to System.Private.CoreLib are replaced with references to netstandard. 
- 
-                var mp = new ModuleParameters { Architecture = TargetArchitecture.AMD64, Kind =  ModuleKind.Console, ReflectionImporterProvider = new SystemPrivateCoreLibFixerReflectionProvider() };
-    using(var assembly = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Program", Version.Parse("1.0.0.0")), Path.GetFileName(path), mp))
-        {
-
-      //Class : Program
-      var cls_Program_0 = new TypeDefinition("", "Program", TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.Public, assembly.MainModule.TypeSystem.Object);
-      assembly.MainModule.Types.Add(cls_Program_0);
-      
-      //Method : Main
-      var md_Main_1 = new MethodDefinition("Main", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, assembly.MainModule.TypeSystem.Void);
-      cls_Program_0.Methods.Add(md_Main_1);
-      md_Main_1.Body.InitLocals = true;
-      var il_Main_2 = md_Main_1.Body.GetILProcessor();
-
-      //Parameters of 'public static void Main(string[] args)...'
-      var p_args_3 = new ParameterDefinition("args", ParameterAttributes.None, assembly.MainModule.TypeSystem.String.MakeArrayType());
-      md_Main_1.Parameters.Add(p_args_3);
-
-      //int y = 2+3;
-      var lv_y_4 = new VariableDefinition(assembly.MainModule.TypeSystem.Int32);
-      md_Main_1.Body.Variables.Add(lv_y_4);
-      il_Main_2.Emit(OpCodes.Ldc_I4, 2);
-      il_Main_2.Emit(OpCodes.Ldc_I4, 3);
-      il_Main_2.Emit(OpCodes.Add);
-      il_Main_2.Emit(OpCodes.Stloc, lv_y_4);
-
-      //string text = "";
-      var lv_text_5 = new VariableDefinition(assembly.MainModule.TypeSystem.String);
-      md_Main_1.Body.Variables.Add(lv_text_5);
-      il_Main_2.Emit(OpCodes.Ldstr, "");
-      il_Main_2.Emit(OpCodes.Stloc, lv_text_5);
-
-      //Console.WriteLine("Hello");
-      il_Main_2.Emit(OpCodes.Ldstr, "Hello");
-      il_Main_2.Emit(OpCodes.Call, assembly.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.String")));
-
-      //void foo () {...
-
-      //Method : <Main>g__foo|0_0
-      var md_foo_6 = new MethodDefinition("<Main>g__foo|0_0", MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, assembly.MainModule.TypeSystem.Void);
-      cls_Program_0.Methods.Add(md_foo_6);
-      md_foo_6.Body.InitLocals = true;
-      var il_foo_7 = md_foo_6.Body.GetILProcessor();
-
-      //int x = 30;
-      var lv_x_8 = new VariableDefinition(assembly.MainModule.TypeSystem.Int32);
-      md_foo_6.Body.Variables.Add(lv_x_8);
-      il_foo_7.Emit(OpCodes.Ldc_I4, 30);
-      il_foo_7.Emit(OpCodes.Stloc, lv_x_8);
-      il_foo_7.Emit(OpCodes.Ret);
-
-      //string newText = "something";
-      var lv_newText_9 = new VariableDefinition(assembly.MainModule.TypeSystem.String);
-      md_Main_1.Body.Variables.Add(lv_newText_9);
-      il_foo_7.Emit(OpCodes.Ldstr, "something");
-      il_foo_7.Emit(OpCodes.Stloc, lv_newText_9);
-      il_Main_2.Emit(OpCodes.Ret);
-
-      // Constructor: Program() 
-      var ctor_Program_10 = new MethodDefinition(".ctor", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName, assembly.MainModule.TypeSystem.Void);
-      cls_Program_0.Methods.Add(ctor_Program_10);
-      var il_ctor_Program_11 = ctor_Program_10.Body.GetILProcessor();
-      il_ctor_Program_11.Emit(OpCodes.Ldarg_0);
-      il_ctor_Program_11.Emit(OpCodes.Call, assembly.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(cls_Program_0.BaseType)));
-      il_ctor_Program_11.Emit(OpCodes.Ret);
-      assembly.EntryPoint = md_Main_1;
-      
-      assembly.Write(path);
-
-      //Writes a .runtimeconfig.json file matching the output assembly name.
-      File.Copy(
-	      Path.ChangeExtension(typeof(Generator).Assembly.Location, ".runtimeconfig.json"),
-	      Path.ChangeExtension(path, ".runtimeconfig.json"),
-	      true);
-        }
-  }
 }
     
     
