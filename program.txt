@@ -1,7 +1,12 @@
 routine main () is
- var x : integer is 2
- for i := 4 to 3 reverse loop
-     x := x - i  
- end
+var x : Real is 2.5
+var y : Real is 8.1
+while (x < y) loop
+    x := x + 1.1
 end
+while (x > y) loop
+     x := x - 3.3
+end
+end
+
 

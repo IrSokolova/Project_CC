@@ -450,7 +450,6 @@ public class Generator
 	    proc.Emit(OpCodes.Pop);
 	    proc.Emit(OpCodes.Br, nop);
 	    proc.Append(lblFel);
-	    proc.Emit(OpCodes.Ret);
     }
 
     public void GenerateCondition(Expression exp, ILProcessor proc, VariableDefinition condDef)
