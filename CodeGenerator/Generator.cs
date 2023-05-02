@@ -544,9 +544,6 @@ public class Generator
 	    Type type = varDecl._type;
 	    Value? value = varDecl._value;
 	    
-	    // Double valCostil = Double.Parse(value._expressions._expression._relation._operation._operand._single._value);
-	    // OpCode typeOpCodeCostil = OpCodes.Ldc_R8;
-	    // TypeReference typeRefCostil = _asm.MainModule.TypeSystem.Double;
 	    if (type._primitiveType != null)
 	    {
 		    var varDef = new VariableDefinition(GetTypeRef(type));
@@ -622,11 +619,12 @@ public class Generator
 		    int i = 0;
 		    Expressions expressions = value._expressions;
 		    Expression expression = null;
+		    List<FieldDefinition> fieldDefs = _recFieldDefinitions[type._userType._name];
 		    while (expressions != null)
 		    {
 			    expression = expressions._expression;
 			    expressions = expressions._expressions;
-			    ProcessField(expression, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
+			    ProcessField(expression, recordDefinition, proc, fieldDefs[i]);
 			    i++;
 		    }
 		    
