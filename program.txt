@@ -1,5 +1,5 @@
 type a is record {
- var a : Integer
- var b : boolean
+ var a : boolean
+ var b : real
 }
-var x : a is (2 true)
+var x : a is (true 3.3)

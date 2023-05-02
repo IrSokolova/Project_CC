@@ -36,6 +36,7 @@ public class Generator
 
     private List<TypeDeclaration> _records;
     private Dictionary<string, TypeDefinition> _recTypeDefinitions;
+    private Dictionary<string, MethodDefinition> _constructors;
     private Dictionary<string, List<FieldDefinition>> _recFieldDefinitions;
     private Dictionary<string, Type> _varsTypes;
     private Dictionary<string, VariableDefinition> _vars;
@@ -49,6 +50,7 @@ public class Generator
 
 	    _recTypeDefinitions = new Dictionary<string, TypeDefinition>();
 	    _recFieldDefinitions = new Dictionary<string, List<FieldDefinition>>();
+	    _constructors = new Dictionary<string, MethodDefinition>();
 	    _varsTypes = new Dictionary<string, Type>();
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _funs = new Dictionary<string, MethodDefinition>();
@@ -79,20 +81,28 @@ public class Generator
 	    foreach (var recDecl in _records)
 	    {
 		    var name = recDecl._identifier._name;
-		    var recType = new TypeDefinition("", name, TypeAttributes.Sealed |TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.SequentialLayout, _asm.MainModule.ImportReference(typeof(System.ValueType)));
+		    var recType = new TypeDefinition("", name, TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, _asm.MainModule.TypeSystem.Object);
 		    _typeDef.NestedTypes.Add(recType);
-
+		    
 		    VariableDeclaration field = recDecl._type._recordType._variableDeclaration;
 		    VariableDeclarations fields = recDecl._type._recordType._variableDeclarations;
 		    _recFieldDefinitions.Add(name, new List<FieldDefinition>());
 		    while (fields != null)
 		    {
-			    ProcessField(recType, field, name);
-			    field = fields._variableDeclaration;
-			    fields = fields._variableDeclarations;
+		     ProcessField(recType, field, name);
+		     field = fields._variableDeclaration;
+		     fields = fields._variableDeclarations;
 		    }
 		    ProcessField(recType, field, name);
 		    _recTypeDefinitions.Add(name, recType);
+		    
+		    var ctor_C_4 = new MethodDefinition(".ctor", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName, _asm.MainModule.TypeSystem.Void);
+		    recType.Methods.Add(ctor_C_4);
+		    var il_ctor_C_5 = ctor_C_4.Body.GetILProcessor();
+		    il_ctor_C_5.Emit(OpCodes.Ldarg_0);
+		    il_ctor_C_5.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(recType.BaseType)));
+		    il_ctor_C_5.Emit(OpCodes.Ret);
+		    _constructors.Add(name, ctor_C_4);
 	    }
     }
 
@@ -177,6 +187,10 @@ public class Generator
 	    _typeDef.Methods.Add(funModule);
 	    funModule.Body.InitLocals = true;
 	    var funProc = funModule.Body.GetILProcessor();
+	    
+	    _funs.Add(name, funModule);
+	    _funsProcs.Add(name, funProc);
+	    
 	    while (body != null)
 	    {
 		    GenerateBody(body, null, funProc, funModule);
@@ -197,6 +211,9 @@ public class Generator
 	    _typeDef.Methods.Add(funModule);
 	    funModule.Body.InitLocals = true;
 	    var funProc = funModule.Body.GetILProcessor();
+	    
+	    _funs.Add(name, funModule);
+	    _funsProcs.Add(name, funProc);
 	    
 	    while (parameters != null)
 	    {
@@ -603,20 +620,15 @@ public class Generator
 		    
 		    var recordDefinition = new VariableDefinition(_recTypeDefinitions[type._userType._name]);
 		    md.Body.Variables.Add(recordDefinition);
+		    proc.Emit(OpCodes.Newobj, _constructors[type._userType._name]);
+		    proc.Emit(OpCodes.Stloc, recordDefinition);
 		    
-		    // VariableDeclaration v = recordType!._variableDeclaration;
-		    // VariableDeclarations? declarations = recordType._variableDeclarations;
+		    // var recordDefinition = new VariableDefinition(_recTypeDefinitions[type._userType._name]);
+		    // md.Body.Variables.Add(recordDefinition);
 		    
-		    
-		    // while (declarations != null)
-		    // {
-		    //  ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
-		    //  v = declarations._variableDeclaration;
-		    //  declarations = declarations._variableDeclarations;
-		    //  i++;
-		    // }
-		    // ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
 		    int i = 0;
+		    VariableDeclaration vd = recordType._variableDeclaration;
+		    VariableDeclarations vds = recordType._variableDeclarations;
 		    Expressions expressions = value._expressions;
 		    Expression expression = null;
 		    List<FieldDefinition> fieldDefs = _recFieldDefinitions[type._userType._name];
@@ -625,6 +637,25 @@ public class Generator
 			    expression = expressions._expression;
 			    expressions = expressions._expressions;
 			    ProcessField(expression, recordDefinition, proc, fieldDefs[i]);
+			    
+			    if (vd._type._primitiveType._isInt || vd._type._primitiveType._isBoolean)
+			    {
+				    proc.Emit(OpCodes.Ldloc, recordDefinition);
+				    proc.Emit(OpCodes.Ldfld, fieldDefs[i]);
+				    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Int32")));
+			    }
+			    else if (vd._type._primitiveType._isReal)
+			    {
+				    proc.Emit(OpCodes.Ldloc, recordDefinition);
+				    proc.Emit(OpCodes.Ldfld, fieldDefs[i]);
+				    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Double")));
+			    }
+
+			    if (vds != null)
+			    {
+				    vd = vds._variableDeclaration;
+				    vds = vds._variableDeclarations;
+			    }
 			    i++;
 		    }
 		    
@@ -638,6 +669,10 @@ public class Generator
 	    proc.Emit(OpCodes.Ldloc, def);
 	    GenerateExpression(field, proc);
 	    proc.Emit(OpCodes.Stfld, fieldDefinition);
+	    
+	    // proc.Emit(OpCodes.Ldloc, def);
+	    // GenerateExpression(field, proc);
+	    // proc.Emit(OpCodes.Stfld, fieldDefinition);
     }
 
     public void GenerateExpressions(Expressions? exp, ILProcessor proc)
