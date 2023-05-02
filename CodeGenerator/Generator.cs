@@ -240,8 +240,6 @@ public class Generator
 	    else if (body._return != null)
 	    {
 		    Expression exp = body._return._expression;
-		    // string value = ""; // todo something with exp
-		    
 		    GenerateExpression(exp, proc);
 		    
 		    // EmitValue(value, proc, returnType);
@@ -282,10 +280,9 @@ public class Generator
 	    if (v._arrayType != null)
 	    {
 		    Expression expInd = v._arrayType._arrayType._expression; // index
-		    int ind = 0; // todo
-		    
+
 		    proc.Emit(OpCodes.Ldloc, _funs[v._identifier._name]);
-		    proc.Emit(OpCodes.Ldc_I4, ind);
+		    GenerateExpression(expInd, proc);
 
 		    GenerateRightAss(ass, proc);
 		    proc.Emit(OpCodes.Stelem_Ref);
@@ -305,7 +302,6 @@ public class Generator
 	    if (ass._expressions != null)
 	    {
 		    Expressions exp = ass._expressions;
-		    // string value = ""; // todo value if var and if no var
 		    GenerateExpression(exp._expression, proc);
 			    
 		    Type type = _varsTypes[v._identifier._name];
@@ -314,7 +310,9 @@ public class Generator
 	    else if (ass._routineCall != null)
 	    {
 		    RoutineCall rc = ass._routineCall;
-		    Expressions callParams = rc._expressions; // todo callParams
+		    Expressions callParams = rc._expressions;
+		    GenerateExpressions(callParams, proc);
+		    
 		    proc.Emit(OpCodes.Call, _funs[rc._identifier._name]);
 	    }
     }
@@ -334,7 +332,7 @@ public class Generator
 
 	    var var_i = new VariableDefinition(_asm.MainModule.TypeSystem.Int32);
 	    md.Body.Variables.Add(var_i);
-	    proc.Emit(OpCodes.Ldc_I4, 5); // todo from
+	   GenerateExpression(from, proc);
 	    proc.Emit(OpCodes.Stloc, var_i);
 		    
 	    var lblFel = proc.Create(OpCodes.Nop);
@@ -342,7 +340,7 @@ public class Generator
 	    proc.Append(nop);
 		    
 	    proc.Emit(OpCodes.Ldloc, var_i);
-	    proc.Emit(OpCodes.Ldc_I4, 1); // todo to
+	    GenerateExpression(to, proc);
 		    
 	    if (loop._reverse)
 	    {
@@ -369,11 +367,8 @@ public class Generator
 	    Expression exp = stmt._condition;
 	    Body ifb = stmt._ifBody;
 	    Body elb = stmt._elseBody;
-		    
-	    // todo make normal condition
-	    proc.Emit(OpCodes.Ldloc, 6); // 6
-	    proc.Emit(OpCodes.Ldc_I4, 6); // 6
-	    proc.Emit(OpCodes.Ceq); // =
+
+	    GenerateExpression(exp, proc);
 		    
 	    var elseEntryPoint = proc.Create(OpCodes.Nop);
 	    proc.Emit(OpCodes.Brfalse, elseEntryPoint);
@@ -495,11 +490,9 @@ public class Generator
 		    Expression exp = at._expression; // length
 		    Type t = at._type;
 
-		    int len = 0; // todo
-		    
 		    var arr = new VariableDefinition(GetTypeRef(t).MakeArrayType());
 		    md.Body.Variables.Add(arr);
-		    proc.Emit(OpCodes.Ldc_I4, len);
+		    GenerateExpression(exp, proc);
 		    proc.Emit(OpCodes.Newarr, GetTypeRef(t));
 		    proc.Emit(OpCodes.Stloc, arr);
 		    
@@ -556,14 +549,28 @@ public class Generator
 
     public void ProcessField(VariableDeclaration field, VariableDefinition def, ILProcessor proc, FieldDefinition fieldDefinition)
     {
-	    Value value = field._value;
+	    Value? value = field._value;
 	    
 	    proc.Emit(OpCodes.Ldloc, def);
-	    proc.Emit(OpCodes.Ldstr, "Sam"); // todo enter value
+	    GenerateExpression(value._expressions._expression, proc);
 	    proc.Emit(OpCodes.Stfld, fieldDefinition);
     }
 
-    public void GenerateExpression(Expression exp, ILProcessor proc)
+    public void GenerateExpressions(Expressions? exp, ILProcessor proc)
+    {
+	    if (exp != null)
+	    {
+		    Expression expression = exp._expression;
+		    Expressions? expressions = exp._expressions;
+		    while (expressions != null)
+		    {
+			    GenerateExpression(expression, proc);
+			    expression = expressions._expression;
+			    expressions = expressions._expressions;
+		    }
+	    }
+    }
+    public void GenerateExpression(Expression? exp, ILProcessor proc)
     {
 	    if (exp != null)
 		    GenerateOperation(exp._relation._operation, proc);
