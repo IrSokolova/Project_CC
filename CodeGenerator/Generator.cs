@@ -48,6 +48,7 @@ public class Generator
 	    _records = processing.FindRecords(action);
 
 	    _recTypeDefinitions = new Dictionary<string, TypeDefinition>();
+	    _recFieldDefinitions = new Dictionary<string, List<FieldDefinition>>();
 	    _varsTypes = new Dictionary<string, Type>();
 	    _vars = new Dictionary<string, VariableDefinition>();
 	    _funs = new Dictionary<string, MethodDefinition>();
@@ -282,11 +283,27 @@ public class Generator
 	    {
 		    Expression expInd = v._arrayType._arrayType._expression; // index
 
-		    proc.Emit(OpCodes.Ldloc, _funs[v._identifier._name]);
+		    proc.Emit(OpCodes.Ldloc, _vars[v._identifier._name]);
 		    GenerateExpression(expInd, proc);
 
 		    GenerateRightAss(ass, proc);
 		    proc.Emit(OpCodes.Stelem_Ref);
+		    
+		    if (_varsTypes[v._identifier._name]._arrayType._type._primitiveType._isInt)
+		    {
+			    PrintElement( _vars[v._identifier._name], "System.Int32", 0);
+		    }
+		    else if (_varsTypes[v._identifier._name]._arrayType._type._primitiveType._isReal)
+		    {
+			    proc.Emit(OpCodes.Ldloc, _vars[v._identifier._name]);
+			    GenerateExpression(expInd, proc);
+			    proc.Emit(OpCodes.Ldelem_I4);
+			    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Double")));
+
+			    // PrintElement( _vars[v._identifier._name], "System.Double", 0);
+		    }
+
+
 	    }
 	    else
 	    {
@@ -339,13 +356,7 @@ public class Generator
 	    md.Body.Variables.Add(var_i);
 	    proc.Emit(OpCodes.Ldc_I4, 0);
 	    proc.Emit(OpCodes.Stloc, var_i);
-	    
-	    // for(int i = 0; cond; i++) 
-	    var lv_i_8 = new VariableDefinition(_asm.MainModule.TypeSystem.Int32); // int i = 0;
-	    md.Body.Variables.Add(lv_i_8);
-	    proc.Emit(OpCodes.Ldc_I4, 0);
-	    proc.Emit(OpCodes.Stloc, lv_i_8);
-	    
+
 	    var lblFel = proc.Create(OpCodes.Nop);
 	    var nop = proc.Create(OpCodes.Nop);
 	    proc.Append(nop);
@@ -360,6 +371,16 @@ public class Generator
 		    GenerateCondition(loop._expression, proc, condDef);
 		    body = body._body;
 	    }
+	    
+	    proc.Emit(OpCodes.Ldloc, var_i);
+	    proc.Emit(OpCodes.Dup);
+	    proc.Emit(OpCodes.Ldc_I4_1);
+	    proc.Emit(OpCodes.Add);
+	    proc.Emit(OpCodes.Stloc, var_i);
+	    proc.Emit(OpCodes.Pop);
+	    proc.Emit(OpCodes.Br, nop);
+	    proc.Append(lblFel);
+	    proc.Emit(OpCodes.Ret);
     }
 
     public void GenerateCondition(Expression exp, ILProcessor proc, VariableDefinition condDef)
@@ -409,17 +430,16 @@ public class Generator
 	    {
 			GenerateBody(body, returnType, proc, md);
 		    body = body._body;
-		    
-		    proc.Emit(OpCodes.Ldloc, var_i);
-		    proc.Emit(OpCodes.Dup);
-		    proc.Emit(OpCodes.Ldc_I4_1);
-		    proc.Emit(OpCodes.Add);
-		    proc.Emit(OpCodes.Stloc, var_i);
-		    proc.Emit(OpCodes.Pop);
-		    proc.Emit(OpCodes.Br, nop);
-		    proc.Append(lblFel);
-		    proc.Emit(OpCodes.Ret);
 	    }
+	    proc.Emit(OpCodes.Ldloc, var_i);
+	    proc.Emit(OpCodes.Dup);
+	    proc.Emit(OpCodes.Ldc_I4_1);
+	    proc.Emit(OpCodes.Add);
+	    proc.Emit(OpCodes.Stloc, var_i);
+	    proc.Emit(OpCodes.Pop);
+	    proc.Emit(OpCodes.Br, nop);
+	    proc.Append(lblFel);
+	    proc.Emit(OpCodes.Ret);
     }
 
     public void GenerateIf(IfStatement stmt, TypeReference returnType, ILProcessor proc, MethodDefinition md)
@@ -541,7 +561,7 @@ public class Generator
 		    _vars.Add(name, varDef);
 		    _varsTypes.Add(name, type);
 		    
-		    if (type._primitiveType._isInt)
+		    if (type._primitiveType._isInt || type._primitiveType._isBoolean)
 		    {
 			    Print(varDef, "System.Int32");
 		    }
@@ -568,17 +588,7 @@ public class Generator
 	    }
 	    else if (type._recordType != null)
 	    {
-		    // RecordType rt = type._recordType;
-		    //
-		    // VariableDeclaration v = rt._variableDeclaration;
-		    // VariableDeclarations? declarations = rt._variableDeclarations;
-		    // while (declarations != null)
-		    // {
-			   //  GenerateVarDecl(v, md, proc, name + v._identifier._name);
-			   //  v = declarations._variableDeclaration;
-			   //  declarations = declarations._variableDeclarations;
-		    // }
-		    // GenerateVarDecl(v, md, proc, name + v._identifier._name);
+
 	    }
 	    else if (type._userType != null)
 	    {
@@ -597,31 +607,38 @@ public class Generator
 		    var recordDefinition = new VariableDefinition(_recTypeDefinitions[type._userType._name]);
 		    md.Body.Variables.Add(recordDefinition);
 		    
-		    VariableDeclaration v = recordType!._variableDeclaration;
-		    VariableDeclarations? declarations = recordType._variableDeclarations;
+		    // VariableDeclaration v = recordType!._variableDeclaration;
+		    // VariableDeclarations? declarations = recordType._variableDeclarations;
+		    
+		    
+		    // while (declarations != null)
+		    // {
+		    //  ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
+		    //  v = declarations._variableDeclaration;
+		    //  declarations = declarations._variableDeclarations;
+		    //  i++;
+		    // }
+		    // ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
 		    int i = 0;
-		    while (declarations != null)
+		    Expressions expressions = value._expressions;
+		    Expression expression = null;
+		    while (expressions != null)
 		    {
-		     ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
-		     v = declarations._variableDeclaration;
-		     declarations = declarations._variableDeclarations;
-		     i++;
+			    expression = expressions._expression;
+			    expressions = expressions._expressions;
+			    ProcessField(expression, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
+			    i++;
 		    }
-		    ProcessField(v, recordDefinition, proc, _recFieldDefinitions[type._userType._name][i]);
 		    
 		    _varsTypes.Add(name, t);
 		    _vars.Add(name, recordDefinition);
 	    }
-	    
-	    
     }
 
-    public void ProcessField(VariableDeclaration field, VariableDefinition def, ILProcessor proc, FieldDefinition fieldDefinition)
+    public void ProcessField(Expression field, VariableDefinition def, ILProcessor proc, FieldDefinition fieldDefinition)
     {
-	    Value? value = field._value;
-	    
 	    proc.Emit(OpCodes.Ldloc, def);
-	    GenerateExpression(value._expressions._expression, proc);
+	    GenerateExpression(field, proc);
 	    proc.Emit(OpCodes.Stfld, fieldDefinition);
     }
 
@@ -770,7 +787,15 @@ public class Generator
 	    
 	    _mainProc.Emit(OpCodes.Ldloc, varDef);
 	    _mainProc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, type)));
-	    // _mainProc.Emit(OpCodes.Ret);
+    }
+    
+    public void PrintElement(VariableDefinition arrDef, string type, int index)
+    {
+	    //Console.WriteLine(a[0]);
+	    _mainProc.Emit(OpCodes.Ldloc, arrDef);
+	    _mainProc.Emit(OpCodes.Ldc_I4, index);
+	    _mainProc.Emit(OpCodes.Ldelem_I4);
+	    _mainProc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, type)));
     }
 }
     
