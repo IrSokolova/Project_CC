@@ -1,5 +1,7 @@
-type a is record {
- var a : boolean
- var b : real
-}
-var x : a is (true 3.3)
+var n : array [5] real
+
+n [0] := 1.4
+n [1] := n [0]
+
+var a : integer is 1
+var b : integer is a

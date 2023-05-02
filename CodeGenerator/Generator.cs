@@ -304,20 +304,43 @@ public class Generator
 		    GenerateExpression(expInd, proc);
 
 		    GenerateRightAss(ass, proc);
-		    proc.Emit(OpCodes.Stelem_Ref);
+		    Type type = _varsTypes[v._identifier._name]._arrayType._type;
+		    if (type._primitiveType._isBoolean)
+		    {
+			    proc.Emit(OpCodes.Stelem_Any, _asm.MainModule.TypeSystem.Boolean);
+		    }
+		    else if (type._primitiveType._isInt)
+		    {
+			    proc.Emit(OpCodes.Stelem_I4);
+		    }
+		    else if (type._primitiveType._isReal)
+		    {
+			    proc.Emit(OpCodes.Stelem_R8);
+		    }
 		    
 		    if (_varsTypes[v._identifier._name]._arrayType._type._primitiveType._isInt)
-		    {
-			    PrintElement( _vars[v._identifier._name], "System.Int32", 0);
-		    }
-		    else if (_varsTypes[v._identifier._name]._arrayType._type._primitiveType._isReal)
 		    {
 			    proc.Emit(OpCodes.Ldloc, _vars[v._identifier._name]);
 			    GenerateExpression(expInd, proc);
 			    proc.Emit(OpCodes.Ldelem_I4);
+			    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Int32")));
+		    }
+		    else if (_varsTypes[v._identifier._name]._arrayType._type._primitiveType._isReal)
+		    {
+			    // PrintElement( _vars[v._identifier._name], "System.Double", 1);
+			    proc.Emit(OpCodes.Ldloc, _vars[v._identifier._name]);
+			    GenerateExpression(expInd, proc);
+			    proc.Emit(OpCodes.Ldelem_R8);
 			    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Double")));
 
 			    // PrintElement( _vars[v._identifier._name], "System.Double", 0);
+		    }
+		    else if (_varsTypes[v._identifier._name]._arrayType._type._primitiveType._isBoolean)
+		    {
+			    proc.Emit(OpCodes.Ldloc, _vars[v._identifier._name]);
+			    GenerateExpression(expInd, proc);
+			    proc.Emit(OpCodes.Ldelem_U1);
+			    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Boolean")));
 		    }
 
 
@@ -513,7 +536,7 @@ public class Generator
 	    }
 	    else if (type.Equals(_asm.MainModule.TypeSystem.Double))
 	    {
-		    proc.Emit(OpCodes.Ldc_R8, Double.Parse(value));
+		    proc.Emit(OpCodes.Ldc_R8, Double.Parse(value, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.NumberFormatInfo.InvariantInfo));
 	    }
 	    else if (type.Equals(_asm.MainModule.TypeSystem.Boolean))
 	    {
