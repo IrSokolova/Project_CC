@@ -40,6 +40,7 @@ public class Generator
     private Dictionary<string, TypeDefinition> _recTypeDefinitions;
     private Dictionary<string, MethodDefinition> _constructors;
     private Dictionary<string, List<FieldDefinition>> _recFieldDefinitions;
+    private Dictionary<string, Tuple<int, ParameterDefinition, Type>> _paramsDefinitions;
     private Dictionary<string, Type> _varsTypes;
     private Dictionary<string, VariableDefinition> _vars;
     private Dictionary<string, MethodDefinition> _funs;
@@ -55,6 +56,7 @@ public class Generator
 	    _functions = funProcessing.FindFunctions(action);
 	    _mainRoutine = funProcessing._mainRoutine;
 
+	    _paramsDefinitions = new Dictionary<string, Tuple<int, ParameterDefinition, Type>>();
 	    _recTypeDefinitions = new Dictionary<string, TypeDefinition>();
 	    _recFieldDefinitions = new Dictionary<string, List<FieldDefinition>>();
 	    _constructors = new Dictionary<string, MethodDefinition>();
@@ -63,21 +65,21 @@ public class Generator
 	    _funs = new Dictionary<string, MethodDefinition>();
 	    _funsProcs = new Dictionary<string, ILProcessor>();
 
-
 	    var mp = new ModuleParameters { Architecture = TargetArchitecture.AMD64, Kind =  ModuleKind.Console, ReflectionImporterProvider = new SystemPrivateCoreLibFixerReflectionProvider() };
 	    _asm = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Program", Version.Parse("1.0.0.0")), Path.GetFileName(_path), mp);
 	    
 	    _typeDef = new TypeDefinition("", "Program", TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.Public, _asm.MainModule.TypeSystem.Object);
 	    _asm.MainModule.Types.Add(_typeDef);
 	    
-	    _mainRoutineModule = new MethodDefinition("main", MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
+	    _mainRoutineModule = new MethodDefinition("mainRoutineModule", MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
 
 	    GenerateRecords();
 	    GenerateFunctions();
-	    GenerateMainRoutine(_mainRoutineModule);
+	    if (_mainRoutine != null)
+	    {
+		    GenerateMainRoutine(_mainRoutineModule);
+	    }
 	    
-	    
-
 	    _mainModule = new MethodDefinition("Main", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, _asm.MainModule.TypeSystem.Void);
 	    _typeDef.Methods.Add(_mainModule);
 	    _mainModule.Body.InitLocals = true;
@@ -242,12 +244,14 @@ public class Generator
 	    
 	    _funs.Add(name, funModule);
 	    _funsProcs.Add(name, funProc);
-	    
+
+	    int i = 0;
 	    while (parameters != null)
 	    {
 		    ParameterDeclaration? pd = parameters._parameterDeclaration;
 		    parameters = parameters._parameters;
-		    if (pd != null) GenerateParamDecl(pd, funModule);
+		    if (pd != null) GenerateParamDecl(pd, funModule, name, i);
+		    i++;
 	    }
 
 	    while (body != null)
@@ -370,13 +374,18 @@ public class Generator
 			    proc.Emit(OpCodes.Ldelem_U1);
 			    proc.Emit(OpCodes.Call, _asm.MainModule.ImportReference(TypeHelpers.ResolveMethod(typeof(System.Console), "WriteLine",System.Reflection.BindingFlags.Default|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public, "System.Boolean")));
 		    }
-
-
 	    }
 	    else
 	    {
 		    GenerateRightAss(ass, proc);
-		    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    if (_vars.Keys.Contains(v._identifier._name))
+		    {
+			    proc.Emit(OpCodes.Stloc, _vars[v._identifier._name]);
+		    }
+		    else
+		    {
+			    proc.Emit(OpCodes.Starg_S, _paramsDefinitions[v._identifier._name].Item2);
+		    }
 		    
 		    if (_varsTypes[v._identifier._name]._primitiveType._isInt)
 		    {
@@ -387,7 +396,6 @@ public class Generator
 			    Print(_vars[v._identifier._name], "System.Double", proc);
 		    }
 		    
-
 		    // Print( _vars[v._identifier._name], "System.Int32");
 	    }
     }
@@ -555,13 +563,14 @@ public class Generator
 	    md.Body.OptimizeMacros();
     }
 
-    public void GenerateParamDecl(ParameterDeclaration pd, MethodDefinition md) // no kostil
+    public void GenerateParamDecl(ParameterDeclaration pd, MethodDefinition md, string funName, int ind)
     {
 	    string? name = pd._identifier._name;
 	    Type type = pd._type;
 	    
 	    var paramDef = new ParameterDefinition(name, ParameterAttributes.None, GetTypeRef(type));
 	    md.Parameters.Add(paramDef);
+	    _paramsDefinitions.Add(name, new Tuple<int, ParameterDefinition, Type>(ind, paramDef, type));
     }
 
     public void EmitValue(string value, ILProcessor proc, TypeReference type)
@@ -724,7 +733,6 @@ public class Generator
 			    }
 		    }
 		    
-		    
 		    _varsTypes.Add(name, t);
 		    _vars.Add(name, recordDefinition);
 	    }
@@ -735,10 +743,6 @@ public class Generator
 	    proc.Emit(OpCodes.Ldloc, def);
 	    GenerateExpression(field, proc);
 	    proc.Emit(OpCodes.Stfld, fieldDefinition);
-	    
-	    // proc.Emit(OpCodes.Ldloc, def);
-	    // GenerateExpression(field, proc);
-	    // proc.Emit(OpCodes.Stfld, fieldDefinition);
     }
 
     public void GenerateExpressions(Expressions? exp, ILProcessor proc)
@@ -783,19 +787,71 @@ public class Generator
 	    }
     }
 
+    public void GenerateLDARG(int i, ILProcessor proc)
+    {
+	    if (i == 0)
+	    {
+		    proc.Emit(OpCodes.Ldarg_0);
+	    }
+	    else if (i == 1)
+	    {
+		    proc.Emit(OpCodes.Ldarg_1);
+	    }
+	    else if (i == 2)
+	    {
+		    proc.Emit(OpCodes.Ldarg_2);
+	    }
+	    else if (i == 3)
+	    {
+		    proc.Emit(OpCodes.Ldarg_3);
+	    }
+	    else
+	    {
+		    proc.Emit(OpCodes.Ldarg, i);
+	    }
+    }
+
     public void GenerateOperand(Operand operand, ILProcessor proc)
     {
 	    if (operand._expression != null)
 		    GenerateOperation(operand._expression._relation._operation, proc);
 	    else if (operand._single._variable != null)
 	    {
-		    proc.Emit(OpCodes.Ldloc, _vars[operand._single._variable._identifier._name]);
-		    if (_varsTypes[operand._single._variable._identifier._name]._arrayType != null)
+		    string name = operand._single._variable._identifier._name;
+		    if (_vars.Keys.Contains(operand._single._variable._identifier._name))
+		    {
+			    proc.Emit(OpCodes.Ldloc, _vars[name]);
+		    }
+		    else
+		    {
+			    GenerateLDARG(_paramsDefinitions[name].Item1, proc);
+		    }
+		    
+		    if (_varsTypes.Keys.Contains(name) && _varsTypes[name]._arrayType != null)
 		    {
 			    Expression index = operand._single._variable._arrayType._arrayType._expression;
 			    //Expression indedex = _varsTypes[operand._single._variable._identifier._name]._arrayType._expression;
 			    GenerateExpression(index, proc);
-			    Type type = _varsTypes[operand._single._variable._identifier._name]._arrayType._type;
+			    Type type = _varsTypes[name]._arrayType._type;
+			    if (type._primitiveType._isInt)
+			    {
+				    proc.Emit(OpCodes.Ldelem_I4);
+			    }
+			    else if (type._primitiveType._isBoolean)
+			    {
+				    proc.Emit(OpCodes.Ldelem_U1);
+			    }
+			    else if (type._primitiveType._isReal)
+			    {
+				    proc.Emit(OpCodes.Ldelem_R8);
+			    }
+		    }
+		    else if (_paramsDefinitions.Keys.Contains(name) && _paramsDefinitions[name].Item3._arrayType != null)
+		    {
+			    Expression index = operand._single._variable._arrayType._arrayType._expression;
+			    //Expression indedex = _varsTypes[operand._single._variable._identifier._name]._arrayType._expression;
+			    GenerateExpression(index, proc);
+			    Type type = _paramsDefinitions[name].Item3._arrayType._type;
 			    if (type._primitiveType._isInt)
 			    {
 				    proc.Emit(OpCodes.Ldelem_I4);
