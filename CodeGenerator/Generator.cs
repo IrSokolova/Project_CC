@@ -30,8 +30,8 @@ public class Generator
     private MethodDefinition _mainModule;
     private ILProcessor _mainProc;
     
-    // private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
-    private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
 
@@ -504,7 +504,14 @@ public class Generator
 	    proc.Emit(OpCodes.Ldloc, var_i);
 	    proc.Emit(OpCodes.Dup);
 	    proc.Emit(OpCodes.Ldc_I4_1);
-	    proc.Emit(OpCodes.Add);
+	    if (loop._reverse)
+	    {
+		    proc.Emit(OpCodes.Sub);
+	    }
+	    else
+	    {
+		    proc.Emit(OpCodes.Add);
+	    }
 	    proc.Emit(OpCodes.Stloc, var_i);
 	    proc.Emit(OpCodes.Pop);
 	    proc.Emit(OpCodes.Br, nop);
