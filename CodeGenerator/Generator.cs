@@ -183,7 +183,7 @@ public class Generator
 		    {
 			    GenerateVarDecl(action._declaration._variableDeclaration, _mainModule, _mainProc, null);
 		    }
-		    else if (action._declaration._typeDeclaration != null)
+		    else if (action._declaration._typeDeclaration != null && action._declaration._typeDeclaration._type._recordType == null)
 		    {
 			    _typeDeclarations.Add(action._declaration._typeDeclaration._identifier._name, action._declaration._typeDeclaration._type);
 		    }
@@ -260,7 +260,7 @@ public class Generator
 		    {
 			    GenerateVarDecl(body._declaration._variableDeclaration, md, proc, null);
 		    }
-		    else if (body._declaration._typeDeclaration != null)
+		    else if (body._declaration._typeDeclaration != null && body._declaration._typeDeclaration._type._recordType == null)
 		    {
 			    _typeDeclarations.Add(body._declaration._typeDeclaration._identifier._name, body._declaration._typeDeclaration._type);
 		    }
