@@ -30,13 +30,14 @@ public class Generator
     private MethodDefinition _mainModule;
     private ILProcessor _mainProc;
     
-    // private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
-    private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
+    private string _path = @"/home/tatiana/RiderProjects/Project_CC/CodeGenerator/Exe/code.exe";
+    // private string _path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\CodeGenerator\Exe\code.exe";
     
     private MainRoutine? _mainRoutine;
 
     private List<TypeDeclaration> _records;
     private Dictionary<string, Function> _functions;
+    private Dictionary<string, Type> _typeDeclarations;
     private Dictionary<string, TypeDefinition> _recTypeDefinitions;
     private Dictionary<string, MethodDefinition> _constructors;
     private Dictionary<string, List<FieldDefinition>> _recFieldDefinitions;
@@ -56,6 +57,7 @@ public class Generator
 	    _functions = funProcessing.FindFunctions(action);
 	    _mainRoutine = funProcessing._mainRoutine;
 
+	    _typeDeclarations = new Dictionary<string, Type>();
 	    _paramsDefinitions = new Dictionary<string, Tuple<int, ParameterDefinition, Type>>();
 	    _recTypeDefinitions = new Dictionary<string, TypeDefinition>();
 	    _recFieldDefinitions = new Dictionary<string, List<FieldDefinition>>();
@@ -129,7 +131,6 @@ public class Generator
 	    }
     }
 
-    
     public void ProcessField(TypeDefinition recType, VariableDeclaration field, string recName)
     {
 	    string name = field._identifier._name;
@@ -182,13 +183,17 @@ public class Generator
 		    {
 			    GenerateVarDecl(action._declaration._variableDeclaration, _mainModule, _mainProc, null);
 		    }
+		    else if (action._declaration._typeDeclaration != null)
+		    {
+			    _typeDeclarations.Add(action._declaration._typeDeclaration._identifier._name, action._declaration._typeDeclaration._type);
+		    }
 	    }
 	    else if (action._statement != null)
 	    {
 		    GenerateStmt(action._statement, null, _mainProc, _mainModule);
 	    } // else error
     }
-    
+
     public void GenerateMainRoutine(MethodDefinition funModule)
     {
 	    string name = "main";
@@ -254,6 +259,10 @@ public class Generator
 		    if (body._declaration._variableDeclaration != null)
 		    {
 			    GenerateVarDecl(body._declaration._variableDeclaration, md, proc, null);
+		    }
+		    else if (body._declaration._typeDeclaration != null)
+		    {
+			    _typeDeclarations.Add(body._declaration._typeDeclaration._identifier._name, body._declaration._typeDeclaration._type);
 		    }
 	    }
 	    else if (body._statement != null)
@@ -632,12 +641,10 @@ public class Generator
 			    {
 				    Print(varDef, "System.Double", proc);
 			    }
-			    
 		    }
 
 		    _vars.Add(name, varDef);
 		    _varsTypes.Add(name, type);
-		    
 		    
 		    // Print(varDef, "System.Double");
 	    }
@@ -656,9 +663,11 @@ public class Generator
 		    _vars.Add(name, arr);
 		    _varsTypes.Add(name, type);
 	    }
-	    else if (type._recordType != null)
+	    else if (type._userType != null && _typeDeclarations.Keys.Contains(type._userType._name))
 	    {
-
+		    VariableDeclaration vewVarDecl = new VariableDeclaration(varDecl._identifier,
+			    _typeDeclarations[type._userType._name], varDecl._value);
+		    GenerateVarDecl(vewVarDecl, md, proc, name);
 	    }
 	    else if (type._userType != null)
 	    {

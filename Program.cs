@@ -12,10 +12,10 @@ internal class Program
     public static void Main(string[] args)
     {
         // ADD YOUR PATH HERE
-        string path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\program.txt";
+        // string path = @"C:\Users\alena\RiderProjects\compiler\Project_CC\program.txt";
         // string path = @"C:\Users\User\RiderProjects\Compiler Construction\СС_Project\program.txt";
         // string path = @"C:\Users\79953\RiderProjects\Project_CC\program.txt"; // do not delete please
-        // string path = @"/home/tatiana/RiderProjects/Project_CC/program.txt"; // do not delete please
+        string path = @"/home/tatiana/RiderProjects/Project_CC/program.txt"; // do not delete please
         string text = "";
 
         using (FileStream stream = File.OpenRead(path))
