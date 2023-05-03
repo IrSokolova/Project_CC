@@ -36,7 +36,7 @@ public class Generator
     private MainRoutine? _mainRoutine;
 
     private List<TypeDeclaration> _records;
-    private List<Function> _functions;
+    private Dictionary<string, Function> _functions;
     private Dictionary<string, TypeDefinition> _recTypeDefinitions;
     private Dictionary<string, MethodDefinition> _constructors;
     private Dictionary<string, List<FieldDefinition>> _recFieldDefinitions;
@@ -125,7 +125,7 @@ public class Generator
     {
 	    foreach (var funDecl in _functions)
 	    {
-		    GenerateFuncDecl(funDecl);
+		    GenerateFuncDecl(funDecl.Value);
 	    }
     }
 
@@ -142,7 +142,7 @@ public class Generator
     public void StartGeneration(Action action)
     {
 	    Actions? actions = action._actions;
-	    MainRoutine? mainRoutine = null;
+	    // MainRoutine? mainRoutine = null;
 
 	    while (actions != null)
 	    {
@@ -151,10 +151,12 @@ public class Generator
 		    actions = action._actions;
 	    }
 	    GenerateAction(action);
-	
+
 	    if (_mainRoutine != null)
-			CallMainRoutine(_mainRoutineModule);
-	    
+	    {
+		    CallMainRoutine(_mainRoutineModule);
+	    }
+
 	    _mainProc.Emit(OpCodes.Ret);
 
 	    var ctorMethod = new MethodDefinition(".ctor", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName, _asm.MainModule.TypeSystem.Void);
@@ -176,21 +178,7 @@ public class Generator
     {
 	    if (action._declaration != null)
 	    {
-		    if (action._declaration._routineDeclaration != null)
-		    {
-			    if (action._declaration._routineDeclaration._mainRoutine != null)
-			    {
-				    _mainRoutine = action._declaration._routineDeclaration._mainRoutine;
-			    } 
-			    // else if (action._declaration._routineDeclaration._function != null)
-			    // {
-				   //  GenerateFuncDecl(action._declaration._routineDeclaration._function);
-			    // }
-		    }
-		    // else if (action._declaration._typeDeclaration != null)
-		    // {
-		    // }
-		    else if (action._declaration._variableDeclaration != null)
+		    if (action._declaration._variableDeclaration != null)
 		    {
 			    GenerateVarDecl(action._declaration._variableDeclaration, _mainModule, _mainProc, null);
 		    }
@@ -234,11 +222,12 @@ public class Generator
 	    Type? returnType = func._routineReturnType._type; // in the fun always should be return
 	    Body? body = func._routineInsights._body;
 	    
-	    var funModule = new MethodDefinition(name, MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, GetTypeRef(returnType!));
+	    // var funModule = new MethodDefinition(name, MethodAttributes.Assembly | MethodAttributes.Static | MethodAttributes.HideBySig, GetTypeRef(returnType!));
+	    var funModule = new MethodDefinition(name, MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig, GetTypeRef(returnType!));
 	    _typeDef.Methods.Add(funModule);
 	    funModule.Body.InitLocals = true;
 	    var funProc = funModule.Body.GetILProcessor();
-	    
+	   
 	    _funs.Add(name, funModule);
 	    _funsProcs.Add(name, funProc);
 
@@ -262,21 +251,7 @@ public class Generator
     {
 	    if (body._declaration != null)
 	    {
-		    if (body._declaration._routineDeclaration != null)
-		    {
-			    if (body._declaration._routineDeclaration._mainRoutine != null)
-			    {
-				    _mainRoutine = body._declaration._routineDeclaration._mainRoutine;
-			    } 
-			    // else if (body._declaration._routineDeclaration._function != null)
-			    // {
-				   //  GenerateFuncDecl(body._declaration._routineDeclaration._function);
-			    // }
-		    }
-		    // else if (body._declaration._typeDeclaration != null)
-		    // {
-		    // }
-		    else if (body._declaration._variableDeclaration != null)
+		    if (body._declaration._variableDeclaration != null)
 		    {
 			    GenerateVarDecl(body._declaration._variableDeclaration, md, proc, null);
 		    }
@@ -315,9 +290,16 @@ public class Generator
 	    }
 	    else if (stmt._routineCall != null)
 	    {
-		    ILProcessor p = _funsProcs[stmt._routineCall._identifier._name];
-		    p.Emit(OpCodes.Call, _funs[stmt._routineCall._identifier._name]);
-		    proc.Emit(OpCodes.Ret);
+		    RoutineCall rc = stmt._routineCall;
+		    Expressions callParams = rc._expressions;
+		    GenerateExpressions(callParams, proc);
+		    
+		    proc.Emit(OpCodes.Call, _funs[rc._identifier._name]);
+		    if (_functions[rc._identifier._name]._routineReturnType != null)
+		    {
+			    proc.Emit(OpCodes.Pop);
+			    // proc.Emit(OpCodes.Ret);
+		    }
 	    }
     }
 
@@ -417,6 +399,11 @@ public class Generator
 		    GenerateExpressions(callParams, proc);
 		    
 		    proc.Emit(OpCodes.Call, _funs[rc._identifier._name]);
+		    if (_functions[rc._identifier._name]._routineReturnType != null)
+		    {
+			    // proc.Emit(OpCodes.Pop);
+			    // proc.Emit(OpCodes.Ret);
+		    }
 	    }
     }
 
@@ -754,6 +741,7 @@ public class Generator
 			    expression = expressions._expression;
 			    expressions = expressions._expressions;
 		    }
+		    GenerateExpression(expression, proc);
 	    }
     }
     public void GenerateExpression(Expression? exp, ILProcessor proc)

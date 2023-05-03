@@ -3,22 +3,22 @@ using ConsoleApp1.SyntaxAnalyser;
 
 public class FunProcessing
 {
-    private List<Function> _functions;
+    private Dictionary<string, Function> _functions;
     public MainRoutine _mainRoutine;
 
     public FunProcessing()
     {
-        _functions = new List<Function>();
+        _functions = new Dictionary<string, Function>();
     }
     
-    public List<Function> FindFunctions(Action action)
+    public Dictionary<string, Function> FindFunctions(Action action)
     {
         Actions? actions = action._actions;
         while (actions != null)
         {
             ProcessAction(action);
             action = actions._action;
-            actions = actions._actions;
+            actions = action._actions;
         }
         ProcessAction(action);
         return _functions;
@@ -47,7 +47,7 @@ public class FunProcessing
             }
             else if (routineDeclaration._function != null)
             {
-                _functions.Add(routineDeclaration._function);
+                _functions.Add(routineDeclaration._function._identifier._name, routineDeclaration._function);
             }
         }
     }

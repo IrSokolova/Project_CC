@@ -1,3 +1,5 @@
-var a : Integer is 42
-a := 7
-a := 9
+function Integer main (Integer a1 Integer a2) is
+  var x : Real is 2.5
+  return a1
+end
+main (2 3)
