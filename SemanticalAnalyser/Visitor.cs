@@ -1024,6 +1024,7 @@ public class Visitor
         }
     }
     
+    
     public class OperatorVisitor
     {
         public Type? Visit(Operator? oOperator)
