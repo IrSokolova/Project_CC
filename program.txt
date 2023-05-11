@@ -1,18 +1,7 @@
-routine main () is
- var num1 : Integer
- var num2 : Integer
- var small : Integer
- var gcd : Integer
- num1 := 24
- num2 := 32
- if (num1 < num2) then
- small := num1
- else
- small := num2
- end
- for i := 1 to small loop
- if ( (num1 % i == 0) and (num2 % i == 0) ) then
- gcd := i
- end
- end
+if (x < y) then
+x := 3.4
+else
+x := 4.5
 end
+
+
